@@ -17,4 +17,6 @@
 #import "Carthage/Checkouts/RaptureXML/RaptureXML/RXMLElement.h"
 #import "Carthage/Checkouts/ios_sdk/Adjust/Adjust.h"
 
+#import "LegacyBackForwardListItem.h"
+
 #endif

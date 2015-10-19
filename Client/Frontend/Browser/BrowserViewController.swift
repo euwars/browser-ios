@@ -739,8 +739,8 @@ class BrowserViewController: UIViewController {
     }
 
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String: AnyObject]?, context: UnsafeMutablePointer<Void>) {
-        let webView = object as! WKWebView
-        if webView !== tabManager.selectedTab?.webView {
+        ///let webView = object as! WKWebView
+        if object !== tabManager.selectedTab?.webView {
             return
         }
         guard let path = keyPath else { assertionFailure("Unhandled KVO key: \(keyPath)"); return }
@@ -758,16 +758,17 @@ class BrowserViewController: UIViewController {
             urlBar.updateReloadStatus(loading)
             auralProgress.progress = loading ? 0 : nil
         case KVOURL:
-            if let tab = tabManager.selectedTab where tab.webView?.URL == nil {
-                log.debug("URL is nil!")
-            }
+//            if let tab = tabManager.selectedTab where tab.webView?.URL == nil {
+//                log.debug("URL is nil!")
+//            }
 
-            if let tab = tabManager.selectedTab where tab.webView === webView && !tab.restoring {
+            if let tab = tabManager.selectedTab where tab.webView === object && !tab.restoring {
                 updateUIForReaderHomeStateForTab(tab)
             }
         case KVOCanGoBack:
             guard let canGoBack = change?[NSKeyValueChangeNewKey] as? Bool else { break }
             navigationToolbar.updateBackStatus(canGoBack)
+            print("canGoBack \(canGoBack)")
         case KVOCanGoForward:
             guard let canGoForward = change?[NSKeyValueChangeNewKey] as? Bool else { break }
             navigationToolbar.updateForwardStatus(canGoForward)
@@ -1105,7 +1106,7 @@ extension BrowserViewController: WindowCloseHelperDelegate {
 
 extension BrowserViewController: BrowserDelegate {
 
-    func browser(browser: Browser, didCreateWebView webView: WKWebView) {
+    func browser(browser: Browser, didCreateWebView webView: LegacyWebView) {
         webViewContainer.insertSubview(webView, atIndex: 0)
         webView.snp_makeConstraints { make in
             make.top.equalTo(webViewContainerToolbar.snp_bottom)
@@ -1122,7 +1123,7 @@ extension BrowserViewController: BrowserDelegate {
 
         webView.scrollView.addObserver(self.scrollController, forKeyPath: KVOContentSize, options: .New, context: nil)
 
-        webView.UIDelegate = self
+        ///webView.UIDelegate = self
 
         let readerMode = ReaderMode(browser: browser)
         readerMode.delegate = self
@@ -1153,7 +1154,7 @@ extension BrowserViewController: BrowserDelegate {
         browser.addHelper(sessionRestoreHelper, name: SessionRestoreHelper.name())
     }
 
-    func browser(browser: Browser, willDeleteWebView webView: WKWebView) {
+    func browser(browser: Browser, willDeleteWebView webView: LegacyWebView) {
         webView.removeObserver(self, forKeyPath: KVOEstimatedProgress)
         webView.removeObserver(self, forKeyPath: KVOLoading)
         webView.removeObserver(self, forKeyPath: KVOCanGoBack)
@@ -1161,7 +1162,7 @@ extension BrowserViewController: BrowserDelegate {
         webView.scrollView.removeObserver(self.scrollController, forKeyPath: KVOContentSize)
         webView.removeObserver(self, forKeyPath: KVOURL)
 
-        webView.UIDelegate = nil
+       // webView.UIDelegate = nil
         webView.scrollView.delegate = nil
         webView.removeFromSuperview()
     }
@@ -1301,7 +1302,7 @@ extension BrowserViewController: HomePanelViewControllerDelegate {
 
     func homePanelViewController(homePanelViewController: HomePanelViewController, didSelectPanel panel: Int) {
         if AboutUtils.isAboutHomeURL(tabManager.selectedTab?.url) {
-            tabManager.selectedTab?.webView?.evaluateJavaScript("history.replaceState({}, '', '#panel=\(panel)')", completionHandler: nil)
+//            tabManager.selectedTab?.webView?.evaluateJavaScript("history.replaceState({}, '', '#panel=\(panel)')", completionHandler: nil)
         }
     }
 
@@ -1467,7 +1468,7 @@ extension BrowserViewController: TabManagerDelegate {
 }
 
 extension BrowserViewController: WKNavigationDelegate {
-    func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+    func webView(webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
         if tabManager.selectedTab?.webView !== webView {
             return
         }
@@ -1599,9 +1600,11 @@ extension BrowserViewController: WKNavigationDelegate {
             // before screenshotting.
             let time = dispatch_time(DISPATCH_TIME_NOW, Int64(100 * NSEC_PER_MSEC))
             dispatch_after(time, dispatch_get_main_queue()) {
-                let screenshot = self.screenshotHelper.takeScreenshot(tab, aspectRatio: 0, quality: 1)
-                tab.setScreenshot(screenshot)
-            }
+              if let t = tab {
+              let screenshot:UIImage? = self.screenshotHelper.takeScreenshot(tab, aspectRatio: 0, quality: 1)
+              tab.setScreenshot(screenshot)
+              }
+          }
         }
 
         addOpenInViewIfNeccessary(webView.URL)
@@ -1646,24 +1649,7 @@ extension BrowserViewController: WKNavigationDelegate {
 }
 
 extension BrowserViewController: WKUIDelegate {
-    func webView(webView: WKWebView, createWebViewWithConfiguration configuration: WKWebViewConfiguration, forNavigationAction navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-
-        guard let currentTab = tabManager.selectedTab else { return nil }
-
-        currentTab.setScreenshot(screenshotHelper.takeScreenshot(currentTab, aspectRatio: 0, quality: 1))
-
-        // If the page uses window.open() or target="_blank", open the page in a new tab.
-        // TODO: This doesn't work for window.open() without user action (bug 1124942).
-        let newTab: Browser
-        if #available(iOS 9, *) {
-            newTab = tabManager.addTab(navigationAction.request, configuration: configuration, isPrivate: currentTab.isPrivate)
-        } else {
-            newTab = tabManager.addTab(navigationAction.request, configuration: configuration)
-        }
-        tabManager.selectTab(newTab)
-        return newTab.webView
-    }
-
+   
     func webView(webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: () -> Void) {
         tabManager.selectTab(tabManager[webView])
 
@@ -1864,31 +1850,31 @@ extension BrowserViewController {
     /// of the current page is there. And if so, we go there.
 
     func enableReaderMode() {
-        guard let tab = tabManager.selectedTab, webView = tab.webView else { return }
-
-        let backList = webView.backForwardList.backList
-        let forwardList = webView.backForwardList.forwardList
-
-        guard let currentURL = webView.backForwardList.currentItem?.URL, let readerModeURL = ReaderModeUtils.encodeURL(currentURL) else { return }
-
-        if backList.count > 1 && backList.last?.URL == readerModeURL {
-            webView.goToBackForwardListItem(backList.last!)
-        } else if forwardList.count > 0 && forwardList.first?.URL == readerModeURL {
-            webView.goToBackForwardListItem(forwardList.first!)
-        } else {
-            // Store the readability result in the cache and load it. This will later move to the ReadabilityHelper.
-            webView.evaluateJavaScript("\(ReaderModeNamespace).readerize()", completionHandler: { (object, error) -> Void in
-                if let readabilityResult = ReadabilityResult(object: object) {
-                    do {
-                        try self.readerModeCache.put(currentURL, readabilityResult)
-                    } catch _ {
-                    }
-                    if let nav = webView.loadRequest(NSURLRequest(URL: readerModeURL)) {
-                        self.ignoreNavigationInTab(tab, navigation: nav)
-                    }
-                }
-            })
-        }
+//        guard let tab = tabManager.selectedTab, webView = tab.webView else { return }
+//
+//        let backList = webView.backForwardList.backList
+//        let forwardList = webView.backForwardList.forwardList
+//
+//        guard let currentURL = webView.backForwardList.currentItem?.URL, let readerModeURL = ReaderModeUtils.encodeURL(currentURL) else { return }
+//
+//        if backList.count > 1 && backList.last?.URL == readerModeURL {
+//            webView.goToBackForwardListItem(backList.last!)
+//        } else if forwardList.count > 0 && forwardList.first?.URL == readerModeURL {
+//            webView.goToBackForwardListItem(forwardList.first!)
+//        } else {
+//            // Store the readability result in the cache and load it. This will later move to the ReadabilityHelper.
+//            webView.evaluateJavaScript("\(ReaderModeNamespace).readerize()", completionHandler: { (object, error) -> Void in
+//                if let readabilityResult = ReadabilityResult(object: object) {
+//                    do {
+//                        try self.readerModeCache.put(currentURL, readabilityResult)
+//                    } catch _ {
+//                    }
+//                    if let nav = webView.loadRequest(NSURLRequest(URL: readerModeURL)) {
+//                        self.ignoreNavigationInTab(tab, navigation: nav)
+//                    }
+//                }
+//            })
+//        }
     }
 
     /// Disabling reader mode can mean two things. In the simplest case we were opened from the reading list, which
@@ -1897,25 +1883,25 @@ extension BrowserViewController {
     /// of the page is either to the left or right in the BackForwardList. If that is the case, we navigate there.
 
     func disableReaderMode() {
-        if let tab = tabManager.selectedTab,
-            let webView = tab.webView {
-            let backList = webView.backForwardList.backList
-            let forwardList = webView.backForwardList.forwardList
-
-            if let currentURL = webView.backForwardList.currentItem?.URL {
-                if let originalURL = ReaderModeUtils.decodeURL(currentURL) {
-                    if backList.count > 1 && backList.last?.URL == originalURL {
-                        webView.goToBackForwardListItem(backList.last!)
-                    } else if forwardList.count > 0 && forwardList.first?.URL == originalURL {
-                        webView.goToBackForwardListItem(forwardList.first!)
-                    } else {
-                        if let nav = webView.loadRequest(NSURLRequest(URL: originalURL)) {
-                            self.ignoreNavigationInTab(tab, navigation: nav)
-                        }
-                    }
-                }
-            }
-        }
+//        if let tab = tabManager.selectedTab,
+//            let webView = tab.webView {
+//            let backList = webView.backForwardList.backList
+//            let forwardList = webView.backForwardList.forwardList
+//
+//            if let currentURL = webView.backForwardList.currentItem?.URL {
+//                if let originalURL = ReaderModeUtils.decodeURL(currentURL) {
+//                    if backList.count > 1 && backList.last?.URL == originalURL {
+//                        webView.goToBackForwardListItem(backList.last!)
+//                    } else if forwardList.count > 0 && forwardList.first?.URL == originalURL {
+//                        webView.goToBackForwardListItem(forwardList.first!)
+//                    } else {
+//                        if let nav = webView.loadRequest(NSURLRequest(URL: originalURL)) {
+//                            self.ignoreNavigationInTab(tab, navigation: nav)
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 }
 

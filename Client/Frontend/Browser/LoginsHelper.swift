@@ -33,10 +33,10 @@ class LoginsHelper: BrowserHelper {
         self.browser = browser
         self.profile = profile
 
-        if let path = NSBundle.mainBundle().pathForResource("LoginsHelper", ofType: "js"), source = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String {
-            let userScript = WKUserScript(source: source, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: false)
-            browser.webView!.configuration.userContentController.addUserScript(userScript)
-        }
+//        if let path = NSBundle.mainBundle().pathForResource("LoginsHelper", ofType: "js"), source = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String {
+//            ///let userScript = WKUserScript(source: source, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: false)
+            ///xx browser.webView!.configuration.userContentController.addUserScript(userScript)
+        //}
     }
 
     func scriptMessageHandlerName() -> String? {
@@ -202,8 +202,8 @@ class LoginsHelper: BrowserHelper {
 
             let json = JSON(jsonObj)
             let src = "window.__firefox__.logins.inject(\(json.toString()))"
-            self.browser?.webView?.evaluateJavaScript(src, completionHandler: { (obj, err) -> Void in
-            })
+            //self.browser?.webView?.evaluateJavaScript(src, completionHandler: { (obj, err) -> Void in
+            //})
         }
     }
 

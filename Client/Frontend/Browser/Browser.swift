@@ -17,12 +17,12 @@ protocol BrowserHelper {
     func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage)
 }
 
-@objc
+
 protocol BrowserDelegate {
     func browser(browser: Browser, didAddSnackbar bar: SnackBar)
     func browser(browser: Browser, didRemoveSnackbar bar: SnackBar)
-    optional func browser(browser: Browser, didCreateWebView webView: WKWebView)
-    optional func browser(browser: Browser, willDeleteWebView webView: WKWebView)
+    func browser(browser: Browser, didCreateWebView webView: LegacyWebView)
+    func browser(browser: Browser, willDeleteWebView webView: LegacyWebView)
 }
 
 class Browser: NSObject {
@@ -40,8 +40,8 @@ class Browser: NSObject {
         }
     }
 
-    var webView: WKWebView? = nil
-    var browserDelegate: BrowserDelegate? = nil
+    var webView: LegacyWebView?
+    var browserDelegate: BrowserDelegate?
     var bars = [SnackBar]()
     var favicons = [Favicon]()
     var lastExecutedTime: Timestamp?
@@ -71,7 +71,8 @@ class Browser: NSObject {
 
     class func toTab(browser: Browser) -> RemoteTab? {
         if let displayURL = browser.displayURL {
-            let history = Array(browser.historyList.filter(RemoteTab.shouldIncludeURL).reverse())
+            let hl = browser.historyList;
+            let history = Array(hl.filter(RemoteTab.shouldIncludeURL).reverse())
             return RemoteTab(clientGUID: nil,
                 URL: displayURL,
                 title: browser.displayTitle,
@@ -102,14 +103,14 @@ class Browser: NSObject {
     func createWebview() {
         if webView == nil {
             assert(configuration != nil, "Create webview can only be called once")
-            configuration!.userContentController = WKUserContentController()
-            configuration!.preferences = WKPreferences()
-            configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
-            let webView = WKWebView(frame: CGRectZero, configuration: configuration!)
-            configuration = nil
+//            configuration!.userContentController = WKUserContentController()
+//            configuration!.preferences = WKPreferences()
+//            configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
+            let webView = LegacyWebView(frame: CGRectZero)
+//            configuration = nil
 
             webView.accessibilityLabel = NSLocalizedString("Web content", comment: "Accessibility label for the main web content view")
-            webView.allowsBackForwardNavigationGestures = true
+//            webView.allowsBackForwardNavigationGestures = true
             webView.backgroundColor = UIColor.lightGrayColor()
 
             // Turning off masking allows the web content to flow outside of the scrollView's frame
@@ -121,7 +122,7 @@ class Browser: NSObject {
             restore(webView)
 
             self.webView = webView
-            browserDelegate?.browser?(self, didCreateWebView: webView)
+            browserDelegate?.browser(self, didCreateWebView: self.webView!)
 
             // lastTitle is used only when showing zombie tabs after a session restore.
             // Since we now have a web view, lastTitle is no longer useful.
@@ -129,7 +130,7 @@ class Browser: NSObject {
         }
     }
 
-    func restore(webView: WKWebView) {
+    func restore(webView: LegacyWebView) {
         // Pulls restored session data from a previous SavedTab to load into the Browser. If it's nil, a session restore
         // has already been triggered via custom URL, so we use the last request to trigger it again; otherwise,
         // we extract the information needed to restore the tabs and create a NSURLRequest with the custom session restore URL
@@ -160,7 +161,7 @@ class Browser: NSObject {
 
     deinit {
         if let webView = webView {
-            browserDelegate?.browser?(self, willDeleteWebView: webView)
+            browserDelegate?.browser(self, willDeleteWebView: webView)
         }
     }
 
@@ -182,9 +183,13 @@ class Browser: NSObject {
 
     var historyList: [NSURL] {
         func listToUrl(item: WKBackForwardListItem) -> NSURL { return item.URL }
-        var tabs = self.backList?.map(listToUrl) ?? [NSURL]()
-        tabs.append(self.url!)
-        return tabs
+        if let backlist = self.backList {
+          var tabs = backlist.map(listToUrl) ?? [NSURL]()
+          tabs.append(self.url!)
+          return tabs
+        } else {
+          return [NSURL]();
+        }
     }
 
     var title: String? {
@@ -261,7 +266,8 @@ class Browser: NSObject {
     func loadRequest(request: NSURLRequest) -> WKNavigation? {
         if let webView = webView {
             lastRequest = request
-            return webView.loadRequest(request)
+            webView.loadRequest(request);
+            return nil;
         }
         return nil
     }
@@ -352,9 +358,9 @@ class Browser: NSObject {
 
 private class HelperManager: NSObject, WKScriptMessageHandler {
     private var helpers = [String: BrowserHelper]()
-    private weak var webView: WKWebView?
+    private var webView: LegacyWebView?
 
-    init(webView: WKWebView) {
+    init(webView: LegacyWebView) {
         self.webView = webView
     }
 

@@ -1,4 +1,4 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
+ /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
@@ -286,7 +286,7 @@ class TabManager : NSObject {
 
         // There's still some time between this and the webView being destroyed.
         // We don't want to pick up any stray events.
-        tab.webView?.navigationDelegate = nil
+        ///tab.webView?.navigationDelegate = nil
 
         for delegate in delegates {
             delegate.get()?.tabManager(self, didRemoveTab: tab)
@@ -341,7 +341,7 @@ class TabManager : NSObject {
         let allowPopups = !(self.profile.prefs.boolForKey("blockPopups") ?? true)
         // Each tab may have its own configuration, so we should tell each of them in turn.
         for tab in tabs {
-            tab.webView?.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
+            ///tab.webView?.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
         }
         // The default tab configurations also need to change.
         self.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
@@ -371,19 +371,17 @@ extension TabManager {
             super.init()
 
             if browser.sessionData == nil {
-                let currentItem: WKBackForwardListItem! = browser.webView?.backForwardList.currentItem
+                let _currentItem: WKBackForwardListItem? = browser.webView?.backForwardList.currentItem
 
                 // Freshly created web views won't have any history entries at all.
                 // If we have no history, abort.
-                if currentItem == nil {
-                    return nil
+                if let currentItem = _currentItem {
+                  let backList = browser.webView?.backForwardList.backList ?? []
+                  let forwardList = browser.webView?.backForwardList.forwardList ?? []
+                  let urls = (backList + [currentItem] + forwardList).map { $0.URL }
+                  let currentPage = -forwardList.count
+                  self.sessionData = SessionData(currentPage: currentPage, urls: urls, lastUsedTime: browser.lastExecutedTime ?? NSDate.now())
                 }
-
-                let backList = browser.webView?.backForwardList.backList ?? []
-                let forwardList = browser.webView?.backForwardList.forwardList ?? []
-                let urls = (backList + [currentItem] + forwardList).map { $0.URL }
-                let currentPage = -forwardList.count
-                self.sessionData = SessionData(currentPage: currentPage, urls: urls, lastUsedTime: browser.lastExecutedTime ?? NSDate.now())
             } else {
                 self.sessionData = browser.sessionData
             }
@@ -527,11 +525,11 @@ extension TabManager {
 }
 
 extension TabManager : WKNavigationDelegate {
-    func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+    func webView(webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
         UIApplication.sharedApplication().networkActivityIndicatorVisible = true
     }
 
-    func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
+    func webView(webView: WKWebView, didFinishNavigation _: WKNavigation!) {
         hideNetworkActivitySpinner()
         // only store changes if this is not an error page
         // as we current handle tab restore as error page redirects then this ensures that we don't
@@ -543,7 +541,7 @@ extension TabManager : WKNavigationDelegate {
         }
     }
 
-    func webView(webView: WKWebView, didFailNavigation navigation: WKNavigation!, withError error: NSError) {
+    func webView(webView: WKWebView, didFailNavigation _: WKNavigation!, withError _: NSError) {
         hideNetworkActivitySpinner()
     }
 
