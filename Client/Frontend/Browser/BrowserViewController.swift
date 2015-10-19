@@ -768,7 +768,6 @@ class BrowserViewController: UIViewController {
         case KVOCanGoBack:
             guard let canGoBack = change?[NSKeyValueChangeNewKey] as? Bool else { break }
             navigationToolbar.updateBackStatus(canGoBack)
-            print("canGoBack \(canGoBack)")
         case KVOCanGoForward:
             guard let canGoForward = change?[NSKeyValueChangeNewKey] as? Bool else { break }
             navigationToolbar.updateForwardStatus(canGoForward)

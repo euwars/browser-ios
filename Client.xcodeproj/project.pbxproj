@@ -649,9 +649,9 @@
 		E6F965421B2F25110034B023 /* NSMutableAttributedStringExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F965411B2F25110034B023 /* NSMutableAttributedStringExtensionsTests.swift */; };
 		E6F9659C1B2F5F800034B023 /* effective_tld_names.dat in Resources */ = {isa = PBXBuildFile; fileRef = E6F9659B1B2F5F800034B023 /* effective_tld_names.dat */; };
 		E6F9659E1B2F63A20034B023 /* NSStringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F9659D1B2F63A20034B023 /* NSStringExtensions.swift */; };
-		EB994FE61BD545A60023B5E1 /* LegacyWebViewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebViewProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		EB99500C1BD549480023B5E1 /* LegacyWebViewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebViewProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		EB99500F1BD575BE0023B5E1 /* LegacyBackForwardListItem.m in Sources */ = {isa = PBXBuildFile; fileRef = EB99500E1BD575BE0023B5E1 /* LegacyBackForwardListItem.m */; settings = {ASSET_TAGS = (); }; };
+		EB994FE61BD545A60023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; settings = {ASSET_TAGS = (); }; };
+		EB99500C1BD549480023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; settings = {ASSET_TAGS = (); }; };
+		EB99500F1BD575BE0023B5E1 /* LegacyWebViewBackForward.m in Sources */ = {isa = PBXBuildFile; fileRef = EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */; settings = {ASSET_TAGS = (); }; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
 		F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F84B21EF1A0910F600AAB793 /* Images.xcassets */; };
@@ -1831,9 +1831,9 @@
 		E6F965411B2F25110034B023 /* NSMutableAttributedStringExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSMutableAttributedStringExtensionsTests.swift; sourceTree = "<group>"; };
 		E6F9659B1B2F5F800034B023 /* effective_tld_names.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = effective_tld_names.dat; path = ../effective_tld_names.dat; sourceTree = "<group>"; };
 		E6F9659D1B2F63A20034B023 /* NSStringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSStringExtensions.swift; sourceTree = "<group>"; };
-		EB994FE51BD545A60023B5E1 /* LegacyWebViewProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewProvider.swift; sourceTree = SOURCE_ROOT; };
-		EB99500D1BD575BE0023B5E1 /* LegacyBackForwardListItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegacyBackForwardListItem.h; sourceTree = "<group>"; };
-		EB99500E1BD575BE0023B5E1 /* LegacyBackForwardListItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegacyBackForwardListItem.m; sourceTree = "<group>"; };
+		EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebView.swift; sourceTree = SOURCE_ROOT; };
+		EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegacyWebViewBackForward.h; sourceTree = "<group>"; };
+		EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegacyWebViewBackForward.m; sourceTree = "<group>"; };
 		F84B21BE1A090F8100AAB793 /* Client.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Client.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84B21D31A090F8100AAB793 /* FennecAurora.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FennecAurora.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84B21D81A090F8100AAB793 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3021,7 +3021,9 @@
 		F84B21C01A090F8100AAB793 /* Client */ = {
 			isa = PBXGroup;
 			children = (
-				EB994FE51BD545A60023B5E1 /* LegacyWebViewProvider.swift */,
+				EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */,
+				EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */,
+				EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */,
 				E4D6BEB51A092E0300F538BD /* Fennec.entitlements */,
 				E414F0781A8445A500283322 /* FennecAurora.entitlements */,
 				E4988B571A9B95FF008B8B92 /* FennecNightly.entitlements */,
@@ -3033,8 +3035,6 @@
 				F84B21E41A0910F600AAB793 /* Application */,
 				28EADE5C1AFC3A6D007FB2FB /* Extensions */,
 				F84B21F11A0910F600AAB793 /* Frontend */,
-				EB99500D1BD575BE0023B5E1 /* LegacyBackForwardListItem.h */,
-				EB99500E1BD575BE0023B5E1 /* LegacyBackForwardListItem.m */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -4685,7 +4685,7 @@
 				D38B2D341A8D96D00040E6B5 /* GCDWebServerFunctions.m in Sources */,
 				E4B334611BBF2393004E2BFF /* ADJUtil.m in Sources */,
 				E698FFDA1B4AADF40001F623 /* BrowserScrollController.swift in Sources */,
-				EB99500F1BD575BE0023B5E1 /* LegacyBackForwardListItem.m in Sources */,
+				EB99500F1BD575BE0023B5E1 /* LegacyWebViewBackForward.m in Sources */,
 				D34510881ACF415700EC27F0 /* SearchLoader.swift in Sources */,
 				E4B3345D1BBF2393004E2BFF /* ADJRequestHandler.m in Sources */,
 				D30B101E1AA7F9C600C01CA3 /* HomePanels.swift in Sources */,
@@ -4709,7 +4709,7 @@
 				E42475DC1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */,
 				0B5142CC1AE1BAF50014D0B3 /* UIViewExtensions.swift in Sources */,
 				E47616C71AB74CA600E7DD25 /* ReaderModeBarView.swift in Sources */,
-				EB994FE61BD545A60023B5E1 /* LegacyWebViewProvider.swift in Sources */,
+				EB994FE61BD545A60023B5E1 /* LegacyWebView.swift in Sources */,
 				E4B3344D1BBF2393004E2BFF /* ADJActivityHandler.m in Sources */,
 				E65AB12C1B7CDADF00C2B47A /* SessionRestoreHelper.swift in Sources */,
 				2F44FCC51A9E85E900FD20CC /* SettingsTableViewController.swift in Sources */,
@@ -4812,7 +4812,7 @@
 				E42475E01AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */,
 				7BBFEEA31BB40A5300A305AA /* ReaderMode.swift in Sources */,
 				D38A1BEF1A9FA2CA00F6A386 /* SiteTableViewController.swift in Sources */,
-				EB99500C1BD549480023B5E1 /* LegacyWebViewProvider.swift in Sources */,
+				EB99500C1BD549480023B5E1 /* LegacyWebView.swift in Sources */,
 				D38B2D381A8D96D00040E6B5 /* GCDWebServerRequest.m in Sources */,
 				0BA8964C1A250E6500C1010C /* TestBookmarks.swift in Sources */,
 				D38B2D321A8D96D00040E6B5 /* GCDWebServerConnection.m in Sources */,

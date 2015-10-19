@@ -371,11 +371,11 @@ extension TabManager {
             super.init()
 
             if browser.sessionData == nil {
-                let _currentItem: WKBackForwardListItem? = browser.webView?.backForwardList.currentItem
+                let _bfl = browser.webView?.backForwardList
 
                 // Freshly created web views won't have any history entries at all.
                 // If we have no history, abort.
-                if let currentItem = _currentItem {
+                if let bfl = _bfl, currentItem = bfl.currentItem {
                   let backList = browser.webView?.backForwardList.backList ?? []
                   let forwardList = browser.webView?.backForwardList.forwardList ?? []
                   let urls = (backList + [currentItem] + forwardList).map { $0.URL }

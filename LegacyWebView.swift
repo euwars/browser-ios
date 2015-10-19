@@ -38,47 +38,6 @@ class LegacyWebViewConfiguration
   var userContentController: LegacyUserContentController = LegacyUserContentController()
 }
 
-class LegacyBackForwardListItem: WKBackForwardListItem
-{
-  var writableURL:NSURL = NSURL(string: "http://0.0.0.0")!
-  var writableTitle:String = ""
-  var writableInitialURL:NSURL = NSURL(string: "http://0.0.0.0")!
-
-  override var URL: NSURL { get { return writableURL} }
-  override var title: String? { get {return writableTitle}}
-  override var initialURL: NSURL { get {return writableInitialURL} }
-}
-
-class LegacyBackForwardList: WKBackForwardList {
-
-  override var currentItem: WKBackForwardListItem? {
-    get {
-      return LegacyBackForwardListItem()
-    }
-  }
-
-  override var backItem: WKBackForwardListItem? {
-    get  {
-      return LegacyBackForwardListItem()
-    }}
-
-  override var forwardItem: WKBackForwardListItem? { get  {
-    return LegacyBackForwardListItem()
-    }}
-
-  override func itemAtIndex(index: Int) -> WKBackForwardListItem? {
-    return LegacyBackForwardListItem()
-  }
-
-  override var backList: [WKBackForwardListItem] {
-    get {
-      return [LegacyBackForwardListItem]()
-    }}
-
-  override var forwardList: [WKBackForwardListItem] {
-    get { return [LegacyBackForwardListItem]()}
-  }
-}
 //
 //class LegacyWebViewNavigationDelegate {
 //
@@ -104,6 +63,16 @@ func convertNavActionToWKType(type:UIWebViewNavigationType) -> WKNavigationType 
 
 var nullWebView:WKWebView = WKWebView()
 var nullWKNavigation: WKNavigation = WKNavigation()
+
+enum KVOStrings: String {
+  case kvoCanGoBack = "canGoBack"
+  case kvoCanGoForward = "canGoForward"
+  case kvoLoading = "loading"
+  case kvoURL = "url"
+  case kvoEstimatedProgress = "estimatedProgress"
+
+  static let allValues = [kvoCanGoBack, kvoCanGoForward, kvoLoading, kvoURL, kvoEstimatedProgress]
+}
 
 class LegacyWebView: UIWebView {
 
@@ -157,7 +126,17 @@ class LegacyWebView: UIWebView {
               result = policy == .Allow
           })
         }
-        kvoBroadcast();
+
+        let locationChanged = request.URL != request.mainDocumentURL;
+        if (locationChanged && navigationType == .LinkClicked || navigationType == .Other) {
+          let item:LegacyBackForwardListItem = LegacyBackForwardListItem()
+          item.writableUrl = request.URL
+          item.writableInitialUrl = request.URL
+          //tem.writableSetTitle("to do");
+          parent.backForwardList.pushItem(item)
+        }
+
+        kvoBroadcast(nil);
 
         parent.title = "Fill me in"
 
@@ -168,14 +147,14 @@ class LegacyWebView: UIWebView {
       if let nd = parent.navigationDelegate {
         nd.webView?(nullWebView, didStartProvisionalNavigation: nullWKNavigation)
       }
-      kvoBroadcast();
+      kvoBroadcast([KVOStrings.kvoLoading]);
     }
 
     func webViewDidFinishLoad(webView: UIWebView) {
       if let nd = parent.navigationDelegate {
         nd.webView?(nullWebView, didFinishNavigation: nullWKNavigation)
       }
-      kvoBroadcast();
+      kvoBroadcast(nil);
     }
 
     func webView(webView: UIWebView, didFailLoadWithError error: NSError?) {
@@ -183,14 +162,18 @@ class LegacyWebView: UIWebView {
         nd.webView?(nullWebView, didFailNavigation: nullWKNavigation,
           withError: error ?? NSError.init(domain: "", code: 0, userInfo: nil))
       }
-      kvoBroadcast();
+      kvoBroadcast(nil);
     }
 
-    func kvoBroadcast() {
-      let kvos:[String] = ["canGoBack", "canGoForward", "loading", "url", "estimatedProgress"]
-      for item in kvos {
-        parent.willChangeValueForKey(item)
-        parent.didChangeValueForKey(item)
+    func kvoBroadcast(kvos: [KVOStrings]?) {
+      if let _kvos = kvos {
+        for item in _kvos {
+          parent.willChangeValueForKey(item.rawValue)
+          parent.didChangeValueForKey(item.rawValue)
+        }
+      } else {
+        // send all
+        kvoBroadcast(KVOStrings.allValues)
       }
     }
   }
@@ -229,6 +212,17 @@ class LegacyWebView: UIWebView {
   }
 
   func goToBackForwardListItem(item: WKBackForwardListItem) {
-    
+    assert(false);
   }
+
+  override func goBack() {
+    super.goBack()
+    self.backForwardList.goBack()
+  }
+
+  override func goForward() {
+    super.goForward()
+    self.backForwardList.goForward()
+  }
+
 }
