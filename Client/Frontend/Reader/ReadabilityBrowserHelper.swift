@@ -23,7 +23,7 @@ class ReadabilityBrowserHelper: BrowserHelper {
            let readabilityBrowserHelperSource = try? NSMutableString(contentsOfFile: readabilityBrowserHelperPath, encoding: NSUTF8StringEncoding) {
             readabilityBrowserHelperSource.replaceOccurrencesOfString("%READABILITYJS%", withString: readabilitySource as String, options: NSStringCompareOptions.LiteralSearch, range: NSMakeRange(0, readabilityBrowserHelperSource.length))
             let userScript = WKUserScript(source: readabilityBrowserHelperSource as String, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: true)
-            ///browser.webView!.configuration.userContentController.addUserScript(userScript)
+            browser.webView!.configuration.userContentController.addUserScript(userScript)
         }
     }
 

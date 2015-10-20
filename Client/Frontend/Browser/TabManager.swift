@@ -364,27 +364,29 @@ extension TabManager {
         var screenshotUUID: NSUUID?
 
         init?(browser: Browser, isSelected: Bool) {
-            self.screenshotUUID = browser.screenshotUUID
-            self.isSelected = isSelected
-            self.title = browser.displayTitle
-            self.isPrivate = browser.isPrivate
-            super.init()
+          self.screenshotUUID = browser.screenshotUUID
+          self.isSelected = isSelected
+          self.title = browser.displayTitle
+          self.isPrivate = browser.isPrivate
+          super.init()
 
-            if browser.sessionData == nil {
-                let _bfl = browser.webView?.backForwardList
+          if browser.sessionData == nil {
+            let currentItem: WKBackForwardListItem! = browser.webView?.backForwardList.currentItem
 
-                // Freshly created web views won't have any history entries at all.
-                // If we have no history, abort.
-                if let bfl = _bfl, currentItem = bfl.currentItem {
-                  let backList = browser.webView?.backForwardList.backList ?? []
-                  let forwardList = browser.webView?.backForwardList.forwardList ?? []
-                  let urls = (backList + [currentItem] + forwardList).map { $0.URL }
-                  let currentPage = -forwardList.count
-                  self.sessionData = SessionData(currentPage: currentPage, urls: urls, lastUsedTime: browser.lastExecutedTime ?? NSDate.now())
-                }
-            } else {
-                self.sessionData = browser.sessionData
+            // Freshly created web views won't have any history entries at all.
+            // If we have no history, abort.
+            if currentItem == nil {
+              return nil
             }
+
+            let backList = browser.webView?.backForwardList.backList ?? []
+            let forwardList = browser.webView?.backForwardList.forwardList ?? []
+            let urls = (backList + [currentItem] + forwardList).map { $0.URL }
+            let currentPage = -forwardList.count
+            self.sessionData = SessionData(currentPage: currentPage, urls: urls, lastUsedTime: browser.lastExecutedTime ?? NSDate.now())
+          } else {
+            self.sessionData = browser.sessionData
+          }
         }
 
         required init?(coder: NSCoder) {

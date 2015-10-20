@@ -23,15 +23,8 @@ public class LegacyWebViewProgress
   }
 
   func setProgress(progress: Double) {
-    // progress should be incremental only
     if (progress > webView?.estimatedProgress || progress == 0) {
       webView?.estimatedProgress = progress;
-//      if ([_progressDelegate respondsToSelector:@selector(webViewProgress:updateProgress:)]) {
-//        [_progressDelegate webViewProgress:self updateProgress:progress];
-//      }
-//      if (_progressBlock) {
-//      _progressBlock(progress);
-//      }
     }
   }
 
@@ -126,7 +119,6 @@ public class LegacyWebViewProgress
       completeProgress()
     }
   }
-
 
   public func didFailLoadWithError() {
     webViewDidFinishLoad()

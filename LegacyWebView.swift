@@ -16,6 +16,9 @@ class LegacyUserContentController
 {
   var scriptHandlers:[WKScriptMessageHandler] = []
 
+  var atStartScripts:[String] = []
+  var atEndScripts:[String] = []
+
   func addScriptMessageHandler(scriptMessageHandler: WKScriptMessageHandler, name: String) {
 
     scriptHandlers.append(scriptMessageHandler)
@@ -30,6 +33,14 @@ class LegacyUserContentController
   }
 
   func addUserScript(script:WKUserScript) {
+    let source = script.source
+    let atEnd = script.injectionTime == .AtDocumentEnd
+
+    if atEnd {
+      atEndScripts.append(source)
+    } else {
+      atStartScripts.append(source)
+    }
   }
 }
 

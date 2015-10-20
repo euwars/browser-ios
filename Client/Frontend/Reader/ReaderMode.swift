@@ -212,7 +212,7 @@ class ReaderMode: BrowserHelper {
         if let path = NSBundle.mainBundle().pathForResource("Readability", ofType: "js") {
             if let source = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String {
                 let userScript = WKUserScript(source: source, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: true)
-                //browser.webView!.configuration.userContentController.addUserScript(userScript)
+                browser.webView!.configuration.userContentController.addUserScript(userScript)
             }
         }
 
@@ -220,7 +220,7 @@ class ReaderMode: BrowserHelper {
         if let path = NSBundle.mainBundle().pathForResource("ReaderMode", ofType: "js") {
             if let source = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String {
                 let userScript = WKUserScript(source: source, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: true)
-                //browser.webView!.configuration.userContentController.addUserScript(userScript)
+                browser.webView!.configuration.userContentController.addUserScript(userScript)
             }
         }
     }
@@ -263,10 +263,10 @@ class ReaderMode: BrowserHelper {
     var style: ReaderModeStyle = DefaultReaderModeStyle {
         didSet {
             if state == ReaderModeState.Active {
-//                browser!.webView?.evaluateJavaScript("\(ReaderModeNamespace).setStyle(\(style.encode()))", completionHandler: {
-//                    (object, error) -> Void in
-//                    return
-//                })
+                browser!.webView?.evaluateJavaScript("\(ReaderModeNamespace).setStyle(\(style.encode()))", completionHandler: {
+                    (object, error) -> Void in
+                    return
+                })
             }
         }
     }
