@@ -40,19 +40,6 @@ class LegacyWebViewConfiguration
 
 //
 //class LegacyWebViewNavigationDelegate {
-//
-//   public func webView(webView: WKWebView, decidePolicyForNavigationAction navigationAction: WKNavigationAction, decisionHandler: (WKNavigationActionPolicy) -> Void)
-//   public func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void)
-//   public func webView(webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!)
-//
-//   public func webView(webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!)
-//
-//   public func webView(webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: NSError)
-//   public func webView(webView: WKWebView, didCommitNavigation navigation: WKNavigation!)
-//
-//   public func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!)
-//   public func webView(webView: WKWebView, didFailNavigation navigation: WKNavigation!, withError error: NSError)
-//
 //   public func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void)
 //
 //}
@@ -61,7 +48,7 @@ func convertNavActionToWKType(type:UIWebViewNavigationType) -> WKNavigationType 
   return WKNavigationType(rawValue: type.rawValue)!
 }
 
-var nullWebView:WKWebView = WKWebView()
+var nullWebView: WKWebView = WKWebView()
 var nullWKNavigation: WKNavigation = WKNavigation()
 
 enum KVOStrings: String {
@@ -75,26 +62,23 @@ enum KVOStrings: String {
 }
 
 class LegacyWebView: UIWebView {
+  var configuration: LegacyWebViewConfiguration = LegacyWebViewConfiguration()
+  weak var navigationDelegate: WKNavigationDelegate?;
+  weak var UIDelegate: WKUIDelegate?;
+  var backForwardList: LegacyBackForwardList = LegacyBackForwardList();
+  var estimatedProgress: Double = 0;
+  var title: String = "";
+  lazy var progress: LegacyWebViewProgress = { return LegacyWebViewProgress(parent: self) }()
+  lazy var webViewDelegate: WebViewDelegate = { return WebViewDelegate(parent: self) }()
 
-  var configuration:LegacyWebViewConfiguration = LegacyWebViewConfiguration()
-
-  weak var navigationDelegate:WKNavigationDelegate?;
-  weak var UIDelegate:WKUIDelegate?;
-
-  var backForwardList:LegacyBackForwardList = LegacyBackForwardList();
-
-  var estimatedProgress:Double = 0;
-
-  var title:String = "";
-
-  var URL:NSURL? {
+  var URL: NSURL? {
     get {
      return self.request?.URL
     }
   }
 
   class WebViewDelegate: NSObject, UIWebViewDelegate {
-    weak var parent:LegacyWebView! = nil;
+    weak var parent:LegacyWebView?
 
     class LegacyNavigationAction : WKNavigationAction {
       var writableRequest: NSURLRequest
@@ -113,11 +97,18 @@ class LegacyWebView: UIWebView {
       }
     }
 
+    init(parent: LegacyWebView) {
+      self.parent = parent
+    }
+
     func webView(webView: UIWebView,shouldStartLoadWithRequest request: NSURLRequest,
       navigationType: UIWebViewNavigationType ) -> Bool {
-        var result: Bool = true
+        var result = parent?.progress.shouldStartLoadWithRequest(request, navigationType: navigationType) ?? false
+        if !result {
+          return false
+        }
 
-        if let nd = parent.navigationDelegate {
+        if let nd = parent?.navigationDelegate {
           let action:LegacyNavigationAction =
             LegacyNavigationAction(type: convertNavActionToWKType(navigationType), request: request)
 
@@ -133,43 +124,45 @@ class LegacyWebView: UIWebView {
           item.writableUrl = request.URL
           item.writableInitialUrl = request.URL
           //tem.writableSetTitle("to do");
-          parent.backForwardList.pushItem(item)
+          parent?.backForwardList.pushItem(item)
         }
 
+        parent?.title = "Fill me in"
         kvoBroadcast(nil);
-
-        parent.title = "Fill me in"
-
         return result;
     }
 
     func webViewDidStartLoad(webView: UIWebView) {
-      if let nd = parent.navigationDelegate {
+      if let nd = parent?.navigationDelegate {
         nd.webView?(nullWebView, didStartProvisionalNavigation: nullWKNavigation)
       }
-      kvoBroadcast([KVOStrings.kvoLoading]);
+      parent?.progress.webViewDidStartLoad()
+      kvoBroadcast([KVOStrings.kvoLoading])
     }
 
     func webViewDidFinishLoad(webView: UIWebView) {
-      if let nd = parent.navigationDelegate {
+      if let nd = parent?.navigationDelegate {
         nd.webView?(nullWebView, didFinishNavigation: nullWKNavigation)
       }
+      
+      parent?.progress.webViewDidFinishLoad()
       kvoBroadcast(nil);
     }
 
     func webView(webView: UIWebView, didFailLoadWithError error: NSError?) {
-      if let nd = parent.navigationDelegate {
+      if let nd = parent?.navigationDelegate {
         nd.webView?(nullWebView, didFailNavigation: nullWKNavigation,
           withError: error ?? NSError.init(domain: "", code: 0, userInfo: nil))
       }
+      parent?.progress.didFailLoadWithError()
       kvoBroadcast(nil);
     }
 
     func kvoBroadcast(kvos: [KVOStrings]?) {
       if let _kvos = kvos {
         for item in _kvos {
-          parent.willChangeValueForKey(item.rawValue)
-          parent.didChangeValueForKey(item.rawValue)
+          parent?.willChangeValueForKey(item.rawValue)
+          parent?.didChangeValueForKey(item.rawValue)
         }
       } else {
         // send all
@@ -178,12 +171,9 @@ class LegacyWebView: UIWebView {
     }
   }
 
-  var webViewDelegate: WebViewDelegate = WebViewDelegate()
-
   override init(frame: CGRect) {
     super.init(frame: frame)
     self.delegate = self.webViewDelegate
-    self.webViewDelegate.parent = self
   }
 
   required init?(coder aDecoder: NSCoder) {

@@ -652,6 +652,8 @@
 		EB994FE61BD545A60023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; settings = {ASSET_TAGS = (); }; };
 		EB99500C1BD549480023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; settings = {ASSET_TAGS = (); }; };
 		EB99500F1BD575BE0023B5E1 /* LegacyWebViewBackForward.m in Sources */ = {isa = PBXBuildFile; fileRef = EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */; settings = {ASSET_TAGS = (); }; };
+		EB9950111BD5932E0023B5E1 /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */; settings = {ASSET_TAGS = (); }; };
+		EB9950121BD5A1810023B5E1 /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */; settings = {ASSET_TAGS = (); }; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
 		F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F84B21EF1A0910F600AAB793 /* Images.xcassets */; };
@@ -1834,6 +1836,7 @@
 		EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebView.swift; sourceTree = SOURCE_ROOT; };
 		EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegacyWebViewBackForward.h; sourceTree = "<group>"; };
 		EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegacyWebViewBackForward.m; sourceTree = "<group>"; };
+		EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewProgress.swift; sourceTree = "<group>"; };
 		F84B21BE1A090F8100AAB793 /* Client.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Client.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84B21D31A090F8100AAB793 /* FennecAurora.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FennecAurora.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84B21D81A090F8100AAB793 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3022,6 +3025,7 @@
 			isa = PBXGroup;
 			children = (
 				EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */,
+				EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */,
 				EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */,
 				EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */,
 				E4D6BEB51A092E0300F538BD /* Fennec.entitlements */,
@@ -4734,6 +4738,7 @@
 				D3A9949D1A3686BD008AD1AC /* Browser.swift in Sources */,
 				D3C744CD1A687D6C004CE85D /* URIFixup.swift in Sources */,
 				E4A961181AC041C40069AD6F /* ReadabilityService.swift in Sources */,
+				EB9950111BD5932E0023B5E1 /* LegacyWebViewProgress.swift in Sources */,
 				D3BE7B261B054D4400641031 /* main.swift in Sources */,
 				0BA1E02E1B046F1E007675AF /* ErrorPageHelper.swift in Sources */,
 				D3A9949C1A3686BD008AD1AC /* BrowserViewController.swift in Sources */,
@@ -4803,6 +4808,7 @@
 				0BF1B7FE1AC60F0200A7B407 /* InsetButton.swift in Sources */,
 				7BBFEEA01BB409F300A305AA /* AboutUtils.swift in Sources */,
 				0BD19A681A2530A40084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
+				EB9950121BD5A1810023B5E1 /* LegacyWebViewProgress.swift in Sources */,
 				7BBFEE9B1BB409C300A305AA /* Browser.swift in Sources */,
 				28EADE5E1AFC3B86007FB2FB /* UIImageViewExtensions.swift in Sources */,
 				D308E4EC1A530A8B00842685 /* SearchEngines.swift in Sources */,
