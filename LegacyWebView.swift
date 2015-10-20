@@ -14,7 +14,7 @@ enum KVOStrings: String {
   case kvoCanGoBack = "canGoBack"
   case kvoCanGoForward = "canGoForward"
   case kvoLoading = "loading"
-  case kvoURL = "url"
+  case kvoURL = "URL"
   case kvoEstimatedProgress = "estimatedProgress"
 
   static let allValues = [kvoCanGoBack, kvoCanGoForward, kvoLoading, kvoURL, kvoEstimatedProgress]
@@ -30,11 +30,7 @@ public class LegacyWebView: UIWebView {
   lazy var progress: LegacyWebViewProgress = { return LegacyWebViewProgress(parent: self) }()
   lazy var webViewDelegate: WebViewDelegate = { return WebViewDelegate(parent: self) }()
 
-  var URL: NSURL? {
-    get {
-     return self.request?.URL
-    }
-  }
+  var URL: NSURL?;
 
   class WebViewDelegate: NSObject, UIWebViewDelegate {
     weak var parent:LegacyWebView?
@@ -62,12 +58,13 @@ public class LegacyWebView: UIWebView {
 
     func webView(webView: UIWebView,shouldStartLoadWithRequest request: NSURLRequest,
       navigationType: UIWebViewNavigationType ) -> Bool {
-        var result = parent?.progress.shouldStartLoadWithRequest(request, navigationType: navigationType) ?? false
+        guard let _parent = parent else { return false }
+        var result = _parent.progress.shouldStartLoadWithRequest(request, navigationType: navigationType)
         if !result {
           return false
         }
 
-        if let nd = parent?.navigationDelegate {
+        if let nd = _parent.navigationDelegate {
           let action:LegacyNavigationAction =
             LegacyNavigationAction(type: convertNavActionToWKType(navigationType), request: request)
 
@@ -77,16 +74,16 @@ public class LegacyWebView: UIWebView {
           })
         }
 
-        let locationChanged = request.URL != request.mainDocumentURL;
-        if (locationChanged && navigationType == .LinkClicked || navigationType == .Other) {
+        let locationChanged = LegacyWebView.isTopFrameRequest(request)
+        if locationChanged && (navigationType == .LinkClicked || navigationType == .Other) {
           let item:LegacyBackForwardListItem = LegacyBackForwardListItem()
           item.writableUrl = request.URL
           item.writableInitialUrl = request.URL
-          item.writableTitle = "to do"
-          parent?.backForwardList.pushItem(item)
+          ////////////item.writableTitle = "to do"
+          _parent.backForwardList.pushItem(item)
+          _parent.URL = request.URL;
         }
 
-        parent?.title = "Fill me in"
         kvoBroadcast(nil);
         return result;
     }
@@ -104,11 +101,26 @@ public class LegacyWebView: UIWebView {
       if let nd = parent?.navigationDelegate {
         nd.webView?(nullWebView, didFinishNavigation: nullWKNavigation)
       }
-      
-      parent?.progress.webViewDidFinishLoad()
-      kvoBroadcast(nil);
 
-      parent?.configuration.userContentController.inject()
+      guard let _parent = parent else { return }
+      _parent.progress.webViewDidFinishLoad()
+
+      _parent.title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? "";
+
+      if let scrapedUrl = webView.stringByEvaluatingJavaScriptFromString("window.location.href") {
+        if !_parent.progress.pathContainsCompleted(scrapedUrl) {
+          if (scrapedUrl.rangeOfString("youtube") != nil) {
+            print("here");
+          }
+          parent?.URL = NSURL(string: scrapedUrl)
+        }
+      }
+
+      if (!webView.loading) {
+        parent?.configuration.userContentController.inject()
+      }
+
+      kvoBroadcast(nil);
     }
 
     func webView(webView: UIWebView, didFailLoadWithError error: NSError?) {

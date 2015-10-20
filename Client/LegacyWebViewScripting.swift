@@ -15,18 +15,7 @@ public class LegacyUserContentController
   weak var webView: LegacyWebView?
 
   func addScriptMessageHandler(scriptMessageHandler: WKScriptMessageHandler, name: String) {
-
     scriptHandlers[name] = scriptMessageHandler
-
-    // do injection of script to frames
-
-//    let message:LegacyScriptMessage = LegacyScriptMessage()
-//    message.writeableMessageBody = "{1:2}"
-//    message.writeableName = name
-//
-//    for (_, handler) in self.scriptHandlers {
-//      handler.userContentController(WKUserContentController(), didReceiveScriptMessage: message)
-//    }
   }
 
   func addUserScript(script:WKUserScript) {
