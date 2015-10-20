@@ -1,9 +1,27 @@
 #import "LegacyJSContext.h"
 #import <JavaScriptCore/JavaScriptCore.h>
 
-@implementation LegacyJSContext
+@interface LegacyScriptMessage: WKScriptMessage
+@property (nonatomic, retain) NSObject* writeableBody;
+@property (nonatomic, copy) NSString* writableName;
+@end
+@implementation LegacyScriptMessage
 
--(void)foo:(UIWebView*)webview handlerName:(NSString*)handlerName
+-(id)body
+{
+  return self.writeableBody;
+}
+
+- (NSString*)name
+{
+  return self.writableName;
+}
+@end
+
+@implementation LegacyJSContext
+-(void)installHandlerForWebView:(UIWebView *)webview
+                    handlerName:(NSString *)handlerName
+                        handler:(id<WKScriptMessageHandler>)handler
 {
   [webview stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@""
    "if (!window.hasOwnProperty('webkit')) {"
@@ -18,7 +36,11 @@
 
   context[@"Window"][@"prototype"][@"webkit"][@"messageHandlers"][handlerName][@"postMessage"] =
   ^(NSDictionary* message) {
-    NSLog(@"%@ %@", handlerName,message);
+    NSLog(@"%@ %@", handlerName, message);
+    LegacyScriptMessage* msg = [LegacyScriptMessage new];
+    msg.writeableBody = message;
+    msg.writableName = handlerName;
+    [handler userContentController:[WKUserContentController new] didReceiveScriptMessage:msg];
   };
 
 

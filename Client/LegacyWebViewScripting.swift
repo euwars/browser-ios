@@ -1,23 +1,6 @@
 import Foundation
 
-class LegacyScriptMessage: WKScriptMessage
-{
-  var writeableMessageBody: AnyObject = ""
-  var writeableName: String = ""
 
-  override var body: AnyObject {
-    get {
-      return writeableMessageBody;
-    }
-  }
-
-  override var name: String {
-    get {
-      return writeableName;
-    }
-  }
-
-}
 
 func hashString (obj: AnyObject) -> String {
   return String(ObjectIdentifier(obj).uintValue)
@@ -59,8 +42,8 @@ public class LegacyUserContentController
 
     guard let web = webView else { return }
 
-    for (name, _) in scriptHandlers {
-      js.foo(web, handlerName: name)
+    for (name, handler) in scriptHandlers {
+      js.installHandlerForWebView(web, handlerName: name, handler:handler)
     }
 
     for script in scripts {

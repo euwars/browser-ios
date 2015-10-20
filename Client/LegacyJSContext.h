@@ -1,7 +1,10 @@
-#import <UIKit/UIKit.h>
+@import WebKit;
+@import UIKit;
 
 @interface LegacyJSContext : NSObject
 
--(void)foo:(UIWebView*)wv handlerName:(NSString*)handlerName;
+-(void)installHandlerForWebView:(UIWebView*)wv
+                    handlerName:(NSString*)handlerName
+                        handler:(id<WKScriptMessageHandler>)handler;
 
 @end
