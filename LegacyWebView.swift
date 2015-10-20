@@ -1,59 +1,7 @@
 import Foundation
 import WebKit
 
-class LegacyScriptMessage: WKScriptMessage
-{
-  var writeableMessageBody: String = ""
 
-  override var body: AnyObject {
-    get {
-      return writeableMessageBody;
-    }
-  }
-}
-
-class LegacyUserContentController
-{
-  var scriptHandlers:[WKScriptMessageHandler] = []
-
-  var atStartScripts:[String] = []
-  var atEndScripts:[String] = []
-
-  func addScriptMessageHandler(scriptMessageHandler: WKScriptMessageHandler, name: String) {
-
-    scriptHandlers.append(scriptMessageHandler)
-
-    // do injection of script to frames
-
-    let message:LegacyScriptMessage = LegacyScriptMessage()
-    message.writeableMessageBody = "some response"
-    for handler in self.scriptHandlers {
-      handler.userContentController(WKUserContentController(), didReceiveScriptMessage: message);
-    }
-  }
-
-  func addUserScript(script:WKUserScript) {
-    let source = script.source
-    let atEnd = script.injectionTime == .AtDocumentEnd
-
-    if atEnd {
-      atEndScripts.append(source)
-    } else {
-      atStartScripts.append(source)
-    }
-  }
-}
-
-class LegacyWebViewConfiguration
-{
-  var userContentController: LegacyUserContentController = LegacyUserContentController()
-}
-
-//
-//class LegacyWebViewNavigationDelegate {
-//   public func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void)
-//
-//}
 
 func convertNavActionToWKType(type:UIWebViewNavigationType) -> WKNavigationType {
   return WKNavigationType(rawValue: type.rawValue)!
@@ -72,8 +20,8 @@ enum KVOStrings: String {
   static let allValues = [kvoCanGoBack, kvoCanGoForward, kvoLoading, kvoURL, kvoEstimatedProgress]
 }
 
-class LegacyWebView: UIWebView {
-  var configuration: LegacyWebViewConfiguration = LegacyWebViewConfiguration()
+public class LegacyWebView: UIWebView {
+  lazy var configuration: LegacyWebViewConfiguration = { return LegacyWebViewConfiguration(webview: self) }()
   weak var navigationDelegate: WKNavigationDelegate?;
   weak var UIDelegate: WKUIDelegate?;
   var backForwardList: LegacyBackForwardList = LegacyBackForwardList();
@@ -134,7 +82,7 @@ class LegacyWebView: UIWebView {
           let item:LegacyBackForwardListItem = LegacyBackForwardListItem()
           item.writableUrl = request.URL
           item.writableInitialUrl = request.URL
-          //tem.writableSetTitle("to do");
+          item.writableTitle = "to do"
           parent?.backForwardList.pushItem(item)
         }
 
@@ -142,6 +90,7 @@ class LegacyWebView: UIWebView {
         kvoBroadcast(nil);
         return result;
     }
+
 
     func webViewDidStartLoad(webView: UIWebView) {
       if let nd = parent?.navigationDelegate {
@@ -158,6 +107,8 @@ class LegacyWebView: UIWebView {
       
       parent?.progress.webViewDidFinishLoad()
       kvoBroadcast(nil);
+
+      parent?.configuration.userContentController.inject()
     }
 
     func webView(webView: UIWebView, didFailLoadWithError error: NSError?) {
@@ -187,7 +138,7 @@ class LegacyWebView: UIWebView {
     self.delegate = self.webViewDelegate
   }
 
-  required init?(coder aDecoder: NSCoder) {
+  public required init?(coder aDecoder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
   }
 
@@ -216,14 +167,17 @@ class LegacyWebView: UIWebView {
     assert(false);
   }
 
-  override func goBack() {
+  override public func goBack() {
     super.goBack()
     self.backForwardList.goBack()
   }
 
-  override func goForward() {
+  override public func goForward() {
     super.goForward()
     self.backForwardList.goForward()
   }
 
+  class func isTopFrameRequest(request:NSURLRequest) -> Bool {
+    return request.URL == request.mainDocumentURL
+  }
 }

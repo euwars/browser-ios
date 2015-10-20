@@ -18,5 +18,6 @@
 #import "Carthage/Checkouts/ios_sdk/Adjust/Adjust.h"
 
 #import "LegacyWebViewBackForward.h"
+#import "LegacyJSContext.h"
 
 #endif

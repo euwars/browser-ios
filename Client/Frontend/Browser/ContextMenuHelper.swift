@@ -53,7 +53,7 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
             return
         }
 
-        let data = message.body as! [String: AnyObject]
+        guard let data = message.body as? [String: AnyObject] else { return }
 
         // On sites where <a> elements have child text elements, the text selection delegate can be triggered
         // when we show a context menu. To prevent this, cancel the text selection delegate if we know the

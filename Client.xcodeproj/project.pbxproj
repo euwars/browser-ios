@@ -654,6 +654,10 @@
 		EB99500F1BD575BE0023B5E1 /* LegacyWebViewBackForward.m in Sources */ = {isa = PBXBuildFile; fileRef = EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */; settings = {ASSET_TAGS = (); }; };
 		EB9950111BD5932E0023B5E1 /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */; settings = {ASSET_TAGS = (); }; };
 		EB9950121BD5A1810023B5E1 /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */; settings = {ASSET_TAGS = (); }; };
+		EB9950141BD6AA930023B5E1 /* LegacyWebViewScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */; settings = {ASSET_TAGS = (); }; };
+		EB9950151BD6ACFE0023B5E1 /* LegacyWebViewScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */; settings = {ASSET_TAGS = (); }; };
+		EBBBFEBF1BD6CA32004A0D7C /* LegacyJSContext.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */; settings = {ASSET_TAGS = (); }; };
+		EBBBFEC01BD6CA32004A0D7C /* LegacyJSContext.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */; settings = {ASSET_TAGS = (); }; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
 		F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F84B21EF1A0910F600AAB793 /* Images.xcassets */; };
@@ -1837,6 +1841,9 @@
 		EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegacyWebViewBackForward.h; sourceTree = "<group>"; };
 		EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegacyWebViewBackForward.m; sourceTree = "<group>"; };
 		EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewProgress.swift; sourceTree = "<group>"; };
+		EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewScripting.swift; sourceTree = "<group>"; };
+		EBBBFEBD1BD6CA32004A0D7C /* LegacyJSContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegacyJSContext.h; sourceTree = "<group>"; };
+		EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegacyJSContext.m; sourceTree = "<group>"; };
 		F84B21BE1A090F8100AAB793 /* Client.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Client.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84B21D31A090F8100AAB793 /* FennecAurora.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FennecAurora.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84B21D81A090F8100AAB793 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -3024,7 +3031,10 @@
 		F84B21C01A090F8100AAB793 /* Client */ = {
 			isa = PBXGroup;
 			children = (
+				EBBBFEBD1BD6CA32004A0D7C /* LegacyJSContext.h */,
+				EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */,
 				EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */,
+				EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */,
 				EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */,
 				EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */,
 				EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */,
@@ -3650,6 +3660,7 @@
 					};
 					F84B21BD1A090F8100AAB793 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = KL8N8XSYF4;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -4636,10 +4647,12 @@
 				E4CD9F6D1A77DD2800318571 /* ReaderModeStyleViewController.swift in Sources */,
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,
 				E4B423DD1ABA0318007E66C8 /* ReaderModeHandlers.swift in Sources */,
+				EBBBFEBF1BD6CA32004A0D7C /* LegacyJSContext.m in Sources */,
 				D308E4E41A5306F500842685 /* SearchEngines.swift in Sources */,
 				0BF0DB941A8545800039F300 /* URLBarView.swift in Sources */,
 				E42475E51AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
 				D38B2D2E1A8D96D00040E6B5 /* GCDWebServer.m in Sources */,
+				EB9950141BD6AA930023B5E1 /* LegacyWebViewScripting.swift in Sources */,
 				E4B334601BBF2393004E2BFF /* Adjust.m in Sources */,
 				E42475E81AB73B9B00B23D33 /* SWUtilityButtonView.m in Sources */,
 				0B3E7DB81B27A7F600E2E84D /* AboutUtils.swift in Sources */,
@@ -4774,6 +4787,7 @@
 				E4CD9F1D1A6D9C2800318571 /* WebServerTests.swift in Sources */,
 				D3D488591ABB54CD00A93597 /* FileAccessorTests.swift in Sources */,
 				0BA8964B1A250E6500C1010C /* ProfileTest.swift in Sources */,
+				EBBBFEC01BD6CA32004A0D7C /* LegacyJSContext.m in Sources */,
 				0BB5B28D1AC0A6130052877D /* Toolbar.swift in Sources */,
 				03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */,
 				F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */,
@@ -4788,6 +4802,7 @@
 				7BBFEE9F1BB409EB00A305AA /* ErrorPageHelper.swift in Sources */,
 				D38B2D351A8D96D00040E6B5 /* GCDWebServerFunctions.m in Sources */,
 				7BBFEE9C1BB409D200A305AA /* SnackBar.swift in Sources */,
+				EB9950151BD6ACFE0023B5E1 /* LegacyWebViewScripting.swift in Sources */,
 				D38B2D501A8D96D00040E6B5 /* GCDWebServerFileResponse.m in Sources */,
 				D38B2D3B1A8D96D00040E6B5 /* GCDWebServerResponse.m in Sources */,
 				D38B2D411A8D96D00040E6B5 /* GCDWebServerFileRequest.m in Sources */,
@@ -6234,7 +6249,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Client/Firefox.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
@@ -7483,7 +7498,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Client/FennecAurora.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
@@ -7497,7 +7512,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MOZ_BUNDLE_ID)";
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
-				PROVISIONING_PROFILE = "340e9444-6fc5-464d-90a9-0fcd3d001c37";
+				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "$SRCROOT/Client-Bridging-Header.h";
 				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "Client-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
