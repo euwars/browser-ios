@@ -6,7 +6,9 @@ import Shared
 import Storage
 import AVFoundation
 import XCGLogger
-import Breakpad
+//import Breakpad
+import Fabric
+import Crashlytics
 
 private let log = Logger.browserLogger
 
@@ -20,6 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
 
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        Fabric.with([Crashlytics.self])
         // Set the Firefox UA for browsing.
         setUserAgent()
 

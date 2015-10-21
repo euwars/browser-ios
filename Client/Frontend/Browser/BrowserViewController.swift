@@ -430,7 +430,7 @@ class BrowserViewController: UIViewController {
 //                showRestoreTabsAlert()
 //            }
 //        } else {
-//            tabManager.restoreTabs()
+           tabManager.restoreTabs()
 //        }
 
         updateTabCountUsingTabManager(tabManager, animated: false)
