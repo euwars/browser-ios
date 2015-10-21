@@ -9,10 +9,10 @@ MOZ_APP_ID = braveios@brave.com
 MOZ_BUNDLE_ID = com.brave.ios.browser.$(MOZ_PRODUCT_NAME)
 
 // App Version
-MOZ_VERSION = 1.1
+MOZ_VERSION = 0.1
 
 // Build ID
-MOZ_BUILD_ID = 1101
+MOZ_BUILD_ID = 0101
 
 // Product Name
 MOZ_SOCORRO_PRODUCT_NAME = UNSET

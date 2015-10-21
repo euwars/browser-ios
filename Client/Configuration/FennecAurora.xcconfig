@@ -4,11 +4,11 @@
 
 #include "BaseConfig.xcconfig"
 
-MOZ_BUNDLE_DISPLAY_NAME = Fennec Aurora
+MOZ_BUNDLE_DISPLAY_NAME = Brave Alpha
 
-MOZ_PRODUCT_NAME = FennecAurora
+MOZ_PRODUCT_NAME = BraveAlpha
 
-MOZ_RELEASE_CHANNEL = aurora
+MOZ_RELEASE_CHANNEL = alpha
 
 ADJUST_ENVIRONMENT =
 ADJUST_APP_TOKEN =
