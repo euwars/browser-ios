@@ -1,9 +1,29 @@
 #import "LegacyJSContext.h"
 #import <JavaScriptCore/JavaScriptCore.h>
 
+
+@interface FrameInfoWrapper : WKFrameInfo
+@property (nonatomic, retain) NSURLRequest* writableRequest;
+@end
+
+@implementation FrameInfoWrapper
+
+-(NSURLRequest*)request
+{
+  return self.writableRequest;
+}
+
+-(BOOL)isMainFrame
+{
+  return true;
+}
+
+@end
+
 @interface LegacyScriptMessage: WKScriptMessage
 @property (nonatomic, retain) NSObject* writeableBody;
 @property (nonatomic, copy) NSString* writableName;
+@property (nonatomic, retain) NSURLRequest* request;
 @end
 @implementation LegacyScriptMessage
 
@@ -16,6 +36,14 @@
 {
   return self.writableName;
 }
+
+-(WKFrameInfo *)frameInfo
+{
+  FrameInfoWrapper* f = [FrameInfoWrapper new];
+  f.writableRequest = self.request;
+  return f;
+}
+
 @end
 
 @implementation LegacyJSContext
@@ -36,10 +64,13 @@
 
   context[@"Window"][@"prototype"][@"webkit"][@"messageHandlers"][handlerName][@"postMessage"] =
   ^(NSDictionary* message) {
+#ifdef DEBUG
     NSLog(@"%@ %@", handlerName, message);
+#endif
     LegacyScriptMessage* msg = [LegacyScriptMessage new];
     msg.writeableBody = message;
     msg.writableName = handlerName;
+    msg.request = webview.request;
     [handler userContentController:[WKUserContentController new] didReceiveScriptMessage:msg];
   };
 
