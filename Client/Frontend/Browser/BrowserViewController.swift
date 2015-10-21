@@ -1566,13 +1566,13 @@ extension BrowserViewController: WKNavigationDelegate {
 //            }
     }
 
-    func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
-        guard let container = webView as? ContainerWebView else { return }
+    func webView(_webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
+        guard let container = _webView as? ContainerWebView else { return }
         guard let legacyWebView = container.legacyWebView else { return }
         let tab: Browser! = tabManager[legacyWebView]
         tabManager.expireSnackbars()
 
-        if let url = webView.URL where !ErrorPageHelper.isErrorPageURL(url) && !AboutUtils.isAboutHomeURL(url) {
+        if let url = legacyWebView.URL where !ErrorPageHelper.isErrorPageURL(url) && !AboutUtils.isAboutHomeURL(url) {
             tab.lastExecutedTime = NSDate.now()
 
             if navigation == nil {
@@ -1585,7 +1585,7 @@ extension BrowserViewController: WKNavigationDelegate {
             // because that event wil not always fire due to unreliable page caching. This will either let us know that
             // the currently loaded page can be turned into reading mode or if the page already is in reading mode. We
             // ignore the result because we are being called back asynchronous when the readermode status changes.
-            webView.evaluateJavaScript("_firefox_ReaderMode.checkReadability()", completionHandler: nil)
+            legacyWebView.evaluateJavaScript("_firefox_ReaderMode.checkReadability()", completionHandler: nil)
         }
 
         if tab === tabManager.selectedTab {
@@ -1608,7 +1608,7 @@ extension BrowserViewController: WKNavigationDelegate {
           }
         }
 
-        addOpenInViewIfNeccessary(webView.URL)
+        addOpenInViewIfNeccessary(legacyWebView.URL)
     }
 
     private func addOpenInViewIfNeccessary(url: NSURL?) {
