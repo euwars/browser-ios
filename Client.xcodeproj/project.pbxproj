@@ -453,7 +453,6 @@
 		D3FEC38D1AC4B42F00494F45 /* AutocompleteTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3FEC38C1AC4B42F00494F45 /* AutocompleteTextField.swift */; };
 		DD31E0FB1B382B520077078A /* BrowserPrintPageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD31E0FA1B382B520077078A /* BrowserPrintPageRenderer.swift */; };
 		E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40FAB0B1A7ABB77009CB80D /* WebServer.swift */; };
-		E414F0791A8445A500283322 /* FennecAurora.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = E414F0781A8445A500283322 /* FennecAurora.entitlements */; };
 		E418D0D91A251B3200CAE47A /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34DC84D1A16C40C00D49B7B /* Profile.swift */; };
 		E41A7D4B1A1BE04500245963 /* InitialViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41A7D4A1A1BE04500245963 /* InitialViewController.swift */; };
 		E41F0D981ADFFB5400FC7387 /* ReadingListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E41F0D971ADFFB5400FC7387 /* ReadingListService.swift */; };
@@ -640,7 +639,6 @@
 		E69922171B94E3EF007C480D /* Licenses.html in Resources */ = {isa = PBXBuildFile; fileRef = E69922121B94E3EF007C480D /* Licenses.html */; };
 		E69966991B72674B0036F797 /* RollingFileLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E69966981B72674B0036F797 /* RollingFileLogger.swift */; };
 		E69BEA5E1BC6A7F300EA6D04 /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E69BEA371BC6A79B00EA6D04 /* ArrayExtensions.swift */; settings = {ASSET_TAGS = (); }; };
-		E6C05DB21BA1CDAB00CDDD08 /* Breakpad.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = E69E4E2A1B9F709A00646EDB /* Breakpad.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E6D8D5E71B569D70009E5A58 /* BrowserTrayAnimators.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */; };
 		E6EAC5961B29CB3A00E1DE1E /* scrollablePage.html in Resources */ = {isa = PBXBuildFile; fileRef = E6EAC5951B29CB3A00E1DE1E /* scrollablePage.html */; };
 		E6F965121B2F1CF20034B023 /* Shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288A2D861AB8B3260023ABC3 /* Shared.framework */; };
@@ -1259,20 +1257,6 @@
 			remoteGlobalIDString = F84B21BD1A090F8100AAB793;
 			remoteInfo = Client;
 		};
-		E69E4E291B9F709A00646EDB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E69E4E241B9F709A00646EDB /* Breakpad.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D2AAC07E0554694100DB518D;
-			remoteInfo = Breakpad;
-		};
-		E6C05DB01BA1CDA400CDDD08 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E69E4E241B9F709A00646EDB /* Breakpad.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = E62CF3751B9F5AE40058D6FC;
-			remoteInfo = Breakpad;
-		};
 		F84B21D41A090F8100AAB793 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
@@ -1314,7 +1298,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				D30DD4251B94FE0E00850E76 /* SQLite.framework in Copy Frameworks */,
-				E6C05DB21BA1CDAB00CDDD08 /* Breakpad.framework in Copy Frameworks */,
 				E4D567301ADECE2800F1EFE7 /* ReadingList.framework in Copy Frameworks */,
 				2F44FA161A9D41A200FD20CC /* Base32.framework in Copy Frameworks */,
 				0BA84AE41AE57147009C4D0C /* SnapKit.framework in Copy Frameworks */,
@@ -1648,7 +1631,6 @@
 		D3FEC38C1AC4B42F00494F45 /* AutocompleteTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutocompleteTextField.swift; sourceTree = "<group>"; };
 		DD31E0FA1B382B520077078A /* BrowserPrintPageRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserPrintPageRenderer.swift; sourceTree = "<group>"; };
 		E40FAB0B1A7ABB77009CB80D /* WebServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebServer.swift; sourceTree = "<group>"; };
-		E414F0781A8445A500283322 /* FennecAurora.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = FennecAurora.entitlements; sourceTree = "<group>"; };
 		E41A7D4A1A1BE04500245963 /* InitialViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InitialViewController.swift; sourceTree = "<group>"; };
 		E41F0D971ADFFB5400FC7387 /* ReadingListService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ReadingListService.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		E41F0D9A1ADFFC5600FC7387 /* ReadingListError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingListError.swift; sourceTree = "<group>"; };
@@ -1666,7 +1648,6 @@
 		E42CCE001A24C4E300B794D3 /* ExtensionUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ExtensionUtils.swift; path = ../Utils/ExtensionUtils.swift; sourceTree = "<group>"; };
 		E4424B1F1AC6EBE100F44C38 /* ReaderSettings.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ReaderSettings.xcassets; sourceTree = "<group>"; };
 		E4424B3B1AC71FB400F44C38 /* FiraSans-Book.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "FiraSans-Book.ttf"; sourceTree = "<group>"; };
-		E448FC7B1AEE79C600869B6C /* Firefox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Firefox.entitlements; sourceTree = "<group>"; };
 		E448FC9B1AEE7A1900869B6C /* Firefox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Firefox.entitlements; sourceTree = "<group>"; };
 		E448FC9C1AEE7A3000869B6C /* Firefox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Firefox.entitlements; sourceTree = "<group>"; };
 		E46C51C11B41ADD800EB349F /* Try.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Try.h; sourceTree = "<group>"; };
@@ -1674,7 +1655,6 @@
 		E47616C61AB74CA600E7DD25 /* ReaderModeBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReaderModeBarView.swift; sourceTree = "<group>"; };
 		E4988B351A9B82D8008B8B92 /* Fennec.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Fennec.entitlements; sourceTree = "<group>"; };
 		E4988B4C1A9B82E0008B8B92 /* Fennec.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Fennec.entitlements; sourceTree = "<group>"; };
-		E4988B571A9B95FF008B8B92 /* FennecNightly.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = FennecNightly.entitlements; sourceTree = "<group>"; };
 		E4988B6E1A9B964B008B8B92 /* FennecNightly.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = FennecNightly.entitlements; sourceTree = "<group>"; };
 		E4988B6F1A9B965A008B8B92 /* FennecNightly.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = FennecNightly.entitlements; sourceTree = "<group>"; };
 		E49943F41AE6879C00BF9DE4 /* IntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroViewController.swift; sourceTree = "<group>"; };
@@ -1792,7 +1772,6 @@
 		E4D567951ADECEB800F1EFE7 /* ReadingListClientRecordTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingListClientRecordTestCase.swift; sourceTree = "<group>"; };
 		E4D5679B1ADECEB800F1EFE7 /* ReadingListStorageTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadingListStorageTestCase.swift; sourceTree = "<group>"; };
 		E4D567AA1ADED44A00F1EFE7 /* SQLite.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SQLite.xcodeproj; path = Carthage/Checkouts/SQLite.swift/SQLite.xcodeproj; sourceTree = "<group>"; };
-		E4D6BEB51A092E0300F538BD /* Fennec.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Fennec.entitlements; sourceTree = "<group>"; };
 		E4D6BEB81A0930EC00F538BD /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		E4D8F3B11ACDD5150005A2E4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E4E0BB151AFBC9E4008D6260 /* Shared-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Shared-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -1826,7 +1805,6 @@
 		E69922121B94E3EF007C480D /* Licenses.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Licenses.html; sourceTree = "<group>"; };
 		E69966981B72674B0036F797 /* RollingFileLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RollingFileLogger.swift; sourceTree = "<group>"; };
 		E69BEA371BC6A79B00EA6D04 /* ArrayExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
-		E69E4E241B9F709A00646EDB /* Breakpad.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Breakpad.xcodeproj; path = "Carthage/Checkouts/google-breakpad-ios/src/client/ios/Breakpad.xcodeproj"; sourceTree = "<group>"; };
 		E6A99D761B20D95800006EDD /* GeometryExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GeometryExtensions.swift; sourceTree = "<group>"; };
 		E6D8D5E61B569D70009E5A58 /* BrowserTrayAnimators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowserTrayAnimators.swift; sourceTree = "<group>"; };
 		E6EAC5951B29CB3A00E1DE1E /* scrollablePage.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = scrollablePage.html; sourceTree = "<group>"; };
@@ -1844,6 +1822,9 @@
 		EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewScripting.swift; sourceTree = "<group>"; };
 		EBBBFEBD1BD6CA32004A0D7C /* LegacyJSContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegacyJSContext.h; sourceTree = "<group>"; };
 		EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegacyJSContext.m; sourceTree = "<group>"; };
+		EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareTo.entitlements; sourceTree = "<group>"; };
+		EBF6A3931BD80BF4009CF0C7 /* SendTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SendTo.entitlements; sourceTree = "<group>"; };
+		EBF6A3941BD80C03009CF0C7 /* Client.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Client.entitlements; sourceTree = "<group>"; };
 		F84B21BE1A090F8100AAB793 /* Client.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Client.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84B21D31A090F8100AAB793 /* FennecAurora.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FennecAurora.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F84B21D81A090F8100AAB793 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -2939,14 +2920,6 @@
 			path = About;
 			sourceTree = "<group>";
 		};
-		E69E4E251B9F709A00646EDB /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				E69E4E2A1B9F709A00646EDB /* Breakpad.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		E6F9650D1B2F1CF20034B023 /* SharedTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -2969,11 +2942,12 @@
 		F84B21B51A090F8100AAB793 = {
 			isa = PBXGroup;
 			children = (
+				EBF6A3931BD80BF4009CF0C7 /* SendTo.entitlements */,
+				EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */,
 				E4B334891BBF23F9004E2BFF /* AdSupport.framework */,
 				E4B334871BBF23F3004E2BFF /* iAd.framework */,
 				D31FC2291A8D908800BAF7EC /* Alamofire.xcodeproj */,
 				2F44F9ED1A9D417500FD20CC /* Base32.xcodeproj */,
-				E69E4E241B9F709A00646EDB /* Breakpad.xcodeproj */,
 				28CE83CA1A1D1D5100576538 /* FxA.xcodeproj */,
 				D38B2D621A8D976A0040E6B5 /* KIF.xcodeproj */,
 				0B6544B01A96C59E000DD202 /* SDWebImage.xcodeproj */,
@@ -3031,6 +3005,7 @@
 		F84B21C01A090F8100AAB793 /* Client */ = {
 			isa = PBXGroup;
 			children = (
+				EBF6A3941BD80C03009CF0C7 /* Client.entitlements */,
 				EBBBFEBD1BD6CA32004A0D7C /* LegacyJSContext.h */,
 				EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */,
 				EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */,
@@ -3038,10 +3013,6 @@
 				EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */,
 				EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */,
 				EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */,
-				E4D6BEB51A092E0300F538BD /* Fennec.entitlements */,
-				E414F0781A8445A500283322 /* FennecAurora.entitlements */,
-				E4988B571A9B95FF008B8B92 /* FennecNightly.entitlements */,
-				E448FC7B1AEE79C600869B6C /* Firefox.entitlements */,
 				F84B22431A09165600AAB793 /* Info.plist */,
 				E4D8F3B21ACDD5150005A2E4 /* InfoPlist.strings */,
 				E60961841B62B7E100DD640F /* Configuration */,
@@ -3530,7 +3501,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E6C05DB11BA1CDA400CDDD08 /* PBXTargetDependency */,
 				F84B22521A0920C600AAB793 /* PBXTargetDependency */,
 				F84B22651A09210A00AAB793 /* PBXTargetDependency */,
 				D31FC2481A8D910E00BAF7EC /* PBXTargetDependency */,
@@ -3676,6 +3646,7 @@
 					};
 					F84B22481A0920C600AAB793 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = KL8N8XSYF4;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -3687,6 +3658,7 @@
 					};
 					F84B225B1A09210A00AAB793 = {
 						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = KL8N8XSYF4;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -3717,10 +3689,6 @@
 				{
 					ProductGroup = 2F44F9EE1A9D417500FD20CC /* Products */;
 					ProjectRef = 2F44F9ED1A9D417500FD20CC /* Base32.xcodeproj */;
-				},
-				{
-					ProductGroup = E69E4E251B9F709A00646EDB /* Products */;
-					ProjectRef = E69E4E241B9F709A00646EDB /* Breakpad.xcodeproj */;
 				},
 				{
 					ProductGroup = 28CE83CB1A1D1D5100576538 /* Products */;
@@ -4065,13 +4033,6 @@
 			remoteRef = D3B5A0E91B5459F600C15BCF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		E69E4E2A1B9F709A00646EDB /* Breakpad.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Breakpad.framework;
-			remoteRef = E69E4E291B9F709A00646EDB /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -4184,7 +4145,6 @@
 				E4B7B7631A793CF20022C5E0 /* CharisSILI.ttf in Resources */,
 				E4CD9F541A71506400318571 /* Reader.html in Resources */,
 				E69922171B94E3EF007C480D /* Licenses.html in Resources */,
-				E414F0791A8445A500283322 /* FennecAurora.entitlements in Resources */,
 				2F1BDF921A8523B000213B54 /* LICENSE in Resources */,
 				E4CD9F5B1A71506C00318571 /* Reader.css in Resources */,
 				E4B7B7611A793CF20022C5E0 /* CharisSILB.ttf in Resources */,
@@ -5094,11 +5054,6 @@
 			isa = PBXTargetDependency;
 			target = 2FCAE2191ABB51F800877008 /* Storage */;
 			targetProxy = E4EE05AF1BA3A0A10021B3A7 /* PBXContainerItemProxy */;
-		};
-		E6C05DB11BA1CDA400CDDD08 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Breakpad;
-			targetProxy = E6C05DB01BA1CDA400CDDD08 /* PBXContainerItemProxy */;
 		};
 		E6F965141B2F1CF20034B023 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -6101,7 +6056,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Client/FennecNightly.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Client/Client.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
@@ -6114,7 +6069,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MOZ_PRODUCT_NAME = FennecNightly;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "$(MOZ_BUNDLE_ID)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser;
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE = "";
@@ -6141,7 +6096,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ShareTo/FennecNightly.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ShareTo.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
@@ -6150,7 +6105,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_BUNDLE_DISPLAY_NAME = "Fennec Nightly";
 				MOZ_PRODUCT_NAME = FennecNightly;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.ShareTo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -6163,7 +6118,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ShareTo/FennecNightly.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SendTo.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
@@ -6171,7 +6126,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_PRODUCT_NAME = FennecNightly;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.SendTo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -6247,7 +6202,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Client/Firefox.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Client/Client.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -6261,7 +6216,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MOZ_PRODUCT_NAME = Firefox;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "$(MOZ_BUNDLE_ID)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser;
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE = "";
@@ -6290,9 +6245,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ShareTo/Firefox.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = ShareTo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Extensions/ShareTo/Info.plist";
@@ -6301,7 +6256,7 @@
 				MOZ_BUNDLE_DISPLAY_NAME = Firefox;
 				MOZ_PRODUCT_NAME = Firefox;
 				OTHER_SWIFT_FLAGS = "-DMOZ_CHANNEL_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.ShareTo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -6315,9 +6270,9 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ShareTo/Firefox.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = SendTo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Extensions/SendTo/Info.plist";
@@ -6325,7 +6280,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_PRODUCT_NAME = Firefox;
 				OTHER_SWIFT_FLAGS = "-DMOZ_CHANNEL_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.SendTo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -6789,7 +6744,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "";
-				CODE_SIGN_ENTITLEMENTS = Extensions/ViewLater/Fennec.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -6803,7 +6757,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_PRODUCT_NAME = Fennec;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.ViewLater;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -6829,7 +6783,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ViewLater/FennecAurora.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = NO;
@@ -6850,9 +6803,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_PRODUCT_NAME = FennecAurora;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.ViewLater;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "826837c1-92e2-4200-8dca-890dc146049c";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -6879,7 +6831,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ViewLater/Firefox.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = NO;
@@ -6900,7 +6851,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_PRODUCT_NAME = Firefox;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.ViewLater;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -6928,7 +6879,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ViewLater/FennecNightly.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
@@ -6949,7 +6899,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_PRODUCT_NAME = FennecNightly;
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.ViewLater;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -7469,7 +7419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Client/Fennec.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Client/Client.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
@@ -7482,7 +7432,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MOZ_PRODUCT_NAME = Fennec;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "$(MOZ_BUNDLE_ID)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser;
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE = "";
@@ -7496,7 +7446,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Client/FennecAurora.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Client/Client.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
@@ -7509,7 +7459,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MOZ_PRODUCT_NAME = FennecAurora;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = "$(MOZ_BUNDLE_ID)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser;
 				PRODUCT_MODULE_NAME = Client;
 				PRODUCT_NAME = Client;
 				PROVISIONING_PROFILE = "";
@@ -7553,7 +7503,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ShareTo/Fennec.entitlements;
+				CODE_SIGN_ENTITLEMENTS = ShareTo.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
@@ -7567,7 +7517,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_BUNDLE_DISPLAY_NAME = "Fennec ($(USER))";
 				MOZ_PRODUCT_NAME = Fennec;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.ShareTo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -7579,9 +7529,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = Client/FennecAurora.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = ShareTo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Extensions/ShareTo/Info.plist";
@@ -7589,9 +7539,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_BUNDLE_DISPLAY_NAME = "Fennec Aurora";
 				MOZ_PRODUCT_NAME = FennecAurora;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.ShareTo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2a788632-d145-4fdd-a5f2-8a3289920e30";
+				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -7602,7 +7552,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Extensions/ShareTo/Fennec.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SendTo.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
@@ -7615,7 +7565,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_PRODUCT_NAME = Fennec;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.SendTo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -7628,18 +7578,18 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Client/FennecAurora.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = SendTo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "$(SRCROOT)/Extensions/SendTo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MOZ_PRODUCT_NAME = FennecAurora;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(MOZ_PRODUCT_NAME).$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser.SendTo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "46453415-1fc9-4d86-9431-3192249a9775";
+				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

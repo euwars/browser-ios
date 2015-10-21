@@ -3,10 +3,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Mozilla Application ID
-MOZ_APP_ID = fennecios@mozilla.org
+MOZ_APP_ID = braveios@brave.com
 
 // Bundle Identifier
-MOZ_BUNDLE_ID = org.mozilla.ios.$(MOZ_PRODUCT_NAME)
+MOZ_BUNDLE_ID = com.brave.ios.browser.$(MOZ_PRODUCT_NAME)
 
 // App Version
 MOZ_VERSION = 1.1
@@ -15,16 +15,16 @@ MOZ_VERSION = 1.1
 MOZ_BUILD_ID = 1101
 
 // Product Name
-MOZ_SOCORRO_PRODUCT_NAME = FenneciOS
+MOZ_SOCORRO_PRODUCT_NAME = UNSET
 
 // Crash-stats upload URL
-MOZ_BREAKPAD_URL = crash-reports.mozilla.com/submit?id=$(MOZ_BUNDLE_ID)&version=$(MOZ_VERSION)&buildid=$(MOZ_BUILD_ID)
+MOZ_BREAKPAD_URL = UNSET
 
 // Frequency to poll for uploads for crashes in seconds
-MOZ_BREAKPAD_UPLOAD_FREQUENCY = 30
+MOZ_BREAKPAD_UPLOAD_FREQUENCY = 0
 
 // Uploading to crash-stats which is a socorro instance
-MOZ_BREAKPAD_SERVER_TYPE = socorro
+MOZ_BREAKPAD_SERVER_TYPE = UNSET
 
 // Vendor property to send to crash-stats
-MOZ_VENDOR = Mozilla
+MOZ_VENDOR = UNSET

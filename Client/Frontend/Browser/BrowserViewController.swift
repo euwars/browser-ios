@@ -409,28 +409,29 @@ class BrowserViewController: UIViewController {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
 
-        if activeCrashReporter?.previouslyCrashed ?? false {
-            // Reset previous crash state
-            activeCrashReporter?.resetPreviousCrashState()
-
-            // Only ask to restore tabs from a crash if we had non-home tabs or tabs with some kind of history in them
-            guard let tabsToRestore = tabManager.tabsToRestore() else { return }
-            let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
-            if onlyNoHistoryTabs {
-                tabManager.addTabAndSelect();
-                return
-            }
-
-            let optedIntoCrashReporting = profile.prefs.boolForKey("crashreports.send.always")
-            if optedIntoCrashReporting == nil {
-                // Offer a chance to allow the user to opt into crash reporting
-                showCrashOptInAlert()
-            } else {
-                showRestoreTabsAlert()
-            }
-        } else {
-            tabManager.restoreTabs()
-        }
+// @TODO BRAVE
+//        if activeCrashReporter?.previouslyCrashed ?? false {
+//            // Reset previous crash state
+//            activeCrashReporter?.resetPreviousCrashState()
+//
+//            // Only ask to restore tabs from a crash if we had non-home tabs or tabs with some kind of history in them
+//            guard let tabsToRestore = tabManager.tabsToRestore() else { return }
+//            let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
+//            if onlyNoHistoryTabs {
+//                tabManager.addTabAndSelect();
+//                return
+//            }
+//
+//            let optedIntoCrashReporting = profile.prefs.boolForKey("crashreports.send.always")
+//            if optedIntoCrashReporting == nil {
+//                // Offer a chance to allow the user to opt into crash reporting
+//                showCrashOptInAlert()
+//            } else {
+//                showRestoreTabsAlert()
+//            }
+//        } else {
+//            tabManager.restoreTabs()
+//        }
 
         updateTabCountUsingTabManager(tabManager, animated: false)
     }
@@ -439,12 +440,12 @@ class BrowserViewController: UIViewController {
         let alert = UIAlertController.crashOptInAlert(
             sendReportCallback: { _ in
                 // Turn on uploading but don't save opt-in flag to profile because this is a one time send.
-                configureActiveCrashReporter(true)
+//                configureActiveCrashReporter(true)
                 self.showRestoreTabsAlert()
             },
             alwaysSendCallback: { _ in
                 self.profile.prefs.setBool(true, forKey: "crashreports.send.always")
-                configureActiveCrashReporter(true)
+//                configureActiveCrashReporter(true)
                 self.showRestoreTabsAlert()
             },
             dontSendCallback: { _ in
@@ -1601,10 +1602,8 @@ extension BrowserViewController: WKNavigationDelegate {
             // before screenshotting.
             let time = dispatch_time(DISPATCH_TIME_NOW, Int64(100 * NSEC_PER_MSEC))
             dispatch_after(time, dispatch_get_main_queue()) {
-              if let t = tab {
               let screenshot:UIImage? = self.screenshotHelper.takeScreenshot(tab, aspectRatio: 0, quality: 1)
               tab.setScreenshot(screenshot)
-              }
           }
         }
 

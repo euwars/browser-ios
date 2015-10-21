@@ -340,7 +340,7 @@ class TabManager : NSObject {
     func prefsDidChange() {
         let allowPopups = !(self.profile.prefs.boolForKey("blockPopups") ?? true)
         // Each tab may have its own configuration, so we should tell each of them in turn.
-        for tab in tabs {
+        for _ in tabs {
             ///tab.webView?.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
         }
         // The default tab configurations also need to change.
