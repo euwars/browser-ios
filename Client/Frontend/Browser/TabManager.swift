@@ -128,7 +128,7 @@ class TabManager : NSObject {
         return tabs[index]
     }
 
-    subscript(webView: WKWebView) -> Browser? {
+    subscript(webView: LegacyWebView) -> Browser? {
         for tab in tabs {
             if tab.webView === webView {
                 return tab
@@ -527,23 +527,27 @@ extension TabManager {
 }
 
 extension TabManager : WKNavigationDelegate {
-    func webView(webView: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
+    func webView(_: WKWebView, didStartProvisionalNavigation _: WKNavigation!) {
         UIApplication.sharedApplication().networkActivityIndicatorVisible = true
     }
 
     func webView(webView: WKWebView, didFinishNavigation _: WKNavigation!) {
         hideNetworkActivitySpinner()
+
+        guard let container = webView as? ContainerWebView else { return }
+        guard let legacyWebView = container.legacyWebView else { return }
+
         // only store changes if this is not an error page
         // as we current handle tab restore as error page redirects then this ensures that we don't
         // call storeChanges unnecessarily on startup
-        if let url = webView.URL {
+        if let url = legacyWebView.URL {
             if !ErrorPageHelper.isErrorPageURL(url) {
                 storeChanges()
             }
         }
     }
 
-    func webView(webView: WKWebView, didFailNavigation _: WKNavigation!, withError _: NSError) {
+    func webView(_: WKWebView, didFailNavigation _: WKNavigation!, withError _: NSError) {
         hideNetworkActivitySpinner()
     }
 

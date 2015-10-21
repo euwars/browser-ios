@@ -48,9 +48,3 @@ public class LegacyWebViewConfiguration
     userContentController = LegacyUserContentController(webview)
   }
 }
-
-//
-//class LegacyWebViewNavigationDelegate {
-//   public func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void)
-//
-//}

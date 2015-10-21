@@ -48,15 +48,19 @@ public class LegacyWebViewProgress
     setProgress(1.0);
   }
 
-   func reset() {
+  public func reset() {
     _maxLoadCount = 0
     _loadingCount = 0
     _interactive = false
     setProgress(0.0)
   }
 
+  public func pathContainsCompleted(path: String?) -> Bool {
+    return path?.rangeOfString(completedUrlPath) != nil;
+  }
+
   public func shouldStartLoadWithRequest(request: NSURLRequest, navigationType:UIWebViewNavigationType) ->Bool {
-    if (request.URL?.path == completedUrlPath) {
+    if (pathContainsCompleted(request.URL?.fragment)) {
       completeProgress()
       return false;
     }
@@ -104,7 +108,7 @@ public class LegacyWebViewProgress
           "window.addEventListener('load',function() {" +
           "var iframe = document.createElement('iframe');" +
           "iframe.style.display = 'none';" +
-          "iframe.src = '%@://%@%@';" +
+          "iframe.src = '%@://%@/#%@';" +
           "document.body.appendChild(iframe);" +
           "  }, false);",
           scheme,

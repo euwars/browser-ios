@@ -1550,24 +1550,26 @@ extension BrowserViewController: WKNavigationDelegate {
     func webView(webView: WKWebView,
         didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge,
         completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
-            if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest {
-                if let tab = tabManager[webView] {
-                    let helper = tab.getHelper(name: LoginsHelper.name()) as! LoginsHelper
-                    helper.handleAuthRequest(self, challenge: challenge).uponQueue(dispatch_get_main_queue()) { res in
-                        if let credentials = res.successValue {
-                            completionHandler(.UseCredential, credentials.credentials)
-                        } else {
-                            completionHandler(NSURLSessionAuthChallengeDisposition.RejectProtectionSpace, nil)
-                        }
-                    }
-                }
-            } else {
-                completionHandler(NSURLSessionAuthChallengeDisposition.PerformDefaultHandling, nil)
-            }
+ //           if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest {
+//                if let tab = tabManager[webView] {
+//                    let helper = tab.getHelper(name: LoginsHelper.name()) as! LoginsHelper
+//                    helper.handleAuthRequest(self, challenge: challenge).uponQueue(dispatch_get_main_queue()) { res in
+//                        if let credentials = res.successValue {
+//                            completionHandler(.UseCredential, credentials.credentials)
+//                        } else {
+//                            completionHandler(NSURLSessionAuthChallengeDisposition.RejectProtectionSpace, nil)
+//                        }
+//                    }
+//                }
+//            } else {
+//                completionHandler(NSURLSessionAuthChallengeDisposition.PerformDefaultHandling, nil)
+//            }
     }
 
     func webView(webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
-        let tab: Browser! = tabManager[webView]
+        guard let container = webView as? ContainerWebView else { return }
+        guard let legacyWebView = container.legacyWebView else { return }
+        let tab: Browser! = tabManager[legacyWebView]
         tabManager.expireSnackbars()
 
         if let url = webView.URL where !ErrorPageHelper.isErrorPageURL(url) && !AboutUtils.isAboutHomeURL(url) {
@@ -1669,50 +1671,50 @@ extension BrowserViewController: WKUIDelegate {
 //    }
 
     func webView(webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: () -> Void) {
-        tabManager.selectTab(tabManager[webView])
-
-        // Show JavaScript alerts.
-        let title = frame.request.URL!.host
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
-            completionHandler()
-        }))
-        presentViewController(alertController, animated: true, completion: nil)
+//        tabManager.selectTab(tabManager[webView])
+//
+//        // Show JavaScript alerts.
+//        let title = frame.request.URL!.host
+//        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
+//            completionHandler()
+//        }))
+//        presentViewController(alertController, animated: true, completion: nil)
     }
 
     func webView(webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: (Bool) -> Void) {
-        tabManager.selectTab(tabManager[webView])
-
-        // Show JavaScript confirm dialogs.
-        let title = frame.request.URL!.host
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
-            completionHandler(true)
-        }))
-        alertController.addAction(UIAlertAction(title: CancelString, style: UIAlertActionStyle.Cancel, handler: { _ in
-            completionHandler(false)
-        }))
-        presentViewController(alertController, animated: true, completion: nil)
+//        tabManager.selectTab(tabManager[webView])
+//
+//        // Show JavaScript confirm dialogs.
+//        let title = frame.request.URL!.host
+//        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+//        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
+//            completionHandler(true)
+//        }))
+//        alertController.addAction(UIAlertAction(title: CancelString, style: UIAlertActionStyle.Cancel, handler: { _ in
+//            completionHandler(false)
+//        }))
+//        presentViewController(alertController, animated: true, completion: nil)
     }
 
     func webView(webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: (String?) -> Void) {
-        tabManager.selectTab(tabManager[webView])
-
-        // Show JavaScript input dialogs.
-        let title = frame.request.URL!.host
-        let alertController = UIAlertController(title: title, message: prompt, preferredStyle: UIAlertControllerStyle.Alert)
-        var input: UITextField!
-        alertController.addTextFieldWithConfigurationHandler({ (textField: UITextField) in
-            textField.text = defaultText
-            input = textField
-        })
-        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
-            completionHandler(input.text)
-        }))
-        alertController.addAction(UIAlertAction(title: CancelString, style: UIAlertActionStyle.Cancel, handler: { _ in
-            completionHandler(nil)
-        }))
-        presentViewController(alertController, animated: true, completion: nil)
+//        tabManager.selectTab(tabManager[webView])
+//
+//        // Show JavaScript input dialogs.
+//        let title = frame.request.URL!.host
+//        let alertController = UIAlertController(title: title, message: prompt, preferredStyle: UIAlertControllerStyle.Alert)
+//        var input: UITextField!
+//        alertController.addTextFieldWithConfigurationHandler({ (textField: UITextField) in
+//            textField.text = defaultText
+//            input = textField
+//        })
+//        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
+//            completionHandler(input.text)
+//        }))
+//        alertController.addAction(UIAlertAction(title: CancelString, style: UIAlertActionStyle.Cancel, handler: { _ in
+//            completionHandler(nil)
+//        }))
+//        presentViewController(alertController, animated: true, completion: nil)
     }
 
     /// Invoked when an error occurs during a committed main frame navigation.
@@ -1751,7 +1753,9 @@ extension BrowserViewController: WKUIDelegate {
         }
 
         if error.code == Int(CFNetworkErrors.CFURLErrorCancelled.rawValue) {
-            if let browser = tabManager[webView] where browser === tabManager.selectedTab {
+            guard let container = webView as? ContainerWebView else { return }
+            guard let legacyWebView = container.legacyWebView else { return }
+            if let browser = tabManager[legacyWebView] where browser === tabManager.selectedTab {
                 urlBar.currentURL = browser.displayURL
             }
             return
