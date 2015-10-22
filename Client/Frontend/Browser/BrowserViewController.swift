@@ -1570,7 +1570,8 @@ extension BrowserViewController: WKNavigationDelegate {
     func webView(_webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
         guard let container = _webView as? ContainerWebView else { return }
         guard let legacyWebView = container.legacyWebView else { return }
-        let tab: Browser! = tabManager[legacyWebView]
+        guard let tab = tabManager[legacyWebView] else { return }
+      
         tabManager.expireSnackbars()
 
         if let url = legacyWebView.URL where !ErrorPageHelper.isErrorPageURL(url) && !AboutUtils.isAboutHomeURL(url) {
