@@ -26,23 +26,45 @@ enum KVOStrings: String {
 
 public class LegacyWebView: UIWebView {
   lazy var configuration: LegacyWebViewConfiguration = { return LegacyWebViewConfiguration(webview: self) }()
-  weak var navigationDelegate: WKNavigationDelegate?;
-  weak var UIDelegate: WKUIDelegate?;
-  var backForwardList: LegacyBackForwardList = LegacyBackForwardList();
-  var estimatedProgress: Double = 0;
-  var title: String = "";
+  weak var navigationDelegate: WKNavigationDelegate?
+  weak var UIDelegate: WKUIDelegate?
+  var backForwardList: LegacyBackForwardList = LegacyBackForwardList()
+  var estimatedProgress: Double = 0
+  var title: String = ""
   lazy var progress: LegacyWebViewProgress = { return LegacyWebViewProgress(parent: self) }()
   lazy var webViewDelegate: WebViewDelegate = { return WebViewDelegate(parent: self) }()
-
-  var URL: NSURL?;
+  var URL: NSURL?
+  var internalIsLoadingEndedFlag: Bool = false;
 
   override init(frame: CGRect) {
     super.init(frame: frame)
     self.delegate = self.webViewDelegate
   }
 
+  override public var loading: Bool {
+    get {
+      if internalIsLoadingEndedFlag {
+        // we detected load complete internally –UIWebView sometimes stays in a loading state (i.e. bbc.com)
+        return false
+      }
+      return super.loading
+    }
+  }
+
   public required init?(coder aDecoder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
+  }
+
+  func kvoBroadcast(kvos: [KVOStrings]? = nil) {
+    if let _kvos = kvos {
+      for item in _kvos {
+        willChangeValueForKey(item.rawValue)
+        didChangeValueForKey(item.rawValue)
+      }
+    } else {
+      // send all
+      kvoBroadcast(KVOStrings.allValues)
+    }
   }
 
   func setScalesPageToFit(setPages: Bool!) {
@@ -58,16 +80,16 @@ public class LegacyWebView: UIWebView {
   }
 
   func reloadFromOrigin() {
-    self.reload();
+    self.reload()
   }
 
   func evaluateJavaScript(javaScriptString: String, completionHandler: ((AnyObject?, NSError?) -> Void)?) {
-    let string = stringByEvaluatingJavaScriptFromString(javaScriptString);
+    let string = stringByEvaluatingJavaScriptFromString(javaScriptString)
     completionHandler?(string, NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil))
   }
 
   func goToBackForwardListItem(item: WKBackForwardListItem) {
-    assert(false);
+    assert(false)
   }
 
   override public func goBack() {
@@ -134,11 +156,11 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
         item.writableInitialUrl = request.URL
         ////////////item.writableTitle = "to do"
         _parent.backForwardList.pushItem(item)
-        _parent.URL = request.URL;
+        _parent.URL = request.URL
       }
 
-      kvoBroadcast(nil);
-      return result;
+      _parent.kvoBroadcast()
+      return result
   }
 
 
@@ -147,20 +169,23 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
       nd.webView?(nullWebView, didStartProvisionalNavigation: nullWKNavigation)
     }
     parent?.progress.webViewDidStartLoad()
-    kvoBroadcast([KVOStrings.kvoLoading])
+    parent?.kvoBroadcast([KVOStrings.kvoLoading])
   }
 
   func webViewDidFinishLoad(webView: UIWebView) {
-    if let nd = parent?.navigationDelegate {
+    guard let _parent = parent else { return }
+
+    _parent.kvoBroadcast()
+
+    if let nd = _parent.navigationDelegate {
       let container = ContainerWebView()
-      container.legacyWebView = parent;
+      container.legacyWebView = parent
       nd.webView?(container, didFinishNavigation: nullWKNavigation)
     }
 
-    guard let _parent = parent else { return }
     _parent.progress.webViewDidFinishLoad()
 
-    _parent.title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? "";
+    _parent.title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? ""
     if let item = _parent.backForwardList.currentItem as? LegacyBackForwardListItem {
       item.writableTitle = _parent.title
     }
@@ -175,10 +200,8 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     }
 
     if (!webView.loading) {
-      parent?.configuration.userContentController.inject()
+      _parent.configuration.userContentController.inject()
     }
-
-    kvoBroadcast(nil);
   }
 
   func webView(webView: UIWebView, didFailLoadWithError error: NSError?) {
@@ -187,18 +210,6 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
         withError: error ?? NSError.init(domain: "", code: 0, userInfo: nil))
     }
     parent?.progress.didFailLoadWithError()
-    kvoBroadcast(nil);
-  }
-
-  func kvoBroadcast(kvos: [KVOStrings]?) {
-    if let _kvos = kvos {
-      for item in _kvos {
-        parent?.willChangeValueForKey(item.rawValue)
-        parent?.didChangeValueForKey(item.rawValue)
-      }
-    } else {
-      // send all
-      kvoBroadcast(KVOStrings.allValues)
-    }
+    parent?.kvoBroadcast()
   }
 }

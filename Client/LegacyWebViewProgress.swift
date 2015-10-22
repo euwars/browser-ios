@@ -23,8 +23,9 @@ public class LegacyWebViewProgress
   }
 
   func setProgress(progress: Double) {
-    if (progress > webView?.estimatedProgress || progress == 0) {
+    if (progress > webView?.estimatedProgress || progress == 0 || progress > 0.99) {
       webView?.estimatedProgress = progress;
+      webView?.kvoBroadcast()
     }
   }
 
@@ -35,17 +36,18 @@ public class LegacyWebViewProgress
   }
 
   func incrementProgress() {
-    var progress = webView?.estimatedProgress ?? 0.0;
-    let maxProgress = _interactive ? finalProgressValue : interactiveProgressValue;
-    let remainPercent = Double(_loadingCount) / Double(_maxLoadCount);
-    let increment = (maxProgress - progress) * remainPercent;
-    progress += increment;
-    progress = fmin(progress, maxProgress);
-    setProgress(progress);
+    var progress = webView?.estimatedProgress ?? 0.0
+    let maxProgress = _interactive ? finalProgressValue : interactiveProgressValue
+    let remainPercent = Double(_loadingCount) / Double(_maxLoadCount)
+    let increment = (maxProgress - progress) * remainPercent
+    progress += increment
+    progress = fmin(progress, maxProgress)
+    setProgress(progress)
   }
 
   func completeProgress() {
-    setProgress(1.0);
+    webView?.internalIsLoadingEndedFlag = true
+    setProgress(1.0)
   }
 
   public func reset() {
@@ -53,16 +55,17 @@ public class LegacyWebViewProgress
     _loadingCount = 0
     _interactive = false
     setProgress(0.0)
+    webView?.internalIsLoadingEndedFlag = false
   }
 
   public func pathContainsCompleted(path: String?) -> Bool {
-    return path?.rangeOfString(completedUrlPath) != nil;
+    return path?.rangeOfString(completedUrlPath) != nil
   }
 
   public func shouldStartLoadWithRequest(request: NSURLRequest, navigationType:UIWebViewNavigationType) ->Bool {
     if (pathContainsCompleted(request.URL?.fragment)) {
       completeProgress()
-      return false;
+      return false
     }
 
     var isFragmentJump: Bool = false
@@ -83,7 +86,7 @@ public class LegacyWebViewProgress
       _currentURL = request.URL
       reset()
     }
-    return true;
+    return true
   }
 
   public func webViewDidStartLoad() {

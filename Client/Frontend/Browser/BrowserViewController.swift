@@ -750,7 +750,7 @@ class BrowserViewController: UIViewController {
             guard let progress = change?[NSKeyValueChangeNewKey] as? Float else { break }
             urlBar.updateProgressBar(progress)
             // when loading is stopped, KVOLoading is fired first, and only then KVOEstimatedProgress with progress 1.0 which would leave the progress bar running
-            if progress != 1.0 || tabManager.selectedTab?.loading ?? false {
+            if progress < 1.0 || tabManager.selectedTab?.loading ?? false {
                 auralProgress.progress = Double(progress)
             }
         case KVOLoading:
