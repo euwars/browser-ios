@@ -13,7 +13,7 @@ public class LegacyWebViewProgress
   var _loadingCount: Int = 0;
   var _maxLoadCount: Int = 0;
   var _interactive: Bool = false;
-  //var _progress: Double = 0.0;
+
   weak var webView: LegacyWebView?;
   var _currentURL: NSURL?;
 
@@ -35,7 +35,7 @@ public class LegacyWebViewProgress
   }
 
   func incrementProgress() {
-    var progress:Double = webView?.estimatedProgress ?? 0.0;
+    var progress = webView?.estimatedProgress ?? 0.0;
     let maxProgress = _interactive ? finalProgressValue : interactiveProgressValue;
     let remainPercent = Double(_loadingCount) / Double(_maxLoadCount);
     let increment = (maxProgress - progress) * remainPercent;
@@ -117,7 +117,7 @@ public class LegacyWebViewProgress
         webView?.stringByEvaluatingJavaScriptFromString(waitForCompleteJS)
       }
     }
-    let isNotRedirect = _currentURL != nil && _currentURL == webView?.request?.mainDocumentURL;
+    let isNotRedirect = _currentURL != nil && _currentURL == webView?.request?.mainDocumentURL
     let complete = readyState == "complete"
     if (complete && isNotRedirect) {
       completeProgress()

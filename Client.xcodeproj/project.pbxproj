@@ -222,7 +222,7 @@
 		2F3724E81ABF3C19007607FA /* StorageClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3724E31ABF3C19007607FA /* StorageClient.swift */; };
 		2F3724E91ABF3C19007607FA /* Synchronizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3724E41ABF3C19007607FA /* Synchronizer.swift */; };
 		2F3724EA1ABF3C19007607FA /* Synchronizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3724E41ABF3C19007607FA /* Synchronizer.swift */; };
-		2F44FA161A9D41A200FD20CC /* Base32.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 2F44F9FD1A9D417600FD20CC /* Base32.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2F44FA161A9D41A200FD20CC /* .framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 2F44F9FD1A9D417600FD20CC /* .framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F44FA1A1A9D426A00FD20CC /* TestHashExtensions.swift */; };
 		2F44FB2C1A9D5D8500FD20CC /* Home.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F84B22261A09127C00AAB793 /* Home.xcassets */; };
 		2F44FB2D1A9D5D8500FD20CC /* FiraSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E4B7B7421A793CF20022C5E0 /* FiraSans-BoldItalic.ttf */; };
@@ -651,11 +651,11 @@
 		EB9412C11BD80FCA00B21564 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BF1BD80FC900B21564 /* Crashlytics.framework */; };
 		EB994FE61BD545A60023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; };
 		EB99500C1BD549480023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; };
-		EB99500F1BD575BE0023B5E1 /* LegacyWebViewBackForward.m in Sources */ = {isa = PBXBuildFile; fileRef = EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */; };
 		EB9950111BD5932E0023B5E1 /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */; };
 		EB9950121BD5A1810023B5E1 /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */; };
 		EB9950141BD6AA930023B5E1 /* LegacyWebViewScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */; };
 		EB9950151BD6ACFE0023B5E1 /* LegacyWebViewScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */; };
+		EBB305541BD96C3D0055439F /* LegacyWebViewBackForward.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBB305531BD96C3D0055439F /* LegacyWebViewBackForward.swift */; };
 		EBBBFEBF1BD6CA32004A0D7C /* LegacyJSContext.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */; };
 		EBBBFEC01BD6CA32004A0D7C /* LegacyJSContext.m in Sources */ = {isa = PBXBuildFile; fileRef = EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
@@ -1301,7 +1301,7 @@
 			files = (
 				D30DD4251B94FE0E00850E76 /* SQLite.framework in Copy Frameworks */,
 				E4D567301ADECE2800F1EFE7 /* ReadingList.framework in Copy Frameworks */,
-				2F44FA161A9D41A200FD20CC /* Base32.framework in Copy Frameworks */,
+				2F44FA161A9D41A200FD20CC /* .framework in Copy Frameworks */,
 				0BA84AE41AE57147009C4D0C /* SnapKit.framework in Copy Frameworks */,
 				D38B2D881A8D98700040E6B5 /* SWXMLHash.framework in Copy Frameworks */,
 				2FCAE2321ABB51F800877008 /* Storage.framework in Copy Frameworks */,
@@ -1821,10 +1821,9 @@
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		EB9412C21BD829A200B21564 /* ViewLater.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ViewLater.entitlements; sourceTree = "<group>"; };
 		EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebView.swift; sourceTree = SOURCE_ROOT; };
-		EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegacyWebViewBackForward.h; sourceTree = "<group>"; };
-		EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegacyWebViewBackForward.m; sourceTree = "<group>"; };
 		EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewProgress.swift; sourceTree = "<group>"; };
 		EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewScripting.swift; sourceTree = "<group>"; };
+		EBB305531BD96C3D0055439F /* LegacyWebViewBackForward.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewBackForward.swift; sourceTree = "<group>"; };
 		EBBBFEBD1BD6CA32004A0D7C /* LegacyJSContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LegacyJSContext.h; sourceTree = "<group>"; };
 		EBBBFEBE1BD6CA32004A0D7C /* LegacyJSContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LegacyJSContext.m; sourceTree = "<group>"; };
 		EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareTo.entitlements; sourceTree = "<group>"; };
@@ -2290,7 +2289,7 @@
 			children = (
 				2F44F9F91A9D417600FD20CC /* Base32.framework */,
 				2F44F9FB1A9D417600FD20CC /* Base32-MacTests.xctest */,
-				2F44F9FD1A9D417600FD20CC /* Base32.framework */,
+				2F44F9FD1A9D417600FD20CC /* .framework */,
 				2F44F9FF1A9D417600FD20CC /* Base32-iOSTests.xctest */,
 				2F44FA011A9D417600FD20CC /* SecEncodeTransformTests.xctest */,
 			);
@@ -3021,8 +3020,7 @@
 				EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */,
 				EB9950131BD6AA930023B5E1 /* LegacyWebViewScripting.swift */,
 				EB9950101BD5932E0023B5E1 /* LegacyWebViewProgress.swift */,
-				EB99500D1BD575BE0023B5E1 /* LegacyWebViewBackForward.h */,
-				EB99500E1BD575BE0023B5E1 /* LegacyWebViewBackForward.m */,
+				EBB305531BD96C3D0055439F /* LegacyWebViewBackForward.swift */,
 				F84B22431A09165600AAB793 /* Info.plist */,
 				E4D8F3B21ACDD5150005A2E4 /* InfoPlist.strings */,
 				E60961841B62B7E100DD640F /* Configuration */,
@@ -3847,10 +3845,10 @@
 			remoteRef = 2F44F9FA1A9D417600FD20CC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		2F44F9FD1A9D417600FD20CC /* Base32.framework */ = {
+		2F44F9FD1A9D417600FD20CC /* .framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
-			path = Base32.framework;
+			path = .framework;
 			remoteRef = 2F44F9FC1A9D417600FD20CC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -4695,7 +4693,6 @@
 				D38B2D341A8D96D00040E6B5 /* GCDWebServerFunctions.m in Sources */,
 				E4B334611BBF2393004E2BFF /* ADJUtil.m in Sources */,
 				E698FFDA1B4AADF40001F623 /* BrowserScrollController.swift in Sources */,
-				EB99500F1BD575BE0023B5E1 /* LegacyWebViewBackForward.m in Sources */,
 				D34510881ACF415700EC27F0 /* SearchLoader.swift in Sources */,
 				E4B3345D1BBF2393004E2BFF /* ADJRequestHandler.m in Sources */,
 				D30B101E1AA7F9C600C01CA3 /* HomePanels.swift in Sources */,
@@ -4750,6 +4747,7 @@
 				D3A9949C1A3686BD008AD1AC /* BrowserViewController.swift in Sources */,
 				59A681BDFC95A19F05E07223 /* SearchViewController.swift in Sources */,
 				D30B0F301AA7D66300C01CA3 /* ThumbnailCell.swift in Sources */,
+				EBB305541BD96C3D0055439F /* LegacyWebViewBackForward.swift in Sources */,
 				59A68B280D62462B85CF57A4 /* HistoryPanel.swift in Sources */,
 				E4B334541BBF2393004E2BFF /* ADJAdjustFactory.m in Sources */,
 				59A68E0B4ABBF55E14819668 /* BookmarksPanel.swift in Sources */,

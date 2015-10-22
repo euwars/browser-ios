@@ -65,7 +65,7 @@
   context[@"Window"][@"prototype"][@"webkit"][@"messageHandlers"][handlerName][@"postMessage"] =
   ^(NSDictionary* message) {
 #ifdef DEBUG
-    NSLog(@"%@ %@", handlerName, message);
+    //NSLog(@"%@ %@", handlerName, message);
 #endif
     LegacyScriptMessage* msg = [LegacyScriptMessage new];
     msg.writeableBody = message;
