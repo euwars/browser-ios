@@ -40,8 +40,13 @@ class LegacyBackForwardList : WKBackForwardList {
   }
 
   func pushItem(item: LegacyBackForwardListItem) {
-    if (writableForwardBackList.count - 1 > currentIndex + 1) {
-      writableForwardBackList.removeRange((currentIndex + 1)..<writableForwardBackList.count)
+    if (writableForwardBackList.count > currentIndex + 1) {
+      print("\(writableForwardBackList.count) > \(currentIndex + 1)")
+      while (writableForwardBackList.count - 1 > currentIndex) {
+        writableForwardBackList.removeLast()
+      }
+
+      //writableForwardBackList.removeRange((currentIndex + 1)..<writableForwardBackList.count)
     }
     writableForwardBackList.append(item)
     currentIndex = writableForwardBackList.count - 1
