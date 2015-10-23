@@ -12,6 +12,7 @@ class LegacyBackForwardList {
   var currentIndex: Int = 0
   var backForwardList: [LegacyBackForwardListItem] = []
 
+  var cachedHistoryStringLength = 0
 
   private func isSpecial(_url: NSURL?) -> Bool {
     guard let url = _url else { return false }
@@ -22,9 +23,15 @@ class LegacyBackForwardList {
     backForwardList = []
     guard let obj = webview.valueForKeyPath("documentView.webView.backForwardList") else { return }
     let history = obj.description
-    let regex = try! NSRegularExpression(pattern:"\\d+\\) +<WebHistoryItem.+> (http.+) ", options: [])
-
     let nsHistory = history as NSString
+
+    if cachedHistoryStringLength > 0 &&
+      cachedHistoryStringLength == nsHistory.length {
+        return;
+    }
+    cachedHistoryStringLength = nsHistory.length
+
+    let regex = try! NSRegularExpression(pattern:"\\d+\\) +<WebHistoryItem.+> (http.+) ", options: [])
     let result = regex.matchesInString(history, options: [], range: NSMakeRange(0, history.characters.count))
     var i = 0
     for match in result {
