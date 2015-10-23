@@ -173,16 +173,16 @@ class Browser: NSObject {
         return webView?.estimatedProgress ?? 0
     }
 
-    var backList: [WKBackForwardListItem]? {
+    var backList: [LegacyBackForwardListItem]? {
         return webView?.backForwardList.backList
     }
 
-    var forwardList: [WKBackForwardListItem]? {
+    var forwardList: [LegacyBackForwardListItem]? {
         return webView?.backForwardList.forwardList
     }
 
     var historyList: [NSURL] {
-        func listToUrl(item: WKBackForwardListItem) -> NSURL { return item.URL }
+        func listToUrl(item: LegacyBackForwardListItem) -> NSURL { return item.URL }
         if let backlist = self.backList {
           var tabs = backlist.map(listToUrl) ?? [NSURL]()
           tabs.append(self.url!)
@@ -259,7 +259,7 @@ class Browser: NSObject {
         webView?.goForward()
     }
 
-    func goToBackForwardListItem(item: WKBackForwardListItem) {
+    func goToBackForwardListItem(item: LegacyBackForwardListItem) {
         webView?.goToBackForwardListItem(item)
     }
 

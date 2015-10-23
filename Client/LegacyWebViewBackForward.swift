@@ -1,73 +1,57 @@
 import Foundation
 
-class LegacyBackForwardListItem : WKBackForwardListItem {
+class LegacyBackForwardListItem  {
 
-  var writableUrl: NSURL?
-  var writableInitialUrl: NSURL?
-  var writableTitle: String?
-
-  override var URL: NSURL {
-    get {
-      return writableUrl ?? NSURL()
-    }}
-
-  override var initialURL: NSURL {
-    get {
-      return writableInitialUrl ?? NSURL()
-    }}
-
-  override var title:String {
-    get {
-      return writableTitle ?? String()
-    }}
+  var URL: NSURL = NSURL()
+  var initialURL: NSURL = NSURL()
+  var title:String = ""
 }
 
-class LegacyBackForwardList : WKBackForwardList {
+class LegacyBackForwardList {
 
   var currentIndex: Int = 0
   var writableForwardBackList: [LegacyBackForwardListItem] = []
 
   func goBack() {
-    if (currentIndex > 0) {
+    if currentIndex > 0 {
       self.currentIndex--
     }
   }
 
   func goForward() {
-    if (currentIndex < writableForwardBackList.count - 1) {
+    if currentIndex < (writableForwardBackList.count - 1) {
       self.currentIndex++
     }
   }
 
   func pushItem(item: LegacyBackForwardListItem) {
-    if (writableForwardBackList.count > currentIndex + 1) {
-      print("\(writableForwardBackList.count) > \(currentIndex + 1)")
-      while (writableForwardBackList.count - 1 > currentIndex) {
-        writableForwardBackList.removeLast()
+    if (writableForwardBackList.count - 1) > currentIndex {
+      if let current = currentItem {
+        writableForwardBackList = backList
+        writableForwardBackList.append(current)
       }
-
-      //writableForwardBackList.removeRange((currentIndex + 1)..<writableForwardBackList.count)
     }
     writableForwardBackList.append(item)
     currentIndex = writableForwardBackList.count - 1
+    print("bf count \(writableForwardBackList.count), current index: \(currentIndex)  #########################################")
   }
 
-  override var currentItem: WKBackForwardListItem? {
+  var currentItem: LegacyBackForwardListItem? {
     get {
         return itemAtIndex(currentIndex)
     }}
 
-  override var backItem: WKBackForwardListItem? {
+  var backItem: LegacyBackForwardListItem? {
     get {
       return itemAtIndex(currentIndex - 1)
     }}
 
-  override var forwardItem: WKBackForwardListItem? {
+  var forwardItem: LegacyBackForwardListItem? {
     get {
       return itemAtIndex(currentIndex + 1)
     }}
 
-  override func itemAtIndex(index: Int) -> WKBackForwardListItem? {
+  func itemAtIndex(index: Int) -> LegacyBackForwardListItem? {
       if (writableForwardBackList.count == 0 ||
           index > writableForwardBackList.count - 1 ||
           index < 0) {
@@ -76,12 +60,12 @@ class LegacyBackForwardList : WKBackForwardList {
       return writableForwardBackList[index]
     }
 
-  override var backList: [WKBackForwardListItem] {
+  var backList: [LegacyBackForwardListItem] {
     get {
       return (currentIndex > 0) ? Array(writableForwardBackList[0..<currentIndex]) : []
     }}
 
-  override var forwardList: [WKBackForwardListItem] {
+  var forwardList: [LegacyBackForwardListItem] {
     get {
       return (currentIndex + 1 < writableForwardBackList.count) ?
               Array(writableForwardBackList[(currentIndex + 1)..<writableForwardBackList.count]) : []

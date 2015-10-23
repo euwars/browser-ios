@@ -6,7 +6,7 @@ import UIKit
 import WebKit
 
 class BackForwardListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    var listData: [WKBackForwardListItem]?
+    var listData: [LegacyBackForwardListItem]?
     var tabManager: TabManager!
 
     override func viewDidLoad() {

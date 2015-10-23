@@ -371,7 +371,7 @@ extension TabManager {
             super.init()
 
             if browser.sessionData == nil {
-                let currentItem: WKBackForwardListItem! = browser.webView?.backForwardList.currentItem
+                let currentItem: LegacyBackForwardListItem! = browser.webView?.backForwardList.currentItem
 
                 // Freshly created web views won't have any history entries at all.
                 // If we have no history, abort.

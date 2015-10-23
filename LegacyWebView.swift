@@ -1,7 +1,6 @@
 import Foundation
 import WebKit
-
-
+import Shared
 
 func convertNavActionToWKType(type:UIWebViewNavigationType) -> WKNavigationType {
   return WKNavigationType(rawValue: type.rawValue)!
@@ -39,6 +38,12 @@ public class LegacyWebView: UIWebView {
   override init(frame: CGRect) {
     super.init(frame: frame)
     self.delegate = self.webViewDelegate
+
+#if DEBUG
+    // TODO move to better spot, these quiet the logging from the core of fx ios
+    GCDWebServer.setLogLevel(5)
+    Logger.syncLogger.setup(.None)
+#endif
   }
 
   override public var loading: Bool {
@@ -88,7 +93,7 @@ public class LegacyWebView: UIWebView {
     completionHandler?(string, NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil))
   }
 
-  func goToBackForwardListItem(item: WKBackForwardListItem) {
+  func goToBackForwardListItem(item: LegacyBackForwardListItem) {
     assert(false)
   }
 
@@ -152,9 +157,8 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
       let locationChanged = LegacyWebView.isTopFrameRequest(request)
       if locationChanged && (navigationType == .LinkClicked || navigationType == .Other) {
         let item:LegacyBackForwardListItem = LegacyBackForwardListItem()
-        item.writableUrl = request.URL
-        item.writableInitialUrl = request.URL
-        ////////////item.writableTitle = "to do"
+        item.URL = request.URL ?? item.URL
+        item.initialURL = request.URL ?? item.initialURL
         _parent.backForwardList.pushItem(item)
         _parent.URL = request.URL
       }
@@ -173,6 +177,8 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
   }
 
   func webViewDidFinishLoad(webView: UIWebView) {
+    assert(NSThread.isMainThread())
+
     guard let _parent = parent else { return }
 
     _parent.kvoBroadcast()
@@ -186,15 +192,15 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     _parent.progress.webViewDidFinishLoad()
 
     _parent.title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? ""
-    if let item = _parent.backForwardList.currentItem as? LegacyBackForwardListItem {
-      item.writableTitle = _parent.title
+    if let item = _parent.backForwardList.currentItem {
+      item.title = _parent.title
     }
 
     if let scrapedUrl = webView.stringByEvaluatingJavaScriptFromString("window.location.href") {
       if !_parent.progress.pathContainsCompleted(scrapedUrl) {
         _parent.URL = NSURL(string: scrapedUrl)
-        if let item = _parent.backForwardList.currentItem as? LegacyBackForwardListItem {
-          item.writableUrl = _parent.URL
+        if let item = _parent.backForwardList.currentItem {
+          item.URL = _parent.URL ?? item.URL
         }
       }
     }
