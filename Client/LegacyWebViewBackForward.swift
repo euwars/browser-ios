@@ -12,60 +12,36 @@ class LegacyBackForwardList {
   var currentIndex: Int = 0
   var backForwardList: [LegacyBackForwardListItem] = []
 
-  func dump() {
-    for i in backList {
-      print("\(i.URL.absoluteString)")
-    }
-  }
-
-  func goBack() {
-    if currentIndex > 0 {
-      self.currentIndex--
-    }
-    dump()
-  }
-
-  func goForward() {
-    if currentIndex < (backForwardList.count - 1) {
-      self.currentIndex++
-    }
-    dump()
-  }
 
   private func isSpecial(_url: NSURL?) -> Bool {
     guard let url = _url else { return false }
     return url.absoluteString.rangeOfString(WebServer.sharedInstance.base) != nil
   }
 
-  func push(_url: NSURL?) {
-    guard let url = _url else { return }
-    if (url.absoluteString.characters.count < 1 || currentItem?.URL.absoluteString == url.absoluteString) {
-      return
-    }
+  func update(webview: UIWebView) {
+    backForwardList = []
+    guard let obj = webview.valueForKeyPath("documentView.webView.backForwardList") else { return }
+    let history = obj.description
+    let regex = try! NSRegularExpression(pattern:"\\d+\\) +<WebHistoryItem.+> (http.+) ", options: [])
 
-    // only one localhost entry allowed, just update the curent one
-    if (isSpecial(_url) && isSpecial(currentItem?.URL)) {
-      currentItem?.URL = url
-      currentItem?.initialURL = url
-      return
-    }
+    let nsHistory = history as NSString
+    let result = regex.matchesInString(history, options: [], range: NSMakeRange(0, history.characters.count))
+    var i = 0
+    for match in result {
+      guard let url = NSURL(string: nsHistory.substringWithRange(match.rangeAtIndex(1))) else { continue }
+      let item = LegacyBackForwardListItem()
+      item.URL = url
+      item.initialURL = item.URL
+      backForwardList.append(item)
 
-    let item:LegacyBackForwardListItem = LegacyBackForwardListItem()
-    item.URL = url
-    item.initialURL = url
-    pushItem(item)
-  }
-
-  func pushItem(item: LegacyBackForwardListItem) {
-    if (backForwardList.count - 1) > currentIndex {
-      if let current = currentItem {
-        backForwardList = backList
-        backForwardList.append(current)
+      let currIndicator = ">>>"
+      let rangeStart = match.range.location - currIndicator.characters.count
+      if rangeStart > -1 &&
+        nsHistory.substringWithRange(NSMakeRange(match.range.location - 4, 3)) == currIndicator {
+          currentIndex = i
       }
+      i++
     }
-    backForwardList.append(item)
-    currentIndex = backForwardList.count - 1
-    print("bf count \(backForwardList.count), current index: \(currentIndex) \(item.URL.absoluteString) ##########################")
   }
 
   var currentItem: LegacyBackForwardListItem? {

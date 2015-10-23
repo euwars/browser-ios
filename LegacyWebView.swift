@@ -99,12 +99,10 @@ public class LegacyWebView: UIWebView {
 
   override public func goBack() {
     super.goBack()
-    self.backForwardList.goBack()
   }
 
   override public func goForward() {
     super.goForward()
-    self.backForwardList.goForward()
   }
 
   class func isTopFrameRequest(request:NSURLRequest) -> Bool {
@@ -156,10 +154,6 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
 
       let locationChanged = LegacyWebView.isTopFrameRequest(request)
       if locationChanged && (navigationType == .LinkClicked || navigationType == .Other) {
-        let item:LegacyBackForwardListItem = LegacyBackForwardListItem()
-        item.URL = request.URL ?? item.URL
-        item.initialURL = request.URL ?? item.initialURL
-        _parent.backForwardList.pushItem(item)
         _parent.URL = request.URL
       }
 
@@ -169,6 +163,8 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
 
 
   func webViewDidStartLoad(webView: UIWebView) {
+    parent?.backForwardList.update(webView)
+
     if let nd = parent?.navigationDelegate {
       nd.webView?(nullWebView, didStartProvisionalNavigation: nullWKNavigation)
     }
@@ -180,14 +176,6 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     assert(NSThread.isMainThread())
 
     guard let _parent = parent else { return }
-
-    _parent.kvoBroadcast()
-
-    if let nd = _parent.navigationDelegate {
-      let container = ContainerWebView()
-      container.legacyWebView = parent
-      nd.webView?(container, didFinishNavigation: nullWKNavigation)
-    }
 
     _parent.progress.webViewDidFinishLoad()
 
@@ -207,6 +195,14 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
 
     if (!webView.loading) {
       _parent.configuration.userContentController.inject()
+    }
+
+    _parent.kvoBroadcast()
+
+    if let nd = _parent.navigationDelegate {
+      let container = ContainerWebView()
+      container.legacyWebView = parent
+      nd.webView?(container, didFinishNavigation: nullWKNavigation)
     }
   }
 
