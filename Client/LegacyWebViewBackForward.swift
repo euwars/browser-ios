@@ -34,6 +34,7 @@ class LegacyBackForwardList {
     let regex = try! NSRegularExpression(pattern:"\\d+\\) +<WebHistoryItem.+> (http.+) ", options: [])
     let result = regex.matchesInString(history, options: [], range: NSMakeRange(0, history.characters.count))
     var i = 0
+    var foundCurrent = false
     for match in result {
       guard let url = NSURL(string: nsHistory.substringWithRange(match.rangeAtIndex(1))) else { continue }
       let item = LegacyBackForwardListItem()
@@ -46,8 +47,12 @@ class LegacyBackForwardList {
       if rangeStart > -1 &&
         nsHistory.substringWithRange(NSMakeRange(match.range.location - 4, 3)) == currIndicator {
           currentIndex = i
+          foundCurrent = true
       }
       i++
+    }
+    if !foundCurrent {
+      currentIndex = 0
     }
   }
 
@@ -77,12 +82,12 @@ class LegacyBackForwardList {
 
   var backList: [LegacyBackForwardListItem] {
     get {
-      return (currentIndex > 0) ? Array(backForwardList[0..<currentIndex]) : []
+      return (currentIndex > 0 && backForwardList.count > 0) ? Array(backForwardList[0..<currentIndex]) : []
     }}
 
   var forwardList: [LegacyBackForwardListItem] {
     get {
-      return (currentIndex + 1 < backForwardList.count) ?
+      return (currentIndex + 1 < backForwardList.count  && backForwardList.count > 0) ?
               Array(backForwardList[(currentIndex + 1)..<backForwardList.count]) : []
     }}
 }
