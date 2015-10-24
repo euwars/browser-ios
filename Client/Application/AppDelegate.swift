@@ -6,9 +6,12 @@ import Shared
 import Storage
 import AVFoundation
 import XCGLogger
-//import Breakpad
+#if !BRAVE
+import Breakpad
+#else
 import Fabric
 import Crashlytics
+#endif
 
 private let log = Logger.browserLogger
 
@@ -22,7 +25,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
 
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+#if BRAVE
         Fabric.with([Crashlytics.self])
+#endif
         // Set the Firefox UA for browsing.
         setUserAgent()
 
@@ -65,6 +70,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.rootViewController = rootViewController
         self.window!.backgroundColor = UIConstants.AppBackgroundColor
 
+#if !BRAVE
+        activeCrashReporter = BreakpadCrashReporter(breakpadInstance: BreakpadController.sharedInstance())
+        configureActiveCrashReporter(profile.prefs.boolForKey("crashreports.send.always"))
+#endif
 
         NSNotificationCenter.defaultCenter().addObserverForName(FSReadingListAddReadingListItemNotification, object: nil, queue: nil) { (notification) -> Void in
             if let userInfo = notification.userInfo, url = userInfo["URL"] as? NSURL {
@@ -230,6 +239,47 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
+
+#if !BRAVE
+  var activeCrashReporter: CrashReporter?
+  func configureActiveCrashReporter(optedIn: Bool?) {
+    if let reporter = activeCrashReporter {
+      configureCrashReporter(reporter, optedIn: optedIn)
+    }
+  }
+
+  public func configureCrashReporter(reporter: CrashReporter, optedIn: Bool?) {
+    let configureReporter: () -> () = {
+      let addUploadParameterForKey: String -> Void = { key in
+        if let value = NSBundle.mainBundle().objectForInfoDictionaryKey(key) as? String {
+          reporter.addUploadParameter(value, forKey: key)
+        }
+      }
+
+      addUploadParameterForKey("AppID")
+      addUploadParameterForKey("BuildID")
+      addUploadParameterForKey("ReleaseChannel")
+      addUploadParameterForKey("Vendor")
+    }
+
+    if let optedIn = optedIn {
+      // User has explicitly opted-in for sending crash reports. If this is not true, then the user has
+      // explicitly opted-out of crash reporting so don't bother starting breakpad or stop if it was running
+      if optedIn {
+        reporter.start(true)
+        configureReporter()
+        reporter.setUploadingEnabled(true)
+      } else {
+        reporter.stop()
+      }
+    }
+      // We haven't asked the user for their crash reporting preference yet. Log crashes anyways but don't send them.
+    else {
+      reporter.start(true)
+      configureReporter()
+    }
+  }
+#endif
 }
 
 // MARK: - Root View Controller Animations
@@ -247,3 +297,4 @@ extension AppDelegate: UINavigationControllerDelegate {
             }
     }
 }
+

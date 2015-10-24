@@ -9,15 +9,18 @@ private var appDelegate: AppDelegate.Type
 if AppConstants.IsRunningTest {
     appDelegate = TestAppDelegate.self
 } else {
-//BRAVE
-//  switch AppConstants.BuildChannel {
-//    case .Aurora:
-//        appDelegate = AuroraAppDelegate.self
-//    case .Developer:
-//        appDelegate = AppDelegate.self
-//    case .Release:
+#if BRAVE
+  appDelegate = AppDelegate.self
+#else
+  switch AppConstants.BuildChannel {
+    case .Aurora:
+        appDelegate = AuroraAppDelegate.self
+    case .Developer:
         appDelegate = AppDelegate.self
-//    }
+    case .Release:
+        appDelegate = AppDelegate.self
+    }
+#endif
 }
 
 UIApplicationMain(Process.argc, Process.unsafeArgv, NSStringFromClass(UIApplication.self), NSStringFromClass(appDelegate))

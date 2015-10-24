@@ -286,8 +286,10 @@ class TabManager : NSObject {
 
         // There's still some time between this and the webView being destroyed.
         // We don't want to pick up any stray events.
-        ///tab.webView?.navigationDelegate = nil
-
+#if !BRAVE
+   // TODO investigate this
+        tab.webView?.navigationDelegate = nil
+#endif
         for delegate in delegates {
             delegate.get()?.tabManager(self, didRemoveTab: tab)
         }
@@ -341,7 +343,9 @@ class TabManager : NSObject {
         let allowPopups = !(self.profile.prefs.boolForKey("blockPopups") ?? true)
         // Each tab may have its own configuration, so we should tell each of them in turn.
         for _ in tabs {
-            ///tab.webView?.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
+          #if !BRAVE
+            tab.webView?.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups
+          #endif
         }
         // The default tab configurations also need to change.
         self.configuration.preferences.javaScriptCanOpenWindowsAutomatically = allowPopups

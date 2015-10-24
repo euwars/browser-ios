@@ -103,14 +103,18 @@ class Browser: NSObject {
     func createWebview() {
         if webView == nil {
             assert(configuration != nil, "Create webview can only be called once")
-//            configuration!.userContentController = WKUserContentController()
-//            configuration!.preferences = WKPreferences()
-//            configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
+#if !BRAVE
+            configuration!.userContentController = WKUserContentController()
+            configuration!.preferences = WKPreferences()
+            configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
+#endif
             let webView = LegacyWebView(frame: CGRectZero)
-//            configuration = nil
+            configuration = nil
 
             webView.accessibilityLabel = NSLocalizedString("Web content", comment: "Accessibility label for the main web content view")
-//            webView.allowsBackForwardNavigationGestures = true
+#if !BRAVE
+            webView.allowsBackForwardNavigationGestures = true
+#endif
             webView.backgroundColor = UIColor.lightGrayColor()
 
             // Turning off masking allows the web content to flow outside of the scrollView's frame
@@ -183,13 +187,9 @@ class Browser: NSObject {
 
     var historyList: [NSURL] {
         func listToUrl(item: LegacyBackForwardListItem) -> NSURL { return item.URL }
-        if let backlist = self.backList {
-          var tabs = backlist.map(listToUrl) ?? [NSURL]()
-          tabs.append(self.url!)
-          return tabs
-        } else {
-          return [NSURL]();
-        }
+        var tabs = self.backList?.map(listToUrl) ?? [NSURL]()
+        tabs.append(self.url!)
+        return tabs
     }
 
     var title: String? {
@@ -266,9 +266,12 @@ class Browser: NSObject {
     func loadRequest(request: NSURLRequest) -> WKNavigation? {
         if let webView = webView {
             lastRequest = request
-            webView.loadRequest(request);
-            return nil;
-        }
+#if !BRAVE
+            return webView.loadRequest(request)
+#else
+            webView.loadRequest(request); return nil;
+#endif
+          }
         return nil
     }
 

@@ -2,6 +2,8 @@ import Foundation
 import WebKit
 import Shared
 
+func configureActiveCrashReporter(_:Bool?) {}
+
 func convertNavActionToWKType(type:UIWebViewNavigationType) -> WKNavigationType {
   return WKNavigationType(rawValue: type.rawValue)!
 }

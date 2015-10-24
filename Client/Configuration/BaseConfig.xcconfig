@@ -28,3 +28,5 @@ MOZ_BREAKPAD_SERVER_TYPE = UNSET
 
 // Vendor property to send to crash-stats
 MOZ_VENDOR = UNSET
+
+OTHER_SWIFT_FLAGS=-DBRAVE

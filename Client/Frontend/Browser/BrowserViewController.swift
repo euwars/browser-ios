@@ -409,30 +409,32 @@ class BrowserViewController: UIViewController {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
 
-// @TODO BRAVE
-//        if activeCrashReporter?.previouslyCrashed ?? false {
-//            // Reset previous crash state
-//            activeCrashReporter?.resetPreviousCrashState()
-//
-//            // Only ask to restore tabs from a crash if we had non-home tabs or tabs with some kind of history in them
-//            guard let tabsToRestore = tabManager.tabsToRestore() else { return }
-//            let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
-//            if onlyNoHistoryTabs {
-//                tabManager.addTabAndSelect();
-//                return
-//            }
-//
-//            let optedIntoCrashReporting = profile.prefs.boolForKey("crashreports.send.always")
-//            if optedIntoCrashReporting == nil {
-//                // Offer a chance to allow the user to opt into crash reporting
-//                showCrashOptInAlert()
-//            } else {
-//                showRestoreTabsAlert()
-//            }
-//        } else {
-           tabManager.restoreTabs()
-//        }
+#if BRAVE
+        tabManager.restoreTabs()
+#else
+        if activeCrashReporter?.previouslyCrashed ?? false {
+            // Reset previous crash state
+            activeCrashReporter?.resetPreviousCrashState()
 
+            // Only ask to restore tabs from a crash if we had non-home tabs or tabs with some kind of history in them
+            guard let tabsToRestore = tabManager.tabsToRestore() else { return }
+            let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
+            if onlyNoHistoryTabs {
+                tabManager.addTabAndSelect();
+                return
+            }
+
+            let optedIntoCrashReporting = profile.prefs.boolForKey("crashreports.send.always")
+            if optedIntoCrashReporting == nil {
+                // Offer a chance to allow the user to opt into crash reporting
+                showCrashOptInAlert()
+            } else {
+                showRestoreTabsAlert()
+            }
+        } else {
+           tabManager.restoreTabs()
+        }
+#endif
         updateTabCountUsingTabManager(tabManager, animated: false)
     }
 
@@ -440,12 +442,12 @@ class BrowserViewController: UIViewController {
         let alert = UIAlertController.crashOptInAlert(
             sendReportCallback: { _ in
                 // Turn on uploading but don't save opt-in flag to profile because this is a one time send.
-//                configureActiveCrashReporter(true)
+                configureActiveCrashReporter(true)
                 self.showRestoreTabsAlert()
             },
             alwaysSendCallback: { _ in
                 self.profile.prefs.setBool(true, forKey: "crashreports.send.always")
-//                configureActiveCrashReporter(true)
+                configureActiveCrashReporter(true)
                 self.showRestoreTabsAlert()
             },
             dontSendCallback: { _ in
@@ -1123,8 +1125,9 @@ extension BrowserViewController: BrowserDelegate {
 
         webView.scrollView.addObserver(self.scrollController, forKeyPath: KVOContentSize, options: .New, context: nil)
 
-        ///webView.UIDelegate = self  --> these are for javascript alert panels
-
+#if !BRAVE
+        webView.UIDelegate = self /// these are for javascript alert panels
+#endif
         let readerMode = ReaderMode(browser: browser)
         readerMode.delegate = self
         browser.addHelper(readerMode, name: ReaderMode.name())
@@ -1162,7 +1165,9 @@ extension BrowserViewController: BrowserDelegate {
         webView.scrollView.removeObserver(self.scrollController, forKeyPath: KVOContentSize)
         webView.removeObserver(self, forKeyPath: KVOURL)
 
-       // webView.UIDelegate = nil
+#if !BRAVE // todo create a fake proxy for this. it is unused completely ATM
+        webView.UIDelegate = nil
+#endif
         webView.scrollView.delegate = nil
         webView.removeFromSuperview()
     }
@@ -1651,71 +1656,76 @@ extension BrowserViewController: WKNavigationDelegate {
 
 extension BrowserViewController: WKUIDelegate {
 
-    /// THIS IS FOR _blank TARGETS
-//    func webView(webView: WKWebView, createWebViewWithConfiguration configuration: WKWebViewConfiguration, forNavigationAction navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-//
-//        guard let currentTab = tabManager.selectedTab else { return nil }
-//
-//        currentTab.setScreenshot(screenshotHelper.takeScreenshot(currentTab, aspectRatio: 0, quality: 1))
-//
-//        // If the page uses window.open() or target="_blank", open the page in a new tab.
-//        // TODO: This doesn't work for window.open() without user action (bug 1124942).
-//        let newTab: Browser
-//        if #available(iOS 9, *) {
-//            newTab = tabManager.addTab(navigationAction.request, configuration: configuration, isPrivate: currentTab.isPrivate)
-//        } else {
-//            newTab = tabManager.addTab(navigationAction.request, configuration: configuration)
-//        }
-//        tabManager.selectTab(newTab)
-//        return newTab.webView
-//    }
+#if !BRAVE
+  /// THIS IS FOR _blank TARGETS
+    func webView(webView: WKWebView, createWebViewWithConfiguration configuration: WKWebViewConfiguration, forNavigationAction navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
 
-    func webView(webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: () -> Void) {
-//        tabManager.selectTab(tabManager[webView])
-//
-//        // Show JavaScript alerts.
-//        let title = frame.request.URL!.host
-//        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-//        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
-//            completionHandler()
-//        }))
-//        presentViewController(alertController, animated: true, completion: nil)
+        guard let currentTab = tabManager.selectedTab else { return nil }
+
+        currentTab.setScreenshot(screenshotHelper.takeScreenshot(currentTab, aspectRatio: 0, quality: 1))
+
+        // If the page uses window.open() or target="_blank", open the page in a new tab.
+        // TODO: This doesn't work for window.open() without user action (bug 1124942).
+        let newTab: Browser
+        if #available(iOS 9, *) {
+            newTab = tabManager.addTab(navigationAction.request, configuration: configuration, isPrivate: currentTab.isPrivate)
+        } else {
+            newTab = tabManager.addTab(navigationAction.request, configuration: configuration)
+        }
+        tabManager.selectTab(newTab)
+        return newTab.webView
     }
+#endif
+#if !BRAVE
+  func webView(webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: () -> Void) {
+        tabManager.selectTab(tabManager[webView])
 
+        // Show JavaScript alerts.
+        let title = frame.request.URL!.host
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
+            completionHandler()
+        }))
+        presentViewController(alertController, animated: true, completion: nil)
+    }
+#endif
+#if !BRAVE
     func webView(webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: (Bool) -> Void) {
-//        tabManager.selectTab(tabManager[webView])
-//
-//        // Show JavaScript confirm dialogs.
-//        let title = frame.request.URL!.host
-//        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-//        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
-//            completionHandler(true)
-//        }))
-//        alertController.addAction(UIAlertAction(title: CancelString, style: UIAlertActionStyle.Cancel, handler: { _ in
-//            completionHandler(false)
-//        }))
-//        presentViewController(alertController, animated: true, completion: nil)
-    }
+        tabManager.selectTab(tabManager[webView])
 
-    func webView(webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: (String?) -> Void) {
-//        tabManager.selectTab(tabManager[webView])
-//
-//        // Show JavaScript input dialogs.
-//        let title = frame.request.URL!.host
-//        let alertController = UIAlertController(title: title, message: prompt, preferredStyle: UIAlertControllerStyle.Alert)
-//        var input: UITextField!
-//        alertController.addTextFieldWithConfigurationHandler({ (textField: UITextField) in
-//            textField.text = defaultText
-//            input = textField
-//        })
-//        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
-//            completionHandler(input.text)
-//        }))
-//        alertController.addAction(UIAlertAction(title: CancelString, style: UIAlertActionStyle.Cancel, handler: { _ in
-//            completionHandler(nil)
-//        }))
-//        presentViewController(alertController, animated: true, completion: nil)
+        // Show JavaScript confirm dialogs.
+        let title = frame.request.URL!.host
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
+            completionHandler(true)
+        }))
+        alertController.addAction(UIAlertAction(title: CancelString, style: UIAlertActionStyle.Cancel, handler: { _ in
+            completionHandler(false)
+        }))
+        presentViewController(alertController, animated: true, completion: nil)
     }
+#endif
+#if !BRAVE
+    func webView(webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: (String?) -> Void) {
+        tabManager.selectTab(tabManager[webView])
+
+        // Show JavaScript input dialogs.
+        let title = frame.request.URL!.host
+        let alertController = UIAlertController(title: title, message: prompt, preferredStyle: UIAlertControllerStyle.Alert)
+        var input: UITextField!
+        alertController.addTextFieldWithConfigurationHandler({ (textField: UITextField) in
+            textField.text = defaultText
+            input = textField
+        })
+        alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
+            completionHandler(input.text)
+        }))
+        alertController.addAction(UIAlertAction(title: CancelString, style: UIAlertActionStyle.Cancel, handler: { _ in
+            completionHandler(nil)
+        }))
+        presentViewController(alertController, animated: true, completion: nil)
+    }
+#endif
 
     /// Invoked when an error occurs during a committed main frame navigation.
     func webView(webView: WKWebView, didFailNavigation navigation: WKNavigation!, withError error: NSError) {
@@ -1889,11 +1899,16 @@ extension BrowserViewController {
                 if let readabilityResult = ReadabilityResult(object: object) {
                     do {
                         try self.readerModeCache.put(currentURL, readabilityResult)
-                    } catch _ {
+                    } catch _ {}
+
+#if BRAVE
+  // this is not really correct, the original code is ignoring the navigation
+  webView.loadRequest(NSURLRequest(URL: readerModeURL))
+#else
+                    if let nav = webView.loadRequest(NSURLRequest(URL: readerModeURL)) {
+                        self.ignoreNavigationInTab(tab, navigation: nav)
                     }
-///XXX                    if let nav = webView.loadRequest(NSURLRequest(URL: readerModeURL)) {
-//                        self.ignoreNavigationInTab(tab, navigation: nav)
-//                    }
+#endif
                 }
             })
         }
@@ -1917,9 +1932,14 @@ extension BrowserViewController {
                     } else if forwardList.count > 0 && forwardList.first?.URL == originalURL {
                         webView.goToBackForwardListItem(forwardList.first!)
                     } else {
-//XXX                        if let nav = webView.loadRequest(NSURLRequest(URL: originalURL)) {
-//                            self.ignoreNavigationInTab(tab, navigation: nav)
-//                        }
+#if BRAVE
+                        // this is not really correct, the original code is ignoring the navigation
+                        webView.loadRequest(NSURLRequest(URL: originalURL))
+#else
+                        if let nav = webView.loadRequest(NSURLRequest(URL: originalURL)) {
+                           self.ignoreNavigationInTab(tab, navigation: nav)
+                        }
+#endif
                     }
                 }
             }

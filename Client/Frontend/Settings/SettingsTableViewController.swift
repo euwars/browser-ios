@@ -655,7 +655,7 @@ private class SendCrashReportsSetting: Setting {
 
     @objc func switchValueChanged(control: UISwitch) {
         profile.prefs.setBool(control.on, forKey: "crashreports.send.always")
-        //configureActiveCrashReporter(profile.prefs.boolForKey("crashreports.send.always"))
+        configureActiveCrashReporter(profile.prefs.boolForKey("crashreports.send.always"))
     }
 }
 
@@ -686,7 +686,7 @@ private class ClosePrivateTabs: Setting {
 
     @objc func switchValueChanged(control: UISwitch) {
         profile.prefs.setBool(control.on, forKey: "settings.closePrivateTabs")
-        //configureActiveCrashReporter(profile.prefs.boolForKey("settings.closePrivateTabs"))
+        configureActiveCrashReporter(profile.prefs.boolForKey("settings.closePrivateTabs"))
     }
 }
 
