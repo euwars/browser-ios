@@ -26,10 +26,10 @@ enum KVOStrings: String {
 }
 
 public class LegacyWebView: UIWebView {
-  lazy var configuration: LegacyWebViewConfiguration = { return LegacyWebViewConfiguration(webview: self) }()
+  lazy var configuration: LegacyWebViewConfiguration = { return LegacyWebViewConfiguration(webView: self) }()
   weak var navigationDelegate: WKNavigationDelegate?
   weak var UIDelegate: WKUIDelegate?
-  var backForwardList: LegacyBackForwardList = LegacyBackForwardList()
+  lazy var backForwardList: LegacyBackForwardList = { return LegacyBackForwardList(webView: self) } ()
   var estimatedProgress: Double = 0
   var title: String = ""
   lazy var progress: LegacyWebViewProgress = { return LegacyWebViewProgress(parent: self) }()
@@ -90,13 +90,36 @@ public class LegacyWebView: UIWebView {
     self.reload()
   }
 
+  private func convertStringToDictionary(text: String?) -> [String:AnyObject]? {
+    if let data = text?.dataUsingEncoding(NSUTF8StringEncoding) where text?.characters.count > 0 {
+      do {
+        let json = try NSJSONSerialization.JSONObjectWithData(data, options: .MutableContainers) as? [String:AnyObject]
+        return json
+      } catch {
+        print("Something went wrong")
+      }
+    }
+    return nil
+  }
+
   func evaluateJavaScript(javaScriptString: String, completionHandler: ((AnyObject?, NSError?) -> Void)?) {
-    let string = stringByEvaluatingJavaScriptFromString(javaScriptString)
-    completionHandler?(string, NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil))
+    let wrapped = "var result = \(javaScriptString); JSON.stringify(result)"
+    let string = stringByEvaluatingJavaScriptFromString(wrapped)
+    let dict = convertStringToDictionary(string)
+    completionHandler?(dict, NSError(domain: NSURLErrorDomain, code: NSURLErrorCannotOpenFile, userInfo: nil))
   }
 
   func goToBackForwardListItem(item: LegacyBackForwardListItem) {
-    assert(false)
+    if let index = backForwardList.backList.indexOf(item) {
+      let backCount = backForwardList.backList.count - index
+      for _ in 0..<backCount {
+        goBack()
+      }
+    } else if let index = backForwardList.forwardList.indexOf(item) {
+      for _ in 0..<(index + 1) {
+        goForward()
+      }
+    }
   }
 
   override public func goBack() {

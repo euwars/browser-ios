@@ -1,16 +1,27 @@
 import Foundation
 
-class LegacyBackForwardListItem  {
+class LegacyBackForwardListItem {
 
   var URL: NSURL = NSURL()
   var initialURL: NSURL = NSURL()
   var title:String = ""
 }
 
+extension LegacyBackForwardListItem: Equatable {}
+func == (lhs: LegacyBackForwardListItem, rhs: LegacyBackForwardListItem) -> Bool {
+  return lhs.URL.absoluteString == rhs.URL.absoluteString;
+}
+
+
 class LegacyBackForwardList {
 
   var currentIndex: Int = 0
   var backForwardList: [LegacyBackForwardListItem] = []
+  let webView: LegacyWebView
+
+  init(webView: LegacyWebView) {
+    self.webView = webView
+  }
 
   var cachedHistoryStringLength = 0
 
@@ -58,7 +69,17 @@ class LegacyBackForwardList {
 
   var currentItem: LegacyBackForwardListItem? {
     get {
-        return itemAtIndex(currentIndex)
+      guard let item = itemAtIndex(currentIndex) else {
+      if let url = webView.URL {
+        let item = LegacyBackForwardListItem()
+        item.URL = url
+        return item
+      } else {
+        return nil
+      }
+    }
+    return item
+
     }}
 
   var backItem: LegacyBackForwardListItem? {

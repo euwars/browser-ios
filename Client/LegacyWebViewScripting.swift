@@ -44,7 +44,7 @@ public class LegacyUserContentController
 public class LegacyWebViewConfiguration
 {
   let userContentController: LegacyUserContentController
-  public init(webview: LegacyWebView) {
-    userContentController = LegacyUserContentController(webview)
+  public init(webView: LegacyWebView) {
+    userContentController = LegacyUserContentController(webView)
   }
 }
