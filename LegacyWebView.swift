@@ -2,6 +2,7 @@ import Foundation
 import WebKit
 import Shared
 
+
 func configureActiveCrashReporter(_:Bool?) {}
 
 func convertNavActionToWKType(type:UIWebViewNavigationType) -> WKNavigationType {
@@ -220,6 +221,7 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
 
     if (!webView.loading) {
       _parent.configuration.userContentController.inject()
+      _parent.replaceImagesUsingTheVault(webView)
     }
 
     _parent.kvoBroadcast()
@@ -239,4 +241,6 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     parent?.progress.didFailLoadWithError()
     parent?.kvoBroadcast()
   }
+
+
 }

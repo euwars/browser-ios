@@ -660,6 +660,9 @@
 		EB1C49351BDE8CA800D31A0A /* NSURL+Matcher.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C492B1BDE8CA800D31A0A /* NSURL+Matcher.m */; };
 		EB1C49361BDE8CA800D31A0A /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C492D1BDE8CA800D31A0A /* Reachability.m */; };
 		EB1C493C1BDE9A6700D31A0A /* AdBlockCppFilter.mm in Sources */ = {isa = PBXBuildFile; fileRef = EB1C493B1BDE9A6700D31A0A /* AdBlockCppFilter.mm */; };
+		EB5E475B1BDFF9D500AE338B /* LegacyWebView+Vault.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */; };
+		EB5E475D1BDFFD6800AE338B /* adInfo.js in Resources */ = {isa = PBXBuildFile; fileRef = EB5E475C1BDFFD6800AE338B /* adInfo.js */; };
+		EB5E475F1BDFFE7100AE338B /* adInfo-wrapper.js in Resources */ = {isa = PBXBuildFile; fileRef = EB5E475E1BDFFE7100AE338B /* adInfo-wrapper.js */; };
 		EB9412C01BD80FC900B21564 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BE1BD80FC900B21564 /* Fabric.framework */; };
 		EB9412C11BD80FCA00B21564 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BF1BD80FC900B21564 /* Crashlytics.framework */; };
 		EB994FE61BD545A60023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; };
@@ -1848,6 +1851,9 @@
 		EB1C492C1BDE8CA800D31A0A /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		EB1C492D1BDE8CA800D31A0A /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		EB1C493B1BDE9A6700D31A0A /* AdBlockCppFilter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AdBlockCppFilter.mm; sourceTree = "<group>"; };
+		EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LegacyWebView+Vault.swift"; sourceTree = "<group>"; };
+		EB5E475C1BDFFD6800AE338B /* adInfo.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = adInfo.js; sourceTree = "<group>"; };
+		EB5E475E1BDFFE7100AE338B /* adInfo-wrapper.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adInfo-wrapper.js"; sourceTree = "<group>"; };
 		EB9412BE1BD80FC900B21564 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		EB9412C21BD829A200B21564 /* ViewLater.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ViewLater.entitlements; sourceTree = "<group>"; };
@@ -2977,15 +2983,18 @@
 		EB1C48C71BDE8B2500D31A0A /* brave */ = {
 			isa = PBXGroup;
 			children = (
+				EB5E475E1BDFFE7100AE338B /* adInfo-wrapper.js */,
+				EB5E475C1BDFFD6800AE338B /* adInfo.js */,
 				EB1C49231BDE8CA800D31A0A /* util */,
 				EB1C48FF1BDE8C7500D31A0A /* adblock */,
 				EB1C48C81BDE8B2500D31A0A /* abp-filterparser */,
-				EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */,
 				EB1C48DF1BDE8B2500D31A0A /* LegacyJSContext.h */,
 				EB1C48E01BDE8B2500D31A0A /* LegacyJSContext.m */,
+				EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */,
 				EB1C48E11BDE8B2500D31A0A /* LegacyWebViewBackForward.swift */,
 				EB1C48E21BDE8B2500D31A0A /* LegacyWebViewProgress.swift */,
 				EB1C48E31BDE8B2500D31A0A /* LegacyWebViewScripting.swift */,
+				EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */,
 			);
 			path = brave;
 			sourceTree = "<group>";
@@ -4253,10 +4262,12 @@
 				E4ECCD8D1AB091470005E717 /* Reader.xcassets in Resources */,
 				E4B7B77D1A793CF20022C5E0 /* FiraSans-Regular.ttf in Resources */,
 				0BDA568B1B26B1BE008C9B96 /* LoginsHelper.js in Resources */,
+				EB5E475F1BDFFE7100AE338B /* adInfo-wrapper.js in Resources */,
 				E4B7B7791A793CF20022C5E0 /* FiraSans-Light.ttf in Resources */,
 				D38A1BF01A9FA2CA00F6A386 /* SiteTableViewControllerHeader.xib in Resources */,
 				E49BFF591B1F48C3009368CC /* Readability.js in Resources */,
 				E4CD9E9A1A68980A00318571 /* ReaderMode.js in Resources */,
+				EB5E475D1BDFFD6800AE338B /* adInfo.js in Resources */,
 				E4424B201AC6EBE100F44C38 /* ReaderSettings.xcassets in Resources */,
 				E4B7B7641A793CF20022C5E0 /* CharisSILR.ttf in Resources */,
 				2F834D161A80629A006A0B7B /* FxASignIn.js in Resources */,
@@ -4860,6 +4871,7 @@
 				59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */,
 				E42475DF1AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */,
 				E49943F51AE6879C00BF9DE4 /* IntroViewController.swift in Sources */,
+				EB5E475B1BDFF9D500AE338B /* LegacyWebView+Vault.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
