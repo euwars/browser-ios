@@ -2,29 +2,26 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import "NSURL+Matcher.h"
 #import "DisconnectDict.m"
+//#import "Client-Swift.h"
 
 #include "ABPFilterParser.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <iostream>
 #include <string>
 
 // Generated with: (echo "const char* easyList = " && cat orig | sed 's|\"|\\"|g' | sed 's|\\\\"|\\\\\\"|g'  | sed 's/^/"/' | sed 's/$/\\"/' && echo ";") > easylist-as-string.cpp
 #include "easylist-as-string.cpp"
 
-@interface Adblock()
+@interface AdBlock()
 @property (atomic, strong) NSMutableSet* replacedUrls;
 @property (nonatomic, strong) NSDictionary* disconnectDomains;
 @end
 
 ABPFilterParser parser;
 
-@implementation Adblock
+@implementation AdBlock
 
 + (instancetype)singleton
 {
-  static Adblock* instance = nil;
+  static AdBlock* instance = nil;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     instance = [[self alloc] init];

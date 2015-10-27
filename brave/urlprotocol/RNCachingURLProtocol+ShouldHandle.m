@@ -1,6 +1,6 @@
 #import "RNCachingURLProtocol+ShouldHandle.h"
 #import "NSURL+Matcher.h"
-#import "Adblock.h"
+#import "AdBlock.h"
 
 @implementation RNCachingURLProtocol (ShouldHandle)
 
@@ -10,7 +10,7 @@
   if ([[self supportedSchemes] containsObject:request.URL.scheme] &&
       ([request valueForHTTPHeaderField:RNCachingURLHeader] == nil))
   {
-    Adblock* ad = [Adblock singleton];
+    AdBlock* ad = [AdBlock singleton];
     return [ad shouldBlock:request];
   }
 

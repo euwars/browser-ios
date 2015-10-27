@@ -763,6 +763,11 @@ class SettingsTableViewController: UITableViewController {
             PopupBlockingSettings(settings: self),
         ]
 
+      #if BRAVE
+        generalSettings += [AdBlockSetting(settings:self)]
+      #endif
+
+
         // There is nothing to show in the Customize section if we don't include the compact tab layout
         // setting on iPad. When more options are added that work on both device types, this logic can
         // be changed.

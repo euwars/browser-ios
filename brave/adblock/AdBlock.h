@@ -2,7 +2,7 @@
 
 #define kNotification_adBlocked @"kNotification_adBlocked"
 
-@interface Adblock : NSObject
+@interface AdBlock : NSObject
 
 + (instancetype)singleton;
 - (BOOL)shouldBlock:(NSURLRequest*)request;
