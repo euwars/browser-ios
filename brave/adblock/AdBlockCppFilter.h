@@ -1,11 +1,7 @@
 #import <Foundation/Foundation.h>
 
-#define kNotification_adBlocked @"kNotification_adBlocked"
-
-@interface AdBlock : NSObject
+@interface AdBlockCppFilter : NSObject
 
 + (instancetype)singleton;
-- (BOOL)shouldBlock:(NSURLRequest*)request;
-- (NSString*)getBlockedAsJSArray;
-- (BOOL)isAlreadyBlockedUrl:(NSURL*)url;
+- (BOOL)checkWithCppABPFilter:(NSString *)url mainDocumentUrl:(NSString *)mainDoc;
 @end

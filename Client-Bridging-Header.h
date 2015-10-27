@@ -19,6 +19,6 @@
 
 // BRAVE
 #import "LegacyJSContext.h"
-#import "RNCachingURLProtocol.h"
+#import "AdBlockCppFilter.h"
 
 #endif

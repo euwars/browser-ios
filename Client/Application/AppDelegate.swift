@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 #if BRAVE
         Fabric.with([Crashlytics.self])
-        NSURLProtocol.registerClass(RNCachingURLProtocol);
+        NSURLProtocol.registerClass(URLProtocol);
 #endif
         // Set the Firefox UA for browsing.
         setUserAgent()

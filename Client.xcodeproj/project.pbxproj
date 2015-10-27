@@ -653,20 +653,20 @@
 		EB1C48F51BDE8B2500D31A0A /* LegacyWebViewBackForward.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1C48E11BDE8B2500D31A0A /* LegacyWebViewBackForward.swift */; };
 		EB1C48F61BDE8B2500D31A0A /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1C48E21BDE8B2500D31A0A /* LegacyWebViewProgress.swift */; };
 		EB1C48F71BDE8B2500D31A0A /* LegacyWebViewScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1C48E31BDE8B2500D31A0A /* LegacyWebViewScripting.swift */; };
-		EB1C48FD1BDE8C3B00D31A0A /* RNCachingURLProtocol+ShouldHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C48FA1BDE8C3B00D31A0A /* RNCachingURLProtocol+ShouldHandle.m */; };
-		EB1C48FE1BDE8C3B00D31A0A /* RNCachingURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C48FC1BDE8C3B00D31A0A /* RNCachingURLProtocol.m */; };
 		EB1C491C1BDE8C7500D31A0A /* DisconnectDict.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C490A1BDE8C7500D31A0A /* DisconnectDict.m */; };
 		EB1C49321BDE8CA800D31A0A /* NSObject+AddAssociatedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C49251BDE8CA800D31A0A /* NSObject+AddAssociatedObject.m */; };
 		EB1C49331BDE8CA800D31A0A /* NSString+Regex.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C49271BDE8CA800D31A0A /* NSString+Regex.m */; };
 		EB1C49341BDE8CA800D31A0A /* NSString+Sha1.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C49291BDE8CA800D31A0A /* NSString+Sha1.m */; };
 		EB1C49351BDE8CA800D31A0A /* NSURL+Matcher.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C492B1BDE8CA800D31A0A /* NSURL+Matcher.m */; };
 		EB1C49361BDE8CA800D31A0A /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C492D1BDE8CA800D31A0A /* Reachability.m */; };
-		EB1C493C1BDE9A6700D31A0A /* AdBlock.mm in Sources */ = {isa = PBXBuildFile; fileRef = EB1C493B1BDE9A6700D31A0A /* AdBlock.mm */; };
+		EB1C493C1BDE9A6700D31A0A /* AdBlockCppFilter.mm in Sources */ = {isa = PBXBuildFile; fileRef = EB1C493B1BDE9A6700D31A0A /* AdBlockCppFilter.mm */; };
 		EB9412C01BD80FC900B21564 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BE1BD80FC900B21564 /* Fabric.framework */; };
 		EB9412C11BD80FCA00B21564 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BF1BD80FC900B21564 /* Crashlytics.framework */; };
 		EB994FE61BD545A60023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; };
 		EB99500C1BD549480023B5E1 /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */; };
 		EBEA2B941BDFC154001013C8 /* AdBlockSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBEA2B931BDFC154001013C8 /* AdBlockSetting.swift */; };
+		EBEA2B961BDFCEED001013C8 /* UrlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBEA2B951BDFCEED001013C8 /* UrlProtocol.swift */; };
+		EBEA2B981BDFD839001013C8 /* AdBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBEA2B971BDFD839001013C8 /* AdBlocker.swift */; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
 		F84B220B1A0910F600AAB793 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F84B21EF1A0910F600AAB793 /* Images.xcassets */; };
@@ -1835,11 +1835,7 @@
 		EB1C48E11BDE8B2500D31A0A /* LegacyWebViewBackForward.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewBackForward.swift; sourceTree = "<group>"; };
 		EB1C48E21BDE8B2500D31A0A /* LegacyWebViewProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewProgress.swift; sourceTree = "<group>"; };
 		EB1C48E31BDE8B2500D31A0A /* LegacyWebViewScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewScripting.swift; sourceTree = "<group>"; };
-		EB1C48F91BDE8C3B00D31A0A /* RNCachingURLProtocol+ShouldHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNCachingURLProtocol+ShouldHandle.h"; sourceTree = "<group>"; };
-		EB1C48FA1BDE8C3B00D31A0A /* RNCachingURLProtocol+ShouldHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RNCachingURLProtocol+ShouldHandle.m"; sourceTree = "<group>"; };
-		EB1C48FB1BDE8C3B00D31A0A /* RNCachingURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCachingURLProtocol.h; sourceTree = "<group>"; };
-		EB1C48FC1BDE8C3B00D31A0A /* RNCachingURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCachingURLProtocol.m; sourceTree = "<group>"; };
-		EB1C49001BDE8C7500D31A0A /* AdBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdBlock.h; sourceTree = "<group>"; };
+		EB1C49001BDE8C7500D31A0A /* AdBlockCppFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdBlockCppFilter.h; sourceTree = "<group>"; };
 		EB1C490A1BDE8C7500D31A0A /* DisconnectDict.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisconnectDict.m; sourceTree = "<group>"; };
 		EB1C49241BDE8CA800D31A0A /* NSObject+AddAssociatedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+AddAssociatedObject.h"; sourceTree = "<group>"; };
 		EB1C49251BDE8CA800D31A0A /* NSObject+AddAssociatedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+AddAssociatedObject.m"; sourceTree = "<group>"; };
@@ -1851,12 +1847,14 @@
 		EB1C492B1BDE8CA800D31A0A /* NSURL+Matcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+Matcher.m"; sourceTree = "<group>"; };
 		EB1C492C1BDE8CA800D31A0A /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		EB1C492D1BDE8CA800D31A0A /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
-		EB1C493B1BDE9A6700D31A0A /* AdBlock.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AdBlock.mm; sourceTree = "<group>"; };
+		EB1C493B1BDE9A6700D31A0A /* AdBlockCppFilter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AdBlockCppFilter.mm; sourceTree = "<group>"; };
 		EB9412BE1BD80FC900B21564 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		EB9412C21BD829A200B21564 /* ViewLater.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ViewLater.entitlements; sourceTree = "<group>"; };
 		EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebView.swift; sourceTree = SOURCE_ROOT; };
-		EBEA2B931BDFC154001013C8 /* AdBlockSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdBlockSetting.swift; sourceTree = "<group>"; };
+		EBEA2B931BDFC154001013C8 /* AdBlockSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AdBlockSetting.swift; path = ../AdBlockSetting.swift; sourceTree = "<group>"; };
+		EBEA2B951BDFCEED001013C8 /* UrlProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UrlProtocol.swift; sourceTree = "<group>"; };
+		EBEA2B971BDFD839001013C8 /* AdBlocker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdBlocker.swift; sourceTree = "<group>"; };
 		EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareTo.entitlements; sourceTree = "<group>"; };
 		EBF6A3931BD80BF4009CF0C7 /* SendTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SendTo.entitlements; sourceTree = "<group>"; };
 		EBF6A3941BD80C03009CF0C7 /* Client.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Client.entitlements; sourceTree = "<group>"; };
@@ -2981,7 +2979,6 @@
 			children = (
 				EB1C49231BDE8CA800D31A0A /* util */,
 				EB1C48FF1BDE8C7500D31A0A /* adblock */,
-				EB1C48F81BDE8C3B00D31A0A /* urlprotocol */,
 				EB1C48C81BDE8B2500D31A0A /* abp-filterparser */,
 				EB994FE51BD545A60023B5E1 /* LegacyWebView.swift */,
 				EB1C48DF1BDE8B2500D31A0A /* LegacyJSContext.h */,
@@ -2989,7 +2986,6 @@
 				EB1C48E11BDE8B2500D31A0A /* LegacyWebViewBackForward.swift */,
 				EB1C48E21BDE8B2500D31A0A /* LegacyWebViewProgress.swift */,
 				EB1C48E31BDE8B2500D31A0A /* LegacyWebViewScripting.swift */,
-				EBEA2B931BDFC154001013C8 /* AdBlockSetting.swift */,
 			);
 			path = brave;
 			sourceTree = "<group>";
@@ -3005,23 +3001,15 @@
 			path = "abp-filterparser";
 			sourceTree = "<group>";
 		};
-		EB1C48F81BDE8C3B00D31A0A /* urlprotocol */ = {
-			isa = PBXGroup;
-			children = (
-				EB1C48F91BDE8C3B00D31A0A /* RNCachingURLProtocol+ShouldHandle.h */,
-				EB1C48FA1BDE8C3B00D31A0A /* RNCachingURLProtocol+ShouldHandle.m */,
-				EB1C48FB1BDE8C3B00D31A0A /* RNCachingURLProtocol.h */,
-				EB1C48FC1BDE8C3B00D31A0A /* RNCachingURLProtocol.m */,
-			);
-			path = urlprotocol;
-			sourceTree = "<group>";
-		};
 		EB1C48FF1BDE8C7500D31A0A /* adblock */ = {
 			isa = PBXGroup;
 			children = (
-				EB1C49001BDE8C7500D31A0A /* AdBlock.h */,
-				EB1C493B1BDE9A6700D31A0A /* AdBlock.mm */,
+				EBEA2B931BDFC154001013C8 /* AdBlockSetting.swift */,
+				EB1C49001BDE8C7500D31A0A /* AdBlockCppFilter.h */,
+				EB1C493B1BDE9A6700D31A0A /* AdBlockCppFilter.mm */,
 				EB1C490A1BDE8C7500D31A0A /* DisconnectDict.m */,
+				EBEA2B951BDFCEED001013C8 /* UrlProtocol.swift */,
+				EBEA2B971BDFD839001013C8 /* AdBlocker.swift */,
 			);
 			path = adblock;
 			sourceTree = "<group>";
@@ -4731,7 +4719,6 @@
 				E4CD9F6D1A77DD2800318571 /* ReaderModeStyleViewController.swift in Sources */,
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,
 				E4B423DD1ABA0318007E66C8 /* ReaderModeHandlers.swift in Sources */,
-				EB1C48FE1BDE8C3B00D31A0A /* RNCachingURLProtocol.m in Sources */,
 				EB1C49321BDE8CA800D31A0A /* NSObject+AddAssociatedObject.m in Sources */,
 				EB1C49331BDE8CA800D31A0A /* NSString+Regex.m in Sources */,
 				D308E4E41A5306F500842685 /* SearchEngines.swift in Sources */,
@@ -4746,7 +4733,7 @@
 				EB1C48F71BDE8B2500D31A0A /* LegacyWebViewScripting.swift in Sources */,
 				D38B2D431A8D96D00040E6B5 /* GCDWebServerMultiPartFormRequest.m in Sources */,
 				EB1C49351BDE8CA800D31A0A /* NSURL+Matcher.m in Sources */,
-				EB1C493C1BDE9A6700D31A0A /* AdBlock.mm in Sources */,
+				EB1C493C1BDE9A6700D31A0A /* AdBlockCppFilter.mm in Sources */,
 				0B3E7D951B27A7CE00E2E84D /* AboutHomeHandler.swift in Sources */,
 				D3BE7B461B054F8600641031 /* TestAppDelegate.swift in Sources */,
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
@@ -4807,7 +4794,6 @@
 				0B7100481B4C72D60046AF87 /* FaviconFetcher.swift in Sources */,
 				E4B334561BBF2393004E2BFF /* ADJAttributionHandler.m in Sources */,
 				E4252A0E1AF01AE40028C684 /* Swizzling.m in Sources */,
-				EB1C48FD1BDE8C3B00D31A0A /* RNCachingURLProtocol+ShouldHandle.m in Sources */,
 				D38B2D4F1A8D96D00040E6B5 /* GCDWebServerFileResponse.m in Sources */,
 				E43A4E551A96B88100E25676 /* GCDWebServerDataRequest.m in Sources */,
 				D38A1BEE1A9FA2CA00F6A386 /* SiteTableViewController.swift in Sources */,
@@ -4860,7 +4846,9 @@
 				7B844E3D1BBDDB9D00E733A2 /* ChevronView.swift in Sources */,
 				D38B2D491A8D96D00040E6B5 /* GCDWebServerDataResponse.m in Sources */,
 				E4C358551AF144BA00299F7E /* FSReadingList.m in Sources */,
+				EBEA2B961BDFCEED001013C8 /* UrlProtocol.swift in Sources */,
 				E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */,
+				EBEA2B981BDFD839001013C8 /* AdBlocker.swift in Sources */,
 				E4B334571BBF2393004E2BFF /* ADJConfig.m in Sources */,
 				D38B2D521A8D96D00040E6B5 /* GCDWebServerStreamedResponse.m in Sources */,
 				E4B334531BBF2393004E2BFF /* UIDevice+ADJAdditions.m in Sources */,
