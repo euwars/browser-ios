@@ -13,10 +13,20 @@ extension NSURL {
   }
 }
 
-func loadJs(name: String, _ webView: UIWebView) {
+var loadedCache = [String: String]()
+func loadJs(name: String) -> String {
+  if let cached = loadedCache[name] {
+    return cached
+  }
   let path = NSBundle.mainBundle().pathForResource(name, ofType: "js")
   assert(path != nil)
-  let fileContents = try! String(contentsOfFile: path!, encoding: NSUTF8StringEncoding)
+  let result = try! String(contentsOfFile: path!, encoding: NSUTF8StringEncoding)
+  loadedCache[name] = result
+  return result
+}
+
+func loadAndRunJs(name: String, _ webView: UIWebView) {
+  let fileContents = loadJs(name)
   webView.stringByEvaluatingJavaScriptFromString(fileContents)
 }
 
@@ -39,31 +49,50 @@ extension LegacyWebView {
     let isJsResourcesLoaded = webView.stringByEvaluatingJavaScriptFromString("typeof _brave_adInfo !== 'undefined'")
 
     if (isJsResourcesLoaded != "true") {
-      loadJs("adInfo", webView)
-      loadJs("adInfo-wrapper", webView)
+      loadAndRunJs("adInfo", webView)
+      loadAndRunJs("adInfo-wrapper", webView)
     }
 
-    guard let host = webView.request?.URL?.hostWithGenericSubdomainPrefixRemoved() else { return }
-    let divSizeQuery = "var domainInfo = _brave_adInfo['\(host)'] && domainInfo &&" +
-      "JSON.stringify(domainInfo.map(function(x) {" +
-        "var node = document.querySelector('[id=' + x.replaceId + ']:not([data-ad-replaced])');" +
-        // mark the divs that have been replaced, this can get called many times on a page
-        "node.setAttribute('data-ad-replaced', 1);" +
-        "if (!node) return {};" +
-        "return { 'divId':x.replaceId, 'width':node.offsetWidth, 'height':node.offsetHeight };" +
-      "}))"
+    guard var host = webView.request?.URL?.hostWithGenericSubdomainPrefixRemoved() else { return }
+    // TODO: ffox code has a function surely to clean up URL
+    host = host.regexReplacePattern(".+error\\.html\\?url=http", with: "http")
+    let divSizeQuery = loadJs("adInfo-divquerytemplate").stringByReplacingOccurrencesOfString("HOST", withString: host)
+
     let jsonResult = webView.stringByEvaluatingJavaScriptFromString(divSizeQuery)
     if (jsonResult == nil || jsonResult?.characters.count < 1) {
       return
     }
-    
+
     let divNamesAndSizes = jsonParseArray(jsonResult)
     if (divNamesAndSizes.count < 1) {
       return
     }
 
     for item in divNamesAndSizes {
-      print("\(item)")
+      let w = item["width"] as? Int ?? 0
+      let h = item["height"] as? Int ?? 0
+      if (w == 0 || h == 0) {
+        continue;
+      }
+      let divId = item["divId"] as! String
+      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
+        let VAULT_SERVER_HOST = "http://localhost:3000"
+        let vault = "http://\(VAULT_SERVER_HOST)/ad?braveUserId=fakeID&intentHost=\(host)&tagName=IFRAME&width=\(w)&height=\(h)"
+        var vaultResponse: String
+        do {
+         // TODO use 'proper' async networking calls (NSURLConnection etc.)
+         vaultResponse = try String(contentsOfURL: NSURL(string: vault)!, encoding: NSUTF8StringEncoding)
+
+          dispatch_async(dispatch_get_main_queue(), {
+            let js = "_brave_replaceDivWithNewContent({'divId':'\(divId)'," +
+            "'width':\(w), 'height':\(h),'newContent':'\(vaultResponse)'})"
+            webView.stringByEvaluatingJavaScriptFromString(js)
+          })
+        } catch {
+          // TODO error handling
+          print("vault error \(error)")
+        }
+      })
     }
   }
 }
