@@ -1,3 +1,5 @@
+# Brave iOS Browser: see readme in brave/
+
 Firefox for iOS
 ===============
 
