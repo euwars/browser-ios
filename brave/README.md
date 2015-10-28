@@ -9,4 +9,7 @@ Run setup in brave/ (this dir)
 ./setup.sh
 ```
 
+Open Client.xcodeproj
+
+build ClientNoTests
 
