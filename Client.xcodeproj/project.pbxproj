@@ -658,6 +658,7 @@
 		EB34D62E1BE0230100C08A48 /* adInfo-divquerytemplate.js in Resources */ = {isa = PBXBuildFile; fileRef = EB34D62B1BE0230100C08A48 /* adInfo-divquerytemplate.js */; };
 		EB34D62F1BE0230100C08A48 /* adInfo-wrapper.js in Resources */ = {isa = PBXBuildFile; fileRef = EB34D62C1BE0230100C08A48 /* adInfo-wrapper.js */; };
 		EB34D6301BE0230100C08A48 /* adInfo.js in Resources */ = {isa = PBXBuildFile; fileRef = EB34D62D1BE0230100C08A48 /* adInfo.js */; };
+		EB34D63D1BE128AB00C08A48 /* VaultAddressSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D63C1BE128AB00C08A48 /* VaultAddressSetting.swift */; };
 		EB5E475B1BDFF9D500AE338B /* LegacyWebView+Vault.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */; };
 		EB9412C01BD80FC900B21564 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BE1BD80FC900B21564 /* Fabric.framework */; };
 		EB9412C11BD80FCA00B21564 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BF1BD80FC900B21564 /* Crashlytics.framework */; };
@@ -1840,6 +1841,7 @@
 		EB34D62B1BE0230100C08A48 /* adInfo-divquerytemplate.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adInfo-divquerytemplate.js"; sourceTree = "<group>"; };
 		EB34D62C1BE0230100C08A48 /* adInfo-wrapper.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adInfo-wrapper.js"; sourceTree = "<group>"; };
 		EB34D62D1BE0230100C08A48 /* adInfo.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = adInfo.js; sourceTree = "<group>"; };
+		EB34D63C1BE128AB00C08A48 /* VaultAddressSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VaultAddressSetting.swift; sourceTree = "<group>"; };
 		EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "LegacyWebView+Vault.swift"; path = "../LegacyWebView+Vault.swift"; sourceTree = "<group>"; };
 		EB9412BE1BD80FC900B21564 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
@@ -3014,6 +3016,7 @@
 				EB34D62B1BE0230100C08A48 /* adInfo-divquerytemplate.js */,
 				EB34D62C1BE0230100C08A48 /* adInfo-wrapper.js */,
 				EB34D62D1BE0230100C08A48 /* adInfo.js */,
+				EB34D63C1BE128AB00C08A48 /* VaultAddressSetting.swift */,
 			);
 			path = vault;
 			sourceTree = "<group>";
@@ -4841,6 +4844,7 @@
 				E4B334521BBF2393004E2BFF /* NSString+ADJAdditions.m in Sources */,
 				59A68FD5260B8D520F890F4A /* ReaderPanel.swift in Sources */,
 				E42475E21AB73B9B00B23D33 /* SWTableViewCell.m in Sources */,
+				EB34D63D1BE128AB00C08A48 /* VaultAddressSetting.swift in Sources */,
 				E40FAB0C1A7ABB77009CB80D /* WebServer.swift in Sources */,
 				59A68D66379CFA85C4EAF00B /* TwoLineCell.swift in Sources */,
 				E42475DF1AB73B9B00B23D33 /* SWLongPressGestureRecognizer.m in Sources */,
