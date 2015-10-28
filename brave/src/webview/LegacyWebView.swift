@@ -52,6 +52,7 @@ public class LegacyWebView: UIWebView {
 
     super.init(frame: frame)
     self.delegate = self.webViewDelegate
+    self.scalesPageToFit = true
   }
 
   override public var loading: Bool {
