@@ -85,7 +85,7 @@ extension LegacyWebView {
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
         // TODO remove fake id
         let fakeId = "30c889b7-6e7f-4f7d-9410-85bf710eb0ff"
-        let vault = "\(vaultServerHost)/ad?braveUserId=\(fakeId)&intentHost=\(host)&tagName=IFRAME&width=\(w)&height=\(h)"
+        let vault = "\(vaultServerHost)/replacement?braveUserId=\(fakeId)&intentHost=\(host)&tagName=IFRAME&width=\(w)&height=\(h)"
         var vaultResponse: String
         do {
          // TODO use 'proper' async networking calls (NSURLConnection etc.)
