@@ -39,14 +39,19 @@ public class LegacyWebView: UIWebView {
   var internalIsLoadingEndedFlag: Bool = false;
 
   override init(frame: CGRect) {
+    #if DEBUG
+      // TODO move to better spot, these quiet the logging from the core of fx ios
+      GCDWebServer.setLogLevel(5)
+      Logger.syncLogger.setup(.None)
+
+      // use desktop UA for testing
+      let defaults = NSUserDefaults(suiteName: AppInfo.sharedContainerIdentifier())!
+      let desktop = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; it-it) AppleWebKit/533.16 (KHTML, like Gecko) Version/5.0 Safari/533.16"
+      defaults.registerDefaults(["UserAgent": desktop])
+    #endif
+
     super.init(frame: frame)
     self.delegate = self.webViewDelegate
-
-#if DEBUG
-    // TODO move to better spot, these quiet the logging from the core of fx ios
-    GCDWebServer.setLogLevel(5)
-    Logger.syncLogger.setup(.None)
-#endif
   }
 
   override public var loading: Bool {
