@@ -1,13 +1,22 @@
 #import "AdBlockCppFilter.h"
 #include "ABPFilterParser.h"
 
-// Generated with:
-// (echo echo "const char* easyList = " && cat orig | sed 's|\\|\\\\|g' | sed 's|\"|\\"|g' | sed 's/^/"/' | sed 's|$|\\n"|' && echo ";") > easylist-as-string.cpp
-#include "easylist-as-string.cpp"
-
 ABPFilterParser parser;
 
+@interface AdBlockCppFilter()
+@property (nonatomic, retain) NSData *data;
+@end
+
 @implementation AdBlockCppFilter
+
+static NSData *loadData()
+{
+  NSString *path = [[NSBundle mainBundle] pathForResource:@"ABPFilterParserData" ofType: @"dat"];
+  assert(path);
+  NSData *data = [NSData dataWithContentsOfFile:path];
+  assert(data);
+  return data;
+}
 
 + (instancetype)singleton
 {
@@ -22,7 +31,8 @@ ABPFilterParser parser;
 - (instancetype)init
 {
   if (self = [super init]) {
-    parser.parse(easyList);
+    self.data = loadData();
+    parser.deserialize((char *)self.data.bytes);
   }
   return self;
 }

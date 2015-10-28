@@ -653,12 +653,13 @@
 		EB1C48F51BDE8B2500D31A0A /* LegacyWebViewBackForward.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1C48E11BDE8B2500D31A0A /* LegacyWebViewBackForward.swift */; };
 		EB1C48F61BDE8B2500D31A0A /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1C48E21BDE8B2500D31A0A /* LegacyWebViewProgress.swift */; };
 		EB1C48F71BDE8B2500D31A0A /* LegacyWebViewScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB1C48E31BDE8B2500D31A0A /* LegacyWebViewScripting.swift */; };
-		EB1C491C1BDE8C7500D31A0A /* DisconnectDict.m in Sources */ = {isa = PBXBuildFile; fileRef = EB1C490A1BDE8C7500D31A0A /* DisconnectDict.m */; };
 		EB1C493C1BDE9A6700D31A0A /* AdBlockCppFilter.mm in Sources */ = {isa = PBXBuildFile; fileRef = EB1C493B1BDE9A6700D31A0A /* AdBlockCppFilter.mm */; };
 		EB34D62E1BE0230100C08A48 /* adInfo-divquerytemplate.js in Resources */ = {isa = PBXBuildFile; fileRef = EB34D62B1BE0230100C08A48 /* adInfo-divquerytemplate.js */; };
 		EB34D62F1BE0230100C08A48 /* adInfo-wrapper.js in Resources */ = {isa = PBXBuildFile; fileRef = EB34D62C1BE0230100C08A48 /* adInfo-wrapper.js */; };
 		EB34D6301BE0230100C08A48 /* adInfo.js in Resources */ = {isa = PBXBuildFile; fileRef = EB34D62D1BE0230100C08A48 /* adInfo.js */; };
 		EB34D63D1BE128AB00C08A48 /* VaultAddressSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D63C1BE128AB00C08A48 /* VaultAddressSetting.swift */; };
+		EB34D6641BE1609F00C08A48 /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = EB34D6631BE1609200C08A48 /* ABPFilterParserData.dat */; };
+		EB34D66C1BE1662200C08A48 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6691BE1662200C08A48 /* BloomFilter.cpp */; };
 		EB5E475B1BDFF9D500AE338B /* LegacyWebView+Vault.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */; };
 		EB9412C01BD80FC900B21564 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BE1BD80FC900B21564 /* Fabric.framework */; };
 		EB9412C11BD80FCA00B21564 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BF1BD80FC900B21564 /* Crashlytics.framework */; };
@@ -1836,12 +1837,15 @@
 		EB1C48E21BDE8B2500D31A0A /* LegacyWebViewProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewProgress.swift; sourceTree = "<group>"; };
 		EB1C48E31BDE8B2500D31A0A /* LegacyWebViewScripting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyWebViewScripting.swift; sourceTree = "<group>"; };
 		EB1C49001BDE8C7500D31A0A /* AdBlockCppFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdBlockCppFilter.h; sourceTree = "<group>"; };
-		EB1C490A1BDE8C7500D31A0A /* DisconnectDict.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisconnectDict.m; sourceTree = "<group>"; };
 		EB1C493B1BDE9A6700D31A0A /* AdBlockCppFilter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AdBlockCppFilter.mm; sourceTree = "<group>"; };
 		EB34D62B1BE0230100C08A48 /* adInfo-divquerytemplate.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adInfo-divquerytemplate.js"; sourceTree = "<group>"; };
 		EB34D62C1BE0230100C08A48 /* adInfo-wrapper.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adInfo-wrapper.js"; sourceTree = "<group>"; };
 		EB34D62D1BE0230100C08A48 /* adInfo.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = adInfo.js; sourceTree = "<group>"; };
 		EB34D63C1BE128AB00C08A48 /* VaultAddressSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VaultAddressSetting.swift; sourceTree = "<group>"; };
+		EB34D6631BE1609200C08A48 /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
+		EB34D6691BE1662200C08A48 /* BloomFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BloomFilter.cpp; path = "node_modules/bloom-filter-cpp/BloomFilter.cpp"; sourceTree = "<group>"; };
+		EB34D66A1BE1662200C08A48 /* BloomFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BloomFilter.h; path = "node_modules/bloom-filter-cpp/BloomFilter.h"; sourceTree = "<group>"; };
+		EB34D66B1BE1662200C08A48 /* hashFn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashFn.h; path = "node_modules/bloom-filter-cpp/hashFn.h"; sourceTree = "<group>"; };
 		EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "LegacyWebView+Vault.swift"; path = "../LegacyWebView+Vault.swift"; sourceTree = "<group>"; };
 		EB9412BE1BD80FC900B21564 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
@@ -2988,6 +2992,9 @@
 		EB1C48C81BDE8B2500D31A0A /* abp-filterparser */ = {
 			isa = PBXGroup;
 			children = (
+				EB34D6691BE1662200C08A48 /* BloomFilter.cpp */,
+				EB34D66A1BE1662200C08A48 /* BloomFilter.h */,
+				EB34D66B1BE1662200C08A48 /* hashFn.h */,
 				EB1C48CA1BDE8B2500D31A0A /* ABPFilterParser.cpp */,
 				EB1C48CB1BDE8B2500D31A0A /* ABPFilterParser.h */,
 				EB1C48CE1BDE8B2500D31A0A /* filter.cpp */,
@@ -2999,10 +3006,10 @@
 		EB1C48FF1BDE8C7500D31A0A /* adblock */ = {
 			isa = PBXGroup;
 			children = (
+				EB34D6631BE1609200C08A48 /* ABPFilterParserData.dat */,
 				EBEA2B931BDFC154001013C8 /* AdBlockSetting.swift */,
 				EB1C49001BDE8C7500D31A0A /* AdBlockCppFilter.h */,
 				EB1C493B1BDE9A6700D31A0A /* AdBlockCppFilter.mm */,
-				EB1C490A1BDE8C7500D31A0A /* DisconnectDict.m */,
 				EBEA2B951BDFCEED001013C8 /* UrlProtocol.swift */,
 				EBEA2B971BDFD839001013C8 /* AdBlocker.swift */,
 			);
@@ -4254,6 +4261,7 @@
 				E4B7B7641A793CF20022C5E0 /* CharisSILR.ttf in Resources */,
 				2F834D161A80629A006A0B7B /* FxASignIn.js in Resources */,
 				D3BA7E0C1B0E902A00153782 /* ContextMenu.js in Resources */,
+				EB34D6641BE1609F00C08A48 /* ABPFilterParserData.dat in Resources */,
 				E4B7B7681A793CF20022C5E0 /* FiraSans-Bold.ttf in Resources */,
 				E4B7B7781A793CF20022C5E0 /* FiraSans-Italic.ttf in Resources */,
 				0BA1E00E1B03FB0B007675AF /* NetError.html in Resources */,
@@ -4741,7 +4749,6 @@
 				D38B2D461A8D96D00040E6B5 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				E60A60821B6BFC0B00F850D4 /* CrashReporter.swift in Sources */,
 				D38B2D4C1A8D96D00040E6B5 /* GCDWebServerErrorResponse.m in Sources */,
-				EB1C491C1BDE8C7500D31A0A /* DisconnectDict.m in Sources */,
 				E4B3344E1BBF2393004E2BFF /* ADJActivityKind.m in Sources */,
 				E4CD9F2D1A6DC91200318571 /* BrowserLocationView.swift in Sources */,
 				0BB5B2881AC0A2B90052877D /* SnackBar.swift in Sources */,
@@ -4791,6 +4798,7 @@
 				E6D8D5E71B569D70009E5A58 /* BrowserTrayAnimators.swift in Sources */,
 				F84B22241A09122500AAB793 /* HomePanelViewController.swift in Sources */,
 				E42475DC1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */,
+				EB34D66C1BE1662200C08A48 /* BloomFilter.cpp in Sources */,
 				0B5142CC1AE1BAF50014D0B3 /* UIViewExtensions.swift in Sources */,
 				E47616C71AB74CA600E7DD25 /* ReaderModeBarView.swift in Sources */,
 				EB1C48E51BDE8B2500D31A0A /* ABPFilterParser.cpp in Sources */,
