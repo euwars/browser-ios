@@ -29,8 +29,6 @@ class URLProtocol: NSURLProtocol {
   }
 
   override func startLoading() {
-    print("Serving response from NSURLConnection")
-
     let newRequest = self.request.mutableCopy() as! NSMutableURLRequest
     NSURLProtocol.setProperty(true, forKey: markerRequestHandled, inRequest: newRequest)
     self.connection = NSURLConnection(request: newRequest, delegate: self)

@@ -764,7 +764,8 @@ class SettingsTableViewController: UITableViewController {
         ]
 
       #if BRAVE
-        generalSettings += [AdBlockSetting(settings:self)]
+        generalSettings += [AdBlockSetting(settings:self),
+                            VaultAddressSetting(settings: self)]
       #endif
 
 

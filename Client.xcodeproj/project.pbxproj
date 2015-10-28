@@ -1840,7 +1840,7 @@
 		EB34D62B1BE0230100C08A48 /* adInfo-divquerytemplate.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adInfo-divquerytemplate.js"; sourceTree = "<group>"; };
 		EB34D62C1BE0230100C08A48 /* adInfo-wrapper.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "adInfo-wrapper.js"; sourceTree = "<group>"; };
 		EB34D62D1BE0230100C08A48 /* adInfo.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = adInfo.js; sourceTree = "<group>"; };
-		EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LegacyWebView+Vault.swift"; sourceTree = "<group>"; };
+		EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "LegacyWebView+Vault.swift"; path = "../LegacyWebView+Vault.swift"; sourceTree = "<group>"; };
 		EB9412BE1BD80FC900B21564 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		EB9412C21BD829A200B21564 /* ViewLater.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ViewLater.entitlements; sourceTree = "<group>"; };
@@ -2979,7 +2979,6 @@
 				EB1C48E11BDE8B2500D31A0A /* LegacyWebViewBackForward.swift */,
 				EB1C48E21BDE8B2500D31A0A /* LegacyWebViewProgress.swift */,
 				EB1C48E31BDE8B2500D31A0A /* LegacyWebViewScripting.swift */,
-				EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */,
 			);
 			path = brave;
 			sourceTree = "<group>";
@@ -3011,6 +3010,7 @@
 		EB34D62A1BE0230100C08A48 /* vault */ = {
 			isa = PBXGroup;
 			children = (
+				EB5E475A1BDFF9D500AE338B /* LegacyWebView+Vault.swift */,
 				EB34D62B1BE0230100C08A48 /* adInfo-divquerytemplate.js */,
 				EB34D62C1BE0230100C08A48 /* adInfo-wrapper.js */,
 				EB34D62D1BE0230100C08A48 /* adInfo.js */,

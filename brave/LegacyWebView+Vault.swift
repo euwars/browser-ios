@@ -68,6 +68,10 @@ extension LegacyWebView {
       return
     }
 
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    let profile = appDelegate.getProfile(UIApplication.sharedApplication())
+    let vaultServerHost = profile.prefs.stringForKey(VaultAddressSetting.prefKey) ?? VaultAddressSetting.defaultValue
+
     for item in divNamesAndSizes {
       let w = item["width"] as? Int ?? 0
       let h = item["height"] as? Int ?? 0
@@ -76,8 +80,9 @@ extension LegacyWebView {
       }
       let divId = item["divId"] as! String
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-        let VAULT_SERVER_HOST = "http://localhost:3000"
-        let vault = "http://\(VAULT_SERVER_HOST)/ad?braveUserId=fakeID&intentHost=\(host)&tagName=IFRAME&width=\(w)&height=\(h)"
+        // TODO remove fake id
+        let fakeId = "30c889b7-6e7f-4f7d-9410-85bf710eb0ff"
+        let vault = "http://\(vaultServerHost)/ad?braveUserId=\(fakeId)&intentHost=\(host)&tagName=IFRAME&width=\(w)&height=\(h)"
         var vaultResponse: String
         do {
          // TODO use 'proper' async networking calls (NSURLConnection etc.)
