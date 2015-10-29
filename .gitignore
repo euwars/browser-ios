@@ -38,4 +38,5 @@ MozBuildID.xcconfig
 # Carthage/Checkouts
 
 Carthage/Build
+
 node_modules/
