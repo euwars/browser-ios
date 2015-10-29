@@ -1,6 +1,0 @@
-[submodule "abp-filterparser"]
-	path = abp-filterparser
-	url = https://github.com/bbondy/ABPFilterParser.cpp
-[submodule "brave/abp-filterparser"]
-	path = brave/abp-filterparser
-	url = https://github.com/bbondy/ABPFilterParser.cpp
