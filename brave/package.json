@@ -1,0 +1,6 @@
+{
+  "name": "brave",
+  "dependencies": {
+    "abp-filter-parser-cpp": "*"
+  }
+}
