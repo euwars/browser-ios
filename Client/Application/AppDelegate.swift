@@ -315,6 +315,7 @@ extension AppDelegate: TabManagerStateDelegate {
     }
 }
 
+#if !BRAVE
 var activeCrashReporter: CrashReporter?
 func configureActiveCrashReporter(optedIn: Bool?) {
     if let reporter = activeCrashReporter {
@@ -353,3 +354,5 @@ public func configureCrashReporter(reporter: CrashReporter, optedIn: Bool?) {
         configureReporter()
     }
 }
+#endif
+
