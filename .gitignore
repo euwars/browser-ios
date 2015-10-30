@@ -41,3 +41,4 @@ Carthage/Build
 
 node_modules/
 build-id.xcconfig
+ABPFilterParserData.dat
