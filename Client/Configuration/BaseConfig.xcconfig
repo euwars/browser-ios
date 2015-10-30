@@ -2,32 +2,35 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// Mozilla Application ID
-MOZ_APP_ID = braveios@brave.com
+#include "build-id.xcconfig"
 
-// Bundle Identifier
+MOZ_BUNDLE_DISPLAY_NAME = Brave
+MOZ_PRODUCT_NAME = Brave
+MOZ_APP_ID = braveios@brave.com
 MOZ_BUNDLE_ID = com.brave.ios.browser.$(MOZ_PRODUCT_NAME)
 
 // App Version
 MOZ_VERSION = 0.1
 
-// Build ID
-MOZ_BUILD_ID = 0101
+MOZ_BUILD_ID = GENERATED_BUILD_ID
 
-// Product Name
-MOZ_SOCORRO_PRODUCT_NAME = UNSET
 
-// Crash-stats upload URL
-MOZ_BREAKPAD_URL = UNSET
+OTHER_SWIFT_FLAGS_Debug = -DBRAVE -DDEBUG
+OTHER_SWIFT_FLAGS_Release = -DBRAVE
+OTHER_SWIFT_FLAGS=$(OTHER_SWIFT_FLAGS_$(CONFIGURATION))
 
-// Frequency to poll for uploads for crashes in seconds
-MOZ_BREAKPAD_UPLOAD_FREQUENCY = 0
+VALIDATE_PRODUCT_Release = YES
+VALIDATE_PRODUCT_Debug = NO
+VALIDATE_PRODUCT = $(VALIDATE_PRODUCT_$(CONFIGURATION))
 
-// Uploading to crash-stats which is a socorro instance
-MOZ_BREAKPAD_SERVER_TYPE = UNSET
+ENABLE_TESTABILITY_Release = NO
+ENABLE_TESTABILITY_Debug = YES
+ENABLE_TESTABILITY = $(ENABLE_TESTABILITY_$(CONFIGURATION))
 
-// Vendor property to send to crash-stats
-MOZ_VENDOR = UNSET
+GCC_PREPROCESSOR_DEFINITIONS_Debug = DEBUG=1
+GCC_PREPROCESSOR_DEFINITIONS_Release = NDEBUG=1
+GCC_PREPROCESSOR_DEFINITIONS = BRAVE=1 $(GCC_PREPROCESSOR_DEFINITIONS_$(CONFIGURATION))
 
-OTHER_SWIFT_FLAGS[config=Debug]=-DBRAVE -DDEBUG
-OTHER_SWIFT_FLAGS[config=Release]=-DBRAVE
+SWIFT_OPTIMIZATION_LEVEL_Debug = -Onone
+SWIFT_OPTIMIZATION_LEVEL_Release = -Owholemodule
+SWIFT_OPTIMIZATION_LEVEL = $(SWIFT_OPTIMIZATION_LEVEL_$(CONFIGURATION))
