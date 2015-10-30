@@ -3,6 +3,12 @@ import Shared
 private let _singleton = AdBlocker()
 
 class AdBlocker {
+  // Store the last 500 URLs checked
+  // Store 10 x 50 URLs in the array called timeOrderedCacheChunks. This is a FIFO array,
+  // Throw out a 50 URL chunk when the array is full
+  var fifoOfCachedUrlChunks: [NSMutableDictionary] = []
+  let maxChunks = 10
+  let maxUrlsPerChunk = 50
 
   private init() {
   }
@@ -12,6 +18,7 @@ class AdBlocker {
   }
 
   func shouldBlock(request: NSURLRequest) -> Bool {
+    // TODO: there shouldn't be a cost to checking unchanged prefs, please confirm this
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     let profile = appDelegate.getProfile(UIApplication.sharedApplication())
     if !(profile.prefs.boolForKey(AdBlockSetting.prefKey) ?? AdBlockSetting.defaultValue) {
@@ -27,6 +34,29 @@ class AdBlocker {
       return false
     }
 
-    return AdBlockCppFilter.singleton().checkWithCppABPFilter(url.absoluteString, mainDocumentUrl: domain)
+    // A cache entry is like: timeOrderedCacheChunks[0]["www.microsoft.com_http://some.url"] = true/false for blocking
+    let key = "\(domain)_\(url.absoluteString)"
+
+    for urls in fifoOfCachedUrlChunks {
+      if let urlIsBlocked = urls[key] {
+        return urlIsBlocked as! Bool
+      }
+    }
+
+    let isBlocked = AdBlockCppFilter.singleton().checkWithCppABPFilter(url.absoluteString, mainDocumentUrl: domain)
+
+    if fifoOfCachedUrlChunks.count > maxChunks {
+      fifoOfCachedUrlChunks.removeFirst()
+    }
+
+    if fifoOfCachedUrlChunks.last == nil || fifoOfCachedUrlChunks.last?.count > maxUrlsPerChunk {
+      fifoOfCachedUrlChunks.append(NSMutableDictionary())
+    }
+
+    if let cacheChunkUrlAndDomain = fifoOfCachedUrlChunks.last {
+      cacheChunkUrlAndDomain[key] = isBlocked
+    }
+
+    return isBlocked
   }
 }
