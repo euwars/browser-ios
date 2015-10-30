@@ -40,3 +40,4 @@ MozBuildID.xcconfig
 Carthage/Build
 
 node_modules/
+build-id.xcconfig
