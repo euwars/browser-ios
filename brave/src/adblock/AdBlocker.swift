@@ -37,6 +37,10 @@ class AdBlocker {
     // A cache entry is like: timeOrderedCacheChunks[0]["www.microsoft.com_http://some.url"] = true/false for blocking
     let key = "\(domain)_\(url.absoluteString)"
 
+    // synchronize code from this point on.
+    objc_sync_enter(self)
+    defer { objc_sync_exit(self) }
+
     for urls in fifoOfCachedUrlChunks {
       if let urlIsBlocked = urls[key] {
         return urlIsBlocked as! Bool
