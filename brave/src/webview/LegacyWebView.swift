@@ -53,6 +53,8 @@ public class LegacyWebView: UIWebView {
     super.init(frame: frame)
     self.delegate = self.webViewDelegate
     self.scalesPageToFit = true
+    self.performSelector(NSSelectorFromString("_setDrawInWebThread:"), withObject:Bool(true))
+    self.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
   }
 
   override public var loading: Bool {
