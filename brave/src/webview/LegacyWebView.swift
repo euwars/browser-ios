@@ -2,7 +2,6 @@ import Foundation
 import WebKit
 import Shared
 
-
 func configureActiveCrashReporter(_:Bool?) {}
 
 func convertNavActionToWKType(type:UIWebViewNavigationType) -> WKNavigationType {
@@ -26,7 +25,8 @@ enum KVOStrings: String {
   static let allValues = [kvoCanGoBack, kvoCanGoForward, kvoLoading, kvoURL, kvoEstimatedProgress]
 }
 
-public class LegacyWebView: UIWebView {
+class LegacyWebView: UIWebView {
+  static let kNotificationWebViewLoadCompleteOrFailed = "kNotificationWebViewLoadCompleteOrFailed"
   lazy var configuration: LegacyWebViewConfiguration = { return LegacyWebViewConfiguration(webView: self) }()
   weak var navigationDelegate: WKNavigationDelegate?
   weak var UIDelegate: WKUIDelegate?
@@ -241,13 +241,26 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
       container.legacyWebView = parent
       nd.webView?(container, didFinishNavigation: nullWKNavigation)
     }
+
+    // For testing
+    if let readyState = _parent.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
+      where readyState == "complete" {
+      NSNotificationCenter.defaultCenter()
+        .postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
+    }
   }
 
   func webView(webView: UIWebView, didFailLoadWithError error: NSError?) {
+    if (error?.code == NSURLErrorCancelled) {
+      return
+    }
+    NSNotificationCenter.defaultCenter()
+      .postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
     if let nd = parent?.navigationDelegate {
       nd.webView?(nullWebView, didFailNavigation: nullWKNavigation,
         withError: error ?? NSError.init(domain: "", code: 0, userInfo: nil))
     }
+    print("\(error)")
     parent?.progress.didFailLoadWithError()
     parent?.kvoBroadcast()
   }
