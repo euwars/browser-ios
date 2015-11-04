@@ -7,7 +7,7 @@ func hashString (obj: AnyObject) -> String {
 }
 
 
-public class LegacyUserContentController
+class LegacyUserContentController
 {
   var scriptHandlers = [String:WKScriptMessageHandler]()
 
@@ -22,11 +22,11 @@ public class LegacyUserContentController
     scripts.append(script)
   }
 
-  public init(_ webView: LegacyWebView) {
+  init(_ webView: LegacyWebView) {
     self.webView = webView
   }
 
-  public func inject() {
+  func inject() {
     let js = LegacyJSContext()
 
     guard let web = webView else { return }
@@ -41,10 +41,10 @@ public class LegacyUserContentController
   }
 }
 
-public class LegacyWebViewConfiguration
+class LegacyWebViewConfiguration
 {
   let userContentController: LegacyUserContentController
-  public init(webView: LegacyWebView) {
+  init(webView: LegacyWebView) {
     userContentController = LegacyUserContentController(webView)
   }
 }
