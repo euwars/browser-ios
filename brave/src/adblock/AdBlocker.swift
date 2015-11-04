@@ -30,7 +30,7 @@ class AdBlocker {
         return false
     }
 
-    if let host = url.host where host.startsWith(domain) {
+    if let host = url.host where host.contains(domain) {
       return false
     }
 
@@ -43,6 +43,11 @@ class AdBlocker {
 
     for urls in fifoOfCachedUrlChunks {
       if let urlIsBlocked = urls[key] {
+        if urlIsBlocked as! Bool {
+#if LOG_AD_BLOCK
+          print("blocked (cached result) \(url.absoluteString)")
+#endif
+        }
         return urlIsBlocked as! Bool
       }
     }
@@ -60,6 +65,12 @@ class AdBlocker {
     if let cacheChunkUrlAndDomain = fifoOfCachedUrlChunks.last {
       cacheChunkUrlAndDomain[key] = isBlocked
     }
+
+#if LOG_AD_BLOCK
+    if isBlocked {
+      print("blocked \(url.absoluteString)")
+    }
+#endif
 
     return isBlocked
   }
