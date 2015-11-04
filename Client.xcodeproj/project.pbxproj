@@ -618,7 +618,6 @@
 		E4F480F51A954660003C0444 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D38B2D811A8D98380040E6B5 /* SWXMLHash.framework */; };
 		E4F481041A95466A003C0444 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D38B2D811A8D98380040E6B5 /* SWXMLHash.framework */; };
 		E60A60821B6BFC0B00F850D4 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60A60811B6BFC0B00F850D4 /* CrashReporter.swift */; };
-		E60A60A11B6BFDDC00F850D4 /* CrashReporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60A60A01B6BFDDC00F850D4 /* CrashReporterTests.swift */; };
 		E61453BE1B750A1700C3F9D7 /* RollingFileLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61453BD1B750A1700C3F9D7 /* RollingFileLoggerTests.swift */; };
 		E6231C011B90A44F005ABB0D /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E6231C001B90A44F005ABB0D /* libz.tbd */; };
 		E6231C031B90A466005ABB0D /* libstdc++.6.0.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E6231C021B90A466005ABB0D /* libstdc++.6.0.9.tbd */; };
@@ -666,6 +665,17 @@
 		EB34D8DE1BE16A1400C08A48 /* ABPFilterParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6E81BE16A1400C08A48 /* ABPFilterParser.cpp */; };
 		EB34D93C1BE16A1500C08A48 /* filter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB34D7861BE16A1400C08A48 /* filter.cpp */; };
 		EB34D9461BE16A1500C08A48 /* BloomFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB34D7941BE16A1400C08A48 /* BloomFilter.cpp */; };
+		EB429FE41BEA7B1300681E31 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EB429FE21BEA7AFB00681E31 /* Info.plist */; };
+		EB642A851BE90D680000F230 /* WebViewLoadTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB89A52D1BE8097100A44D4B /* WebViewLoadTest.swift */; };
+		EB642A861BE90D6C0000F230 /* top500.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB89A5341BE80D0500A44D4B /* top500.swift */; };
+		EB89A50D1BE801CD00A44D4B /* LegacyJSContext.m in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6D11BE169C600C08A48 /* LegacyJSContext.m */; };
+		EB89A50E1BE801CD00A44D4B /* LegacyWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6D21BE169C600C08A48 /* LegacyWebView.swift */; };
+		EB89A50F1BE801CD00A44D4B /* LegacyWebViewBackForward.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6D31BE169C600C08A48 /* LegacyWebViewBackForward.swift */; };
+		EB89A5101BE801CD00A44D4B /* LegacyWebViewProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6D41BE169C600C08A48 /* LegacyWebViewProgress.swift */; };
+		EB89A5111BE801CD00A44D4B /* LegacyWebViewScripting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6D51BE169C600C08A48 /* LegacyWebViewScripting.swift */; };
+		EB89A5141BE801DB00A44D4B /* AdBlockCppFilter.mm in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6C51BE169C600C08A48 /* AdBlockCppFilter.mm */; };
+		EB89A5151BE801DB00A44D4B /* AdBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6C61BE169C600C08A48 /* AdBlocker.swift */; };
+		EB89A5171BE801DB00A44D4B /* UrlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6C81BE169C600C08A48 /* UrlProtocol.swift */; };
 		EB9412C01BD80FC900B21564 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BE1BD80FC900B21564 /* Fabric.framework */; };
 		EB9412C11BD80FCA00B21564 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BF1BD80FC900B21564 /* Crashlytics.framework */; };
 		EBF2BAE01BE413F00041A5DA /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */; };
@@ -1270,6 +1280,13 @@
 			remoteGlobalIDString = F84B21BD1A090F8100AAB793;
 			remoteInfo = Client;
 		};
+		EB89A5411BE853F000A44D4B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F84B21BD1A090F8100AAB793;
+			remoteInfo = Client;
+		};
 		F84B21D41A090F8100AAB793 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F84B21B61A090F8100AAB793 /* Project object */;
@@ -1850,6 +1867,10 @@
 		EB34D7941BE16A1400C08A48 /* BloomFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BloomFilter.cpp; sourceTree = "<group>"; };
 		EB34D7951BE16A1400C08A48 /* BloomFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BloomFilter.h; sourceTree = "<group>"; };
 		EB34D7E21BE16A1400C08A48 /* hashFn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hashFn.h; sourceTree = "<group>"; };
+		EB429FE21BEA7AFB00681E31 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EB89A52D1BE8097100A44D4B /* WebViewLoadTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebViewLoadTest.swift; sourceTree = "<group>"; };
+		EB89A5341BE80D0500A44D4B /* top500.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = top500.swift; sourceTree = "<group>"; };
+		EB89A53C1BE853F000A44D4B /* BraveUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BraveUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB9412BE1BD80FC900B21564 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		EB9412C21BD829A200B21564 /* ViewLater.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ViewLater.entitlements; sourceTree = "<group>"; };
@@ -2003,6 +2024,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E6F965121B2F1CF20034B023 /* Shared.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB89A5391BE853F000A44D4B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2992,6 +3020,7 @@
 		EB34D6C11BE169C600C08A48 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				EB89A52C1BE8097100A44D4B /* test */,
 				EB34D6C21BE169C600C08A48 /* adblock */,
 				EB34D6C91BE169C600C08A48 /* vault */,
 				EB34D6CF1BE169C600C08A48 /* webview */,
@@ -3068,6 +3097,16 @@
 			path = "bloom-filter-cpp";
 			sourceTree = "<group>";
 		};
+		EB89A52C1BE8097100A44D4B /* test */ = {
+			isa = PBXGroup;
+			children = (
+				EB429FE21BEA7AFB00681E31 /* Info.plist */,
+				EB89A5341BE80D0500A44D4B /* top500.swift */,
+				EB89A52D1BE8097100A44D4B /* WebViewLoadTest.swift */,
+			);
+			path = test;
+			sourceTree = "<group>";
+		};
 		F84B21B51A090F8100AAB793 = {
 			isa = PBXGroup;
 			children = (
@@ -3131,6 +3170,7 @@
 				E4D567221ADECE2700F1EFE7 /* ReadingListTests.xctest */,
 				E6F9650C1B2F1CF20034B023 /* SharedTests.xctest */,
 				E4BA8A2B1B4B0A1600BC2E95 /* ViewLater.appex */,
+				EB89A53C1BE853F000A44D4B /* BraveUnitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3615,6 +3655,24 @@
 			productReference = E6F9650C1B2F1CF20034B023 /* SharedTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		EB89A53B1BE853F000A44D4B /* BraveUnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EB89A5431BE853F000A44D4B /* Build configuration list for PBXNativeTarget "BraveUnitTests" */;
+			buildPhases = (
+				EB89A5381BE853F000A44D4B /* Sources */,
+				EB89A5391BE853F000A44D4B /* Frameworks */,
+				EB89A53A1BE853F000A44D4B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EB89A5421BE853F000A44D4B /* PBXTargetDependency */,
+			);
+			name = BraveUnitTests;
+			productName = BraveUnitTests;
+			productReference = EB89A53C1BE853F000A44D4B /* BraveUnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		F84B21BD1A090F8100AAB793 /* Client */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F84B21DD1A090F8100AAB793 /* Build configuration list for PBXNativeTarget "Client" */;
@@ -3712,7 +3770,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftMigration = 0700;
-				LastSwiftUpdateCheck = 0700;
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = Mozilla;
 				TargetAttributes = {
@@ -3762,6 +3820,10 @@
 					};
 					E6F9650B1B2F1CF20034B023 = {
 						CreatedOnToolsVersion = 6.3.2;
+					};
+					EB89A53B1BE853F000A44D4B = {
+						CreatedOnToolsVersion = 7.1;
+						TestTargetID = F84B21BD1A090F8100AAB793;
 					};
 					F84B21BD1A090F8100AAB793 = {
 						CreatedOnToolsVersion = 6.1;
@@ -3879,6 +3941,7 @@
 				E4D567171ADECE2700F1EFE7 /* ReadingList */,
 				E4D567211ADECE2700F1EFE7 /* ReadingListTests */,
 				E6F9650B1B2F1CF20034B023 /* SharedTests */,
+				EB89A53B1BE853F000A44D4B /* BraveUnitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -4269,6 +4332,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EB89A53A1BE853F000A44D4B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB429FE41BEA7B1300681E31 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4772,6 +4843,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EB89A5381BE853F000A44D4B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EB642A861BE90D6C0000F230 /* top500.swift in Sources */,
+				EB642A851BE90D680000F230 /* WebViewLoadTest.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F84B21BA1A090F8100AAB793 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -4932,8 +5012,8 @@
 				0BB5B28D1AC0A6130052877D /* Toolbar.swift in Sources */,
 				03CCC9181AF05E7300DBF30D /* RelativeDatesTests.swift in Sources */,
 				F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */,
-				E60A60A11B6BFDDC00F850D4 /* CrashReporterTests.swift in Sources */,
 				281B2BEA1ADF4D90002917DC /* MockProfile.swift in Sources */,
+				EB89A5111BE801CD00A44D4B /* LegacyWebViewScripting.swift in Sources */,
 				74E36E151B716BAF00D69DA1 /* SettingsContentViewController.swift in Sources */,
 				2F697F7E1A9FD22D009E03AE /* SearchEnginesTests.swift in Sources */,
 				2F44FA1B1A9D426A00FD20CC /* TestHashExtensions.swift in Sources */,
@@ -4941,7 +5021,9 @@
 				D38B2D2F1A8D96D00040E6B5 /* GCDWebServer.m in Sources */,
 				0BA2E43C1A69EDAB000581FA /* Profile.swift in Sources */,
 				7BBFEE9F1BB409EB00A305AA /* ErrorPageHelper.swift in Sources */,
+				EB89A5141BE801DB00A44D4B /* AdBlockCppFilter.mm in Sources */,
 				D38B2D351A8D96D00040E6B5 /* GCDWebServerFunctions.m in Sources */,
+				EB89A5101BE801CD00A44D4B /* LegacyWebViewProgress.swift in Sources */,
 				7BBFEE9C1BB409D200A305AA /* SnackBar.swift in Sources */,
 				D38B2D501A8D96D00040E6B5 /* GCDWebServerFileResponse.m in Sources */,
 				D38B2D3B1A8D96D00040E6B5 /* GCDWebServerResponse.m in Sources */,
@@ -4957,6 +5039,8 @@
 				7BBFEEA11BB40A0800A305AA /* ReaderModeCache.swift in Sources */,
 				D38B2D441A8D96D00040E6B5 /* GCDWebServerMultiPartFormRequest.m in Sources */,
 				E42475DD1AB73B9B00B23D33 /* SWCellScrollView.m in Sources */,
+				EB89A50D1BE801CD00A44D4B /* LegacyJSContext.m in Sources */,
+				EB89A5171BE801DB00A44D4B /* UrlProtocol.swift in Sources */,
 				D39843171AC13F9300D658F4 /* ThumbnailCell.swift in Sources */,
 				D3C744CE1A687D6C004CE85D /* URIFixup.swift in Sources */,
 				2816F0011B33E05400522243 /* UIConstants.swift in Sources */,
@@ -4965,6 +5049,7 @@
 				7BBFEEA01BB409F300A305AA /* AboutUtils.swift in Sources */,
 				0BD19A681A2530A40084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
 				7BBFEE9B1BB409C300A305AA /* Browser.swift in Sources */,
+				EB89A5151BE801DB00A44D4B /* AdBlocker.swift in Sources */,
 				28EADE5E1AFC3B86007FB2FB /* UIImageViewExtensions.swift in Sources */,
 				D308E4EC1A530A8B00842685 /* SearchEngines.swift in Sources */,
 				0BF42D4F1A7CD09600889E28 /* TestFavicons.swift in Sources */,
@@ -4974,6 +5059,7 @@
 				7BBFEEA31BB40A5300A305AA /* ReaderMode.swift in Sources */,
 				D38A1BEF1A9FA2CA00F6A386 /* SiteTableViewController.swift in Sources */,
 				D38B2D381A8D96D00040E6B5 /* GCDWebServerRequest.m in Sources */,
+				EB89A50E1BE801CD00A44D4B /* LegacyWebView.swift in Sources */,
 				0BA8964C1A250E6500C1010C /* TestBookmarks.swift in Sources */,
 				D38B2D321A8D96D00040E6B5 /* GCDWebServerConnection.m in Sources */,
 				7BBFEE9D1BB409D800A305AA /* SessionData.swift in Sources */,
@@ -4981,6 +5067,7 @@
 				0BE108361A1B1EC700D4B712 /* TestLocking.swift in Sources */,
 				D31A0FC81A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,
 				2F13E79B1AC0C02700D75081 /* StringExtensionsTests.swift in Sources */,
+				EB89A50F1BE801CD00A44D4B /* LegacyWebViewBackForward.swift in Sources */,
 				E46C51C41B41ADD800EB349F /* Try.m in Sources */,
 				59A687B4A05CC772FE7E5A09 /* SearchViewController.swift in Sources */,
 				7BBFEE9E1BB409E300A305AA /* ReaderModeUtils.swift in Sources */,
@@ -5243,6 +5330,11 @@
 			isa = PBXTargetDependency;
 			target = F84B21BD1A090F8100AAB793 /* Client */;
 			targetProxy = E63CD1B21B31B66400A63AFF /* PBXContainerItemProxy */;
+		};
+		EB89A5421BE853F000A44D4B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F84B21BD1A090F8100AAB793 /* Client */;
+			targetProxy = EB89A5411BE853F000A44D4B /* PBXContainerItemProxy */;
 		};
 		F84B21D51A090F8100AAB793 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -7502,6 +7594,93 @@
 			};
 			name = FennecNightly;
 		};
+		EB89A5441BE853F000A44D4B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = brave/src/test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = brave.com.BraveUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
+			};
+			name = Debug;
+		};
+		EB89A5451BE853F000A44D4B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = brave/src/test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = brave.com.BraveUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		EB89A5461BE853F000A44D4B /* FennecAurora */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = brave/src/test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = brave.com.BraveUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = FennecAurora;
+		};
+		EB89A5471BE853F000A44D4B /* Firefox */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = brave/src/test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = brave.com.BraveUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Firefox;
+		};
+		EB89A5481BE853F000A44D4B /* FennecNightly */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = brave/src/test/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = brave.com.BraveUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Client.app/Client";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = FennecNightly;
+		};
 		EBF2BAB61BE3B43F0041A5DA /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E60961851B62B89200DD640F /* BaseConfig.xcconfig */;
@@ -8414,6 +8593,18 @@
 				E6F965161B2F1CF20034B023 /* FennecAurora */,
 				E6F965171B2F1CF20034B023 /* Firefox */,
 				E6F965181B2F1CF20034B023 /* FennecNightly */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EB89A5431BE853F000A44D4B /* Build configuration list for PBXNativeTarget "BraveUnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EB89A5441BE853F000A44D4B /* Debug */,
+				EB89A5451BE853F000A44D4B /* Release */,
+				EB89A5461BE853F000A44D4B /* FennecAurora */,
+				EB89A5471BE853F000A44D4B /* Firefox */,
+				EB89A5481BE853F000A44D4B /* FennecNightly */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
