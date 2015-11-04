@@ -12,7 +12,6 @@ class URLProtocol: NSURLProtocol {
 
   override class func canInitWithRequest(request: NSURLRequest) -> Bool {
     //print("Request #\(requestCount++): URL = \(request.URL?.absoluteString)")
-
     if let scheme = request.URL?.scheme where !scheme.startsWith("http") {
       return false
     }
@@ -29,7 +28,19 @@ class URLProtocol: NSURLProtocol {
   }
 
   override func startLoading() {
-    let newRequest = self.request.mutableCopy() as! NSMutableURLRequest
+    // Reportedly not safe to use built-in cloning methods: http://openradar.appspot.com/11596316
+    let newRequest = NSMutableURLRequest(URL: request.URL!, cachePolicy: request.cachePolicy, timeoutInterval: request.timeoutInterval)
+    newRequest.allHTTPHeaderFields = request.allHTTPHeaderFields
+    if let m = request.HTTPMethod {
+      newRequest.HTTPMethod = m
+    }
+    if let b = request.HTTPBodyStream {
+      newRequest.HTTPBodyStream = b
+    }
+    if let b = request.HTTPBody {
+      newRequest.HTTPBody = b
+    }
+
     NSURLProtocol.setProperty(true, forKey: markerRequestHandled, inRequest: newRequest)
     self.connection = NSURLConnection(request: newRequest, delegate: self)
 
