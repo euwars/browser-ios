@@ -138,12 +138,16 @@ class WebViewLoadTest: XCTestCase {
         let arr = noBlockAndBlockArrays[i]
         let average = arr.reduce(0.0) { return ($0 + $1) } / Double(arr.count)
         print("\(i) \(key) \(average)")
-
-        averages[key] = (i < 1)? (average, 0.0) : (averages[key].0, average)
-
+        if i < 1 {
+          averages[key] = (average, 0.0)
+        } else {
+          averages[key] = (averages[key]!.0, average)
+          if (averages[key]!.1 < averages[key]!.0) {
+            countSitesWithFasterLoad++
+          }
+        }
       }
     }
-
 
     XCTAssert(countSitesWithFasterLoad == sites.count, "Expected all sites to load faster with ad block")
   }
