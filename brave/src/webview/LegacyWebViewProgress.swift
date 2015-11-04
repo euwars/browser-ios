@@ -99,31 +99,38 @@ public class LegacyWebViewProgress
     _loadingCount--;
     incrementProgress()
 
-    let readyState = webView?.stringByEvaluatingJavaScriptFromString("document.readyState")
+    let readyState = webView?.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
 
-    let interactive = readyState == "interactive";
-    if (interactive) {
-      if let scheme = webView?.request?.mainDocumentURL?.scheme,
-          host = webView?.request?.mainDocumentURL?.host
-      {
-        _interactive = true
-        let waitForCompleteJS = String(format:
-          "window.addEventListener('load',function() {" +
-          "var iframe = document.createElement('iframe');" +
-          "iframe.style.display = 'none';" +
-          "iframe.src = '%@://%@/#%@';" +
-          "document.body.appendChild(iframe);" +
-          "  }, false);",
-          scheme,
-          host,
-          completedUrlPath);
-        webView?.stringByEvaluatingJavaScriptFromString(waitForCompleteJS)
+    if let readyState = readyState {
+      switch readyState {
+      case "loaded":
+        completeProgress()
+      case "interactive":
+        if let scheme = webView?.request?.mainDocumentURL?.scheme,
+            host = webView?.request?.mainDocumentURL?.host
+        {
+          _interactive = true
+          let waitForCompleteJS = String(format:
+            "window.addEventListener('load', function() {" +
+                "var iframe = document.createElement('iframe');" +
+                "iframe.style.display = 'none';" +
+                "iframe.src = '%@://%@/#%@';" +
+                "document.body.appendChild(iframe);" +
+            "}, false);",
+            scheme,
+            host,
+            completedUrlPath);
+          webView?.stringByEvaluatingJavaScriptFromString(waitForCompleteJS)
+        }
+      case "complete":
+        // When loading consecutive pages, I often see a finishLoad for the previous page
+        // arriving. I have tried webview.stopLoading, and still this seems to arrive. Bizarre.
+        let isMainDoc = _currentURL != nil && _currentURL == webView?.request?.mainDocumentURL
+        if (isMainDoc) {
+          completeProgress()
+        }
+        default: ()
       }
-    }
-    let isNotRedirect = _currentURL != nil && _currentURL == webView?.request?.mainDocumentURL
-    let complete = readyState == "complete"
-    if (complete && isNotRedirect) {
-      completeProgress()
     }
   }
 
