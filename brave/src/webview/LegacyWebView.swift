@@ -52,14 +52,15 @@ class LegacyWebView: UIWebView {
     #endif
 
     super.init(frame: frame)
-    self.delegate = self.webViewDelegate
-    self.scalesPageToFit = true
+    delegate = self.webViewDelegate
+    scalesPageToFit = true
     let selectorName = String(format: "_%@WebThread:", "setDrawIn") // avoid Apple Store static analyzer
-    self.performSelector(NSSelectorFromString(selectorName), withObject:Bool(true))
-    self.scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
+    performSelector(NSSelectorFromString(selectorName), withObject:Bool(true))
+    scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
+    setupSwipeGesture()
   }
 
-  override public var loading: Bool {
+  override var loading: Bool {
     get {
       if internalIsLoadingEndedFlag {
         // we detected load complete internally –UIWebView sometimes stays in a loading state (i.e. bbc.com)
@@ -69,7 +70,7 @@ class LegacyWebView: UIWebView {
     }
   }
 
-  public required init?(coder aDecoder: NSCoder) {
+  required init?(coder aDecoder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
   }
 
@@ -133,16 +134,41 @@ class LegacyWebView: UIWebView {
     }
   }
 
-  override public func goBack() {
+  override func goBack() {
     super.goBack()
   }
 
-  override public func goForward() {
+  override func goForward() {
     super.goForward()
   }
 
   class func isTopFrameRequest(request:NSURLRequest) -> Bool {
     return request.URL == request.mainDocumentURL
+  }
+
+  func setupSwipeGesture() {
+    let right = UISwipeGestureRecognizer(target: self, action: "swipeRight:")
+    right.direction = .Right
+    let left = UISwipeGestureRecognizer(target: self, action: "swipeLeft:")
+    left.direction = .Left
+
+    left.requireGestureRecognizerToFail(right)
+    right.requireGestureRecognizerToFail(left)
+
+    addGestureRecognizer(right)
+    addGestureRecognizer(left)
+  }
+
+  @objc func swipeRight(gesture: UISwipeGestureRecognizer) {
+    if canGoBack {
+      goBack()
+    }
+  }
+
+  @objc func swipeLeft(gesture: UISwipeGestureRecognizer) {
+    if canGoForward {
+      goForward()
+    }
   }
 }
 
@@ -264,6 +290,4 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     parent?.progress.didFailLoadWithError()
     parent?.kvoBroadcast()
   }
-
-
 }
