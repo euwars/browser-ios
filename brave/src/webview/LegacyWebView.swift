@@ -37,6 +37,12 @@ class LegacyWebView: UIWebView {
   lazy var webViewDelegate: WebViewDelegate = { return WebViewDelegate(parent: self) }()
   var URL: NSURL?
   var internalIsLoadingEndedFlag: Bool = false;
+  let uuid = NSUUID().UUIDString
+  var knownFrameContexts = Set<NSObject>()
+
+  override class func initialize () {
+    LegacyJSContext.setup()
+  }
 
   override init(frame: CGRect) {
     #if DEBUG
@@ -232,6 +238,10 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     }
     parent?.progress.webViewDidStartLoad()
     parent?.kvoBroadcast([KVOStrings.kvoLoading])
+
+    if let uuid = parent?.uuid {
+      webView.stringByEvaluatingJavaScriptFromString("var brave_web_view_id = '\(uuid)'")
+    }
   }
 
   func webViewDidFinishLoad(webView: UIWebView) {
@@ -256,8 +266,9 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     }
 
     if (!webView.loading) {
-      _parent.configuration.userContentController.inject()
+      _parent.configuration.userContentController.injectIntoMain()
       _parent.replaceImagesUsingTheVault(webView)
+      _parent.configuration.userContentController.notificationFrameCreated()
     }
 
     _parent.kvoBroadcast()
