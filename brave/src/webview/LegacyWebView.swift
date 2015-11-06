@@ -37,6 +37,7 @@ class LegacyWebView: UIWebView {
   lazy var webViewDelegate: WebViewDelegate = { return WebViewDelegate(parent: self) }()
   var URL: NSURL?
   var internalIsLoadingEndedFlag: Bool = false;
+  var knownFrameContexts = Set<NSObject>()
 
   override init(frame: CGRect) {
     #if DEBUG
@@ -256,7 +257,8 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     }
 
     if (!webView.loading) {
-      _parent.configuration.userContentController.inject()
+      _parent.configuration.userContentController.injectIntoMain()
+      _parent.configuration.userContentController.injectIntoSubFrame()
       _parent.replaceImagesUsingTheVault(webView)
     }
 

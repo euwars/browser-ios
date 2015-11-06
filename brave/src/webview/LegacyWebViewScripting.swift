@@ -1,7 +1,5 @@
 import Foundation
 
-
-
 func hashString (obj: AnyObject) -> String {
   return String(ObjectIdentifier(obj).uintValue)
 }
@@ -9,34 +7,73 @@ func hashString (obj: AnyObject) -> String {
 
 class LegacyUserContentController
 {
-  var scriptHandlers = [String:WKScriptMessageHandler]()
-
+  var scriptHandlersMainFrame = [String:WKScriptMessageHandler]()
+  var scriptHandlersSubFrames = [String:WKScriptMessageHandler]()
+  let whitelistSubFrameScripts = ["contextMenuMessageHandler"]
   var scripts:[WKUserScript] = []
   weak var webView: LegacyWebView?
 
   func addScriptMessageHandler(scriptMessageHandler: WKScriptMessageHandler, name: String) {
-    scriptHandlers[name] = scriptMessageHandler
+    scriptHandlersMainFrame[name] = scriptMessageHandler
+
+    if hasWhitelistedSubFrameHandlerInString(name) {
+      scriptHandlersSubFrames[name] = scriptMessageHandler
+    }
+  }
+
+  func hasWhitelistedSubFrameHandlerInString(script: String) -> Bool {
+    return whitelistSubFrameScripts.filter({ script.contains($0) }).count > 0
   }
 
   func addUserScript(script:WKUserScript) {
-    scripts.append(script)
+    var mainFrameOnly = true
+    if !script.forMainFrameOnly && hasWhitelistedSubFrameHandlerInString(script.source) {
+      // Only contextMenu injection to subframes for now,
+      // whitelist this explicitly, don't just inject scripts willy-nilly into frames without
+      // careful consideration. For instance, there are security implications with password management in frames
+      mainFrameOnly = false
+    }
+    scripts.append(WKUserScript(source: script.source, injectionTime: script.injectionTime, forMainFrameOnly: mainFrameOnly))
   }
 
   init(_ webView: LegacyWebView) {
     self.webView = webView
   }
 
-  func inject() {
+  func injectIntoMain() {
+    guard let webView = webView else { return }
+
+    let result = webView.stringByEvaluatingJavaScriptFromString("Window.prototype.webkit.hasOwnProperty('messageHandlers')")
+    if result == "true" {
+      // already injected into this context
+      return
+    }
+
     let js = LegacyJSContext()
-
-    guard let web = webView else { return }
-
-    for (name, handler) in scriptHandlers {
-      js.installHandlerForWebView(web, handlerName: name, handler:handler)
+    for (name, handler) in scriptHandlersMainFrame {
+      js.installHandlerForWebView(webView, handlerName: name, handler:handler)
     }
 
     for script in scripts {
-      webView?.stringByEvaluatingJavaScriptFromString(script.source)
+      webView.stringByEvaluatingJavaScriptFromString(script.source)
+    }
+  }
+
+  func injectIntoSubFrame() {
+    let js = LegacyJSContext()
+    let contexts = js.findNewFramesForWebView(webView, withFrameContexts: webView?.knownFrameContexts)
+
+    for ctx in contexts {
+      webView?.knownFrameContexts.insert(ctx.hash)
+
+      for (name, handler) in scriptHandlersSubFrames {
+        js.installHandlerForContext(ctx, handlerName: name, handler:handler, webView:webView)
+      }
+      for script in scripts {
+        if !script.forMainFrameOnly {
+          js.callOnContext(ctx, script: script.source)
+        }
+      }
     }
   }
 }
