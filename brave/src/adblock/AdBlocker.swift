@@ -18,6 +18,11 @@ class AdBlocker {
   }
 
   func shouldBlock(request: NSURLRequest) -> Bool {
+
+    // synchronize code from this point on.
+    objc_sync_enter(self)
+    defer { objc_sync_exit(self) }
+
     // TODO: there shouldn't be a cost to checking unchanged prefs, please confirm this
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     let profile = appDelegate.getProfile(UIApplication.sharedApplication())
@@ -36,10 +41,6 @@ class AdBlocker {
 
     // A cache entry is like: timeOrderedCacheChunks[0]["www.microsoft.com_http://some.url"] = true/false for blocking
     let key = "\(domain)_\(url.absoluteString)"
-
-    // synchronize code from this point on.
-    objc_sync_enter(self)
-    defer { objc_sync_exit(self) }
 
     for urls in fifoOfCachedUrlChunks {
       if let urlIsBlocked = urls[key] {
