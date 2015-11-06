@@ -83,7 +83,7 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
-
+#if !BRAVE // This seems to suppress the text selection context menu on long press, which we don't need
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailByGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         // Hack to detect the built-in text selection gesture recognizer.
         if let otherDelegate = otherGestureRecognizer.delegate where String(otherDelegate).contains("_UIKeyboardBasedNonEditableTextSelectionGestureController") {
@@ -93,7 +93,7 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
         // Hack to detect the built-in context menu gesture recognizer.
         return otherGestureRecognizer is UILongPressGestureRecognizer && otherGestureRecognizer.delegate?.description.rangeOfString("WKContentView") != nil
     }
-
+#endif
     func gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer) -> Bool {
         return showCustomContextMenu
     }
