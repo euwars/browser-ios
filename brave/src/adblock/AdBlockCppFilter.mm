@@ -37,9 +37,24 @@ static NSData *loadData()
   return self;
 }
 
-- (BOOL)checkWithCppABPFilter:(NSString *)url mainDocumentUrl:(NSString *)mainDoc
+- (BOOL)checkWithCppABPFilter:(NSString *)url
+              mainDocumentUrl:(NSString *)mainDoc
+             acceptHTTPHeader:(NSString *)acceptHeader
 {
-  return parser.matches(url.UTF8String, FONoFilterOption, mainDoc.UTF8String);
+  FilterOption option = FONoFilterOption;
+  if (acceptHeader) {
+    if ([acceptHeader rangeOfString:@"/css"].location != NSNotFound) {
+      option  = FOStylesheet;
+    }
+    else if ([acceptHeader rangeOfString:@"image/"].location != NSNotFound) {
+      option  = FOImage;
+    }
+    else if ([acceptHeader rangeOfString:@"javascript"].location != NSNotFound) {
+      option  = FOScript;
+    }
+  }
+
+  return parser.matches(url.UTF8String, option, mainDoc.UTF8String);
 }
 
 @end

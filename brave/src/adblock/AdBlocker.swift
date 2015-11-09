@@ -53,7 +53,9 @@ class AdBlocker {
       }
     }
 
-    let isBlocked = AdBlockCppFilter.singleton().checkWithCppABPFilter(url.absoluteString, mainDocumentUrl: domain)
+    let isBlocked = AdBlockCppFilter.singleton().checkWithCppABPFilter(url.absoluteString,
+      mainDocumentUrl: domain,
+      acceptHTTPHeader:request.valueForHTTPHeaderField("Accept"))
 
     if fifoOfCachedUrlChunks.count > maxChunks {
       fifoOfCachedUrlChunks.removeFirst()
