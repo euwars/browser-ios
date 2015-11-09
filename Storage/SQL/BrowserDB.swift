@@ -227,6 +227,23 @@ public class BrowserDB {
 }
 
 extension BrowserDB {
+    func vacuum() {
+        log.debug("Vacuuming a BrowserDB.")
+        db.withConnection(SwiftData.Flags.ReadWriteCreate) { connection in
+            return connection.vacuum()
+        }
+    }
+
+    func checkpoint() {
+        log.debug("Checkpointing a BrowserDB.")
+        db.transaction { connection in
+            connection.checkpoint()
+            return true
+        }
+    }
+}
+
+extension BrowserDB {
     public class func varlist(count: Int) -> String {
         return "(" + Array(count: count, repeatedValue: "?").joinWithSeparator(", ") + ")"
     }

@@ -26,6 +26,12 @@ public protocol BrowserHistory {
     func getSitesByFrecencyWithLimit(limit: Int) -> Deferred<Maybe<Cursor<Site>>>
     func getSitesByFrecencyWithLimit(limit: Int, whereURLContains filter: String) -> Deferred<Maybe<Cursor<Site>>>
     func getSitesByLastVisit(limit: Int) -> Deferred<Maybe<Cursor<Site>>>
+
+    func getTopSitesWithLimit(limit: Int) -> Deferred<Maybe<Cursor<Site>>>
+    func setTopSitesNeedsInvalidation()
+    func invalidateTopSitesIfNeeded() -> Deferred<Maybe<Bool>>
+    func setTopSitesCacheSize(size: Int32)
+    func clearTopSitesCache() -> Success
 }
 
 /**
@@ -55,6 +61,9 @@ public protocol SyncableHistory: AccountRemovalDelegate {
      */
     func markAsSynchronized(_: [GUID], modified: Timestamp) -> Deferred<Maybe<Timestamp>>
     func markAsDeleted(guids: [GUID]) -> Success
+
+    func doneApplyingRecordsAfterDownload() -> Success
+    func doneUpdatingMetadataAfterUpload() -> Success
 }
 
 // TODO: integrate Site with this.

@@ -355,7 +355,13 @@ class TabTrayController: UIViewController {
 
         // Update the trait collection we reference in our layout delegate
         tabLayoutDelegate.traitCollection = traitCollection
-        collectionView.collectionViewLayout.invalidateLayout()
+    }
+
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        coordinator.animateAlongsideTransition({ _ in
+            self.collectionView.collectionViewLayout.invalidateLayout()
+        }, completion: nil)
     }
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -439,7 +445,7 @@ class TabTrayController: UIViewController {
         // If we are exiting private mode and we have the close private tabs option selected, make sure
         // we clear out all of the private tabs
         if !privateMode && profile.prefs.boolForKey("settings.closePrivateTabs") ?? false {
-            tabManager.privateTabs.forEach { tabManager.removeTab($0) }
+            tabManager.removeAllPrivateTabsAndNotify(false)
         }
 
         togglePrivateMode.setSelected(privateMode, animated: true)
