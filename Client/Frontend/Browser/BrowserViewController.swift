@@ -265,6 +265,7 @@ class BrowserViewController: UIViewController {
         topTouchArea.addTarget(self, action: "SELtappedTopArea", forControlEvents: UIControlEvents.TouchUpInside)
         view.addSubview(topTouchArea)
 
+#if !BRAVE
         // Setup the URL bar, wrapped in a view to get transparency effect
         urlBar = URLBarView()
         urlBar.translatesAutoresizingMaskIntoConstraints = false
@@ -272,6 +273,17 @@ class BrowserViewController: UIViewController {
         urlBar.browserToolbarDelegate = self
         header = BlurWrapper(view: urlBar)
         view.addSubview(header)
+#else
+        // Brave: need to inject in the middle of this function, override won't work
+        urlBar = BraveURLBarView()
+        urlBar.translatesAutoresizingMaskIntoConstraints = false
+        urlBar.delegate = self
+        urlBar.browserToolbarDelegate = self
+        header = EmptyBlurWrapper(view: urlBar)
+        view.addSubview(header)
+
+        headerBackdrop.backgroundColor = BraveUX.HeaderBackdropBackgroundColor
+#endif
 
         // UIAccessibilityCustomAction subclass holding an AccessibleAction instance does not work, thus unable to generate AccessibleActions and UIAccessibilityCustomActions "on-demand" and need to make them "persistent" e.g. by being stored in BVC
         pasteGoAction = AccessibleAction(name: NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit"), handler: { () -> Bool in
@@ -2310,7 +2322,7 @@ class BlurWrapper: UIView {
         }
     }
 
-    private var effectView: UIVisualEffectView
+    var effectView: UIVisualEffectView
     private var wrappedView: UIView
 
     init(view: UIView) {
