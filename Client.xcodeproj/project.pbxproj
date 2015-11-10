@@ -3699,7 +3699,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F84B21DD1A090F8100AAB793 /* Build configuration list for PBXNativeTarget "Client" */;
 			buildPhases = (
-				EBF2BAC81BE3B9B20041A5DA /* ShellScript */,
 				F84B21BA1A090F8100AAB793 /* Sources */,
 				F84B21BC1A090F8100AAB793 /* Resources */,
 				F84B22351A09144D00AAB793 /* Copy Frameworks */,
@@ -4461,20 +4460,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "./Fabric.framework/run ***REMOVED*** 0806bf3128922cff0f49a7cbce97b7b0d50b04a43ce14a4ef5fe0eeb8fc87a31";
-		};
-		EBF2BAC81BE3B9B20041A5DA /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 8;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-			shellPath = /bin/sh;
-			shellScript = "echo GENERATED_BUILD_ID=`date +\"%y.%V.%d.%H\"` >Client/Configuration/build-id.xcconfig";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
