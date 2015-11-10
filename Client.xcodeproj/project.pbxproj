@@ -682,6 +682,23 @@
 		EB89A5171BE801DB00A44D4B /* UrlProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB34D6C81BE169C600C08A48 /* UrlProtocol.swift */; };
 		EB9412C01BD80FC900B21564 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BE1BD80FC900B21564 /* Fabric.framework */; };
 		EB9412C11BD80FCA00B21564 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BF1BD80FC900B21564 /* Crashlytics.framework */; };
+		EBD9DFDD1BF286140003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFDE1BF286570003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFDF1BF286570003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE01BF286590003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE11BF286E90003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE21BF286EA0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE31BF286EB0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE41BF286EB0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE51BF286EC0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE61BF286EC0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE71BF286ED0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE81BF286ED0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFE91BF286EE0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFEA1BF286EE0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFEB1BF286EF0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFEC1BF286F00003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFED1BF286F10003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
 		EBF2BAE01BE413F00041A5DA /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
@@ -1883,6 +1900,7 @@
 		EB9412BE1BD80FC900B21564 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		EB9412C21BD829A200B21564 /* ViewLater.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ViewLater.entitlements; sourceTree = "<group>"; };
+		EBD9DFDC1BF286140003F11D /* build-id.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = "build-id.xcconfig"; path = "Configuration/build-id.xcconfig"; sourceTree = "<group>"; };
 		EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareTo.entitlements; sourceTree = "<group>"; };
 		EBF6A3931BD80BF4009CF0C7 /* SendTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SendTo.entitlements; sourceTree = "<group>"; };
@@ -2953,6 +2971,7 @@
 		E60961841B62B7E100DD640F /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
+				EBD9DFDC1BF286140003F11D /* build-id.xcconfig */,
 				E60961851B62B89200DD640F /* BaseConfig.xcconfig */,
 			);
 			name = Configuration;
@@ -4262,6 +4281,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFE71BF286ED0003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4269,6 +4289,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFE81BF286ED0003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4276,6 +4297,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFE31BF286EB0003F11D /* build-id.xcconfig in Resources */,
 				E6F9659C1B2F5F800034B023 /* effective_tld_names.dat in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4284,6 +4306,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFE51BF286EC0003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4291,6 +4314,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFE61BF286EC0003F11D /* build-id.xcconfig in Resources */,
 				2F14E2521ABC8D2B00FF98DB /* signedInUser.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4299,6 +4323,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFE41BF286EB0003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4306,6 +4331,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFED1BF286F10003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4315,6 +4341,7 @@
 			files = (
 				E6EAC5961B29CB3A00E1DE1E /* scrollablePage.html in Resources */,
 				D34E33031BA793C2006135F0 /* loginForm.html in Resources */,
+				EBD9DFE21BF286EA0003F11D /* build-id.xcconfig in Resources */,
 				0B6FBAB21AC1F830007EC669 /* numberedPage.html in Resources */,
 				0B5A93421B1EB572004F47A2 /* readablePage.html in Resources */,
 				0BF8F8DA1AEFF1C900E90BC2 /* noTitle.html in Resources */,
@@ -4327,6 +4354,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFE01BF286590003F11D /* build-id.xcconfig in Resources */,
 				E4BA8AAA1B4B15EF00BC2E95 /* FennecAurora.entitlements in Resources */,
 				E4BA8AAD1B4B15EF00BC2E95 /* ViewLater.xcassets in Resources */,
 				E4BA8AAC1B4B15EF00BC2E95 /* Firefox.entitlements in Resources */,
@@ -4339,6 +4367,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFE91BF286EE0003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4346,6 +4375,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFEA1BF286EE0003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4353,6 +4383,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFEB1BF286EF0003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4360,6 +4391,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFEC1BF286F00003F11D /* build-id.xcconfig in Resources */,
 				EB429FE41BEA7B1300681E31 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4402,6 +4434,7 @@
 				E4B7B7781A793CF20022C5E0 /* FiraSans-Italic.ttf in Resources */,
 				0BA1E00E1B03FB0B007675AF /* NetError.html in Resources */,
 				E4A961381AC06FA50069AD6F /* ReaderViewLoading.html in Resources */,
+				EBD9DFDD1BF286140003F11D /* build-id.xcconfig in Resources */,
 				E4ECCDAE1AB131770005E717 /* FiraSans-Medium.ttf in Resources */,
 				EBF2BAE01BE413F00041A5DA /* ABPFilterParserData.dat in Resources */,
 				E4424B3C1AC71FB400F44C38 /* FiraSans-Book.ttf in Resources */,
@@ -4421,6 +4454,7 @@
 				D38A1BF11A9FA2CA00F6A386 /* SiteTableViewControllerHeader.xib in Resources */,
 				2F834D171A80629A006A0B7B /* FxASignIn.js in Resources */,
 				0BF9F8BC1A3A82CA0049A0FA /* Images.xcassets in Resources */,
+				EBD9DFE11BF286E90003F11D /* build-id.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4428,6 +4462,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFDF1BF286570003F11D /* build-id.xcconfig in Resources */,
 				E487B24F1AC1CC9200F3E86F /* FiraSans-Medium.ttf in Resources */,
 				E487B2331AC1C64300F3E86F /* FiraSans-Regular.ttf in Resources */,
 				F8708D2E1A0970B70051AB07 /* Images.xcassets in Resources */,
@@ -4440,6 +4475,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBD9DFDE1BF286570003F11D /* build-id.xcconfig in Resources */,
 				E4F21AA61A13C4A300B0FAAA /* Images.xcassets in Resources */,
 				F8708D2C1A0970B40051AB07 /* MainInterface.storyboard in Resources */,
 			);
