@@ -95,7 +95,7 @@ class URLBarView: UIView {
         return locationView
     }()
 
-    private lazy var locationTextField: ToolbarTextField = {
+    lazy var locationTextField: ToolbarTextField = {
         let locationTextField = ToolbarTextField()
         locationTextField.translatesAutoresizingMaskIntoConstraints = false
         locationTextField.autocompleteDelegate = self
@@ -112,7 +112,7 @@ class URLBarView: UIView {
         return locationTextField
     }()
 
-    private lazy var locationContainer: UIView = {
+    lazy var locationContainer: UIView = {
         let locationContainer = UIView()
         locationContainer.translatesAutoresizingMaskIntoConstraints = false
 
@@ -126,7 +126,7 @@ class URLBarView: UIView {
         return locationContainer
     }()
 
-    private lazy var tabsButton: TabsButton = {
+    lazy var tabsButton: TabsButton = {
         let tabsButton = TabsButton()
         tabsButton.titleLabel.text = "0"
         tabsButton.addTarget(self, action: "SELdidClickAddTab", forControlEvents: UIControlEvents.TouchUpInside)
@@ -134,7 +134,7 @@ class URLBarView: UIView {
         return tabsButton
     }()
 
-    private lazy var progressBar: UIProgressView = {
+    lazy var progressBar: UIProgressView = {
         let progressBar = UIProgressView()
         progressBar.progressTintColor = URLBarViewUX.ProgressTintColor
         progressBar.alpha = 0
@@ -142,7 +142,7 @@ class URLBarView: UIView {
         return progressBar
     }()
 
-    private lazy var cancelButton: UIButton = {
+    lazy var cancelButton: UIButton = {
         let cancelButton = InsetButton()
         cancelButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
         let cancelTitle = NSLocalizedString("Cancel", comment: "Button label to cancel entering a URL or search query")
@@ -155,9 +155,9 @@ class URLBarView: UIView {
         return cancelButton
     }()
 
-    private lazy var curveShape: CurveView = { return CurveView() }()
+    lazy var curveShape: CurveView = { return CurveView() }()
 
-    private lazy var scrollToTopButton: UIButton = {
+    lazy var scrollToTopButton: UIButton = {
         let button = UIButton()
         button.addTarget(self, action: "SELtappedScrollToTopArea", forControlEvents: UIControlEvents.TouchUpInside)
         return button
@@ -203,7 +203,7 @@ class URLBarView: UIView {
         commonInit()
     }
 
-    private func commonInit() {
+    func commonInit() {
         backgroundColor = URLBarViewUX.backgroundColorWithAlpha(0)
         addSubview(curveShape)
         addSubview(scrollToTopButton)
@@ -230,7 +230,7 @@ class URLBarView: UIView {
         self.locationTextField.hidden = !inOverlayMode
     }
 
-    private func setupConstraints() {
+    func setupConstraints() {
         scrollToTopButton.snp_makeConstraints { make in
             make.top.equalTo(self)
             make.left.right.equalTo(self.locationContainer)
@@ -707,7 +707,7 @@ private let H_M3 = 0.72
 private let H_M4 = 0.961
 
 /* Code for drawing the urlbar curve */
-private class CurveView: UIView {
+class CurveView: UIView {
     private lazy var leftCurvePath: UIBezierPath = {
         var leftArc = UIBezierPath(arcCenter: CGPoint(x: 5, y: 5), radius: CGFloat(5), startAngle: CGFloat(-M_PI), endAngle: CGFloat(-M_PI_2), clockwise: true)
         leftArc.addLineToPoint(CGPoint(x: 0, y: 0))
