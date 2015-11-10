@@ -6349,13 +6349,7 @@
 				);
 				INFOPLIST_FILE = Client/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/brave/abp-filterparser/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/bloom-filter-cpp/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/bloom-filter-cpp/node_modules/cppunitlite/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/cppunitlite/build/Release",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser;
 				PRODUCT_MODULE_NAME = Client;
@@ -6501,13 +6495,7 @@
 				);
 				INFOPLIST_FILE = Client/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/brave/abp-filterparser/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/bloom-filter-cpp/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/bloom-filter-cpp/node_modules/cppunitlite/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/cppunitlite/build/Release",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser;
 				PRODUCT_MODULE_NAME = Client;
@@ -8267,13 +8255,7 @@
 				);
 				INFOPLIST_FILE = Client/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/brave/abp-filterparser/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/bloom-filter-cpp/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/bloom-filter-cpp/node_modules/cppunitlite/build/Release",
-					"$(PROJECT_DIR)/brave/abp-filterparser/node_modules/cppunitlite/build/Release",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.brave.ios.browser;
 				PRODUCT_MODULE_NAME = Client;
