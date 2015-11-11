@@ -699,6 +699,7 @@
 		EBD9DFEB1BF286EF0003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
 		EBD9DFEC1BF286F00003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
 		EBD9DFED1BF286F10003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
+		EBD9DFF21BF295E00003F11D /* UIView+ShowBorders.m in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF11BF295E00003F11D /* UIView+ShowBorders.m */; };
 		EBF2BAE01BE413F00041A5DA /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
@@ -1901,6 +1902,8 @@
 		EB9412BF1BD80FC900B21564 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		EB9412C21BD829A200B21564 /* ViewLater.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ViewLater.entitlements; sourceTree = "<group>"; };
 		EBD9DFDC1BF286140003F11D /* build-id.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = "build-id.xcconfig"; path = "Configuration/build-id.xcconfig"; sourceTree = "<group>"; };
+		EBD9DFF01BF295E00003F11D /* UIView+ShowBorders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+ShowBorders.h"; sourceTree = "<group>"; };
+		EBD9DFF11BF295E00003F11D /* UIView+ShowBorders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ShowBorders.m"; sourceTree = "<group>"; };
 		EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareTo.entitlements; sourceTree = "<group>"; };
 		EBF6A3931BD80BF4009CF0C7 /* SendTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SendTo.entitlements; sourceTree = "<group>"; };
@@ -3134,6 +3137,8 @@
 				EB690C7A1BF1655B00B4C586 /* BraveURLBarView.swift */,
 				EB690C771BF1496500B4C586 /* BraveUX.swift */,
 				EB690C811BF1708A00B4C586 /* BraveBrowserViewController.swift */,
+				EBD9DFF01BF295E00003F11D /* UIView+ShowBorders.h */,
+				EBD9DFF11BF295E00003F11D /* UIView+ShowBorders.m */,
 			);
 			path = frontend;
 			sourceTree = "<group>";
@@ -5010,6 +5015,7 @@
 				0BD19A671A25309B0084FBA7 /* NSUserDefaultsPrefs.swift in Sources */,
 				E68AEDB01B18F81A00133D99 /* SwipeAnimator.swift in Sources */,
 				D31F95E91AC226CB005C9F3B /* ScreenshotHelper.swift in Sources */,
+				EBD9DFF21BF295E00003F11D /* UIView+ShowBorders.m in Sources */,
 				28EADE5D1AFC3A78007FB2FB /* UIImageViewExtensions.swift in Sources */,
 				0BB5B2BC1AC0AB9F0052877D /* UIImage+Extensions.swift in Sources */,
 				EB690C7F1BF1657A00B4C586 /* URLBarView.swift in Sources */,
