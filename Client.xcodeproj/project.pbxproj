@@ -700,6 +700,8 @@
 		EBD9DFEC1BF286F00003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
 		EBD9DFED1BF286F10003F11D /* build-id.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = EBD9DFDC1BF286140003F11D /* build-id.xcconfig */; };
 		EBD9DFF21BF295E00003F11D /* UIView+ShowBorders.m in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF11BF295E00003F11D /* UIView+ShowBorders.m */; };
+		EBD9DFF41BF3F37C0003F11D /* BraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */; };
+		EBD9DFF51BF3F37C0003F11D /* BraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */; };
 		EBF2BAE01BE413F00041A5DA /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
@@ -1904,6 +1906,7 @@
 		EBD9DFDC1BF286140003F11D /* build-id.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = "build-id.xcconfig"; path = "Configuration/build-id.xcconfig"; sourceTree = "<group>"; };
 		EBD9DFF01BF295E00003F11D /* UIView+ShowBorders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+ShowBorders.h"; sourceTree = "<group>"; };
 		EBD9DFF11BF295E00003F11D /* UIView+ShowBorders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ShowBorders.m"; sourceTree = "<group>"; };
+		EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveApp.swift; sourceTree = "<group>"; };
 		EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareTo.entitlements; sourceTree = "<group>"; };
 		EBF6A3931BD80BF4009CF0C7 /* SendTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SendTo.entitlements; sourceTree = "<group>"; };
@@ -3057,6 +3060,7 @@
 				EB34D6C21BE169C600C08A48 /* adblock */,
 				EB34D6C91BE169C600C08A48 /* vault */,
 				EB34D6CF1BE169C600C08A48 /* webview */,
+				EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -4990,6 +4994,7 @@
 				D38B2D4F1A8D96D00040E6B5 /* GCDWebServerFileResponse.m in Sources */,
 				E43A4E551A96B88100E25676 /* GCDWebServerDataRequest.m in Sources */,
 				D38A1BEE1A9FA2CA00F6A386 /* SiteTableViewController.swift in Sources */,
+				EBD9DFF41BF3F37C0003F11D /* BraveApp.swift in Sources */,
 				E4B334581BBF2393004E2BFF /* ADJDeviceInfo.m in Sources */,
 				EB34D6E31BE169C600C08A48 /* LegacyWebViewProgress.swift in Sources */,
 				E6D8D5E71B569D70009E5A58 /* BrowserTrayAnimators.swift in Sources */,
@@ -5084,6 +5089,7 @@
 				D38B2D411A8D96D00040E6B5 /* GCDWebServerFileRequest.m in Sources */,
 				D38B2D471A8D96D00040E6B5 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				D38B2D4A1A8D96D00040E6B5 /* GCDWebServerDataResponse.m in Sources */,
+				EBD9DFF51BF3F37C0003F11D /* BraveApp.swift in Sources */,
 				D38B2D531A8D96D00040E6B5 /* GCDWebServerStreamedResponse.m in Sources */,
 				D38B2D4D1A8D96D00040E6B5 /* GCDWebServerErrorResponse.m in Sources */,
 				2F834D1B1A80629A006A0B7B /* FxAContentViewController.swift in Sources */,

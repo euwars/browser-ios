@@ -8,9 +8,6 @@ import AVFoundation
 import XCGLogger
 #if !BRAVE
 import Breakpad
-#else
-import Fabric
-import Crashlytics
 #endif
 
 private let log = Logger.browserLogger
@@ -26,8 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 #if BRAVE
-        Fabric.with([Crashlytics.self])
-        NSURLProtocol.registerClass(URLProtocol);
+        BraveApp.willFinishLaunching()
 #endif
         // Set the Firefox UA for browsing.
         setUserAgent()
