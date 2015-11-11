@@ -2,6 +2,8 @@ import Foundation
 
 
 struct BraveUX {
+  static let DebugShowBorders = false
+
   static let LocationBarBackgroundColor_NonPrivateMode = UIColor(white: 77/255.0, alpha: 1)
   static let LocationBarTextColor = UIColor(white: 230/255.0, alpha: 1)
 

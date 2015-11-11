@@ -118,10 +118,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
         if let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) {
 #if BRAVE
-            // TODO look at what x-callback is for
-            if components.scheme != "brave" && components.scheme != "brave-x-callback"{
-              return false
-            }
+            if !BraveApp.shouldHandleOpenURL(components) { return false }
 #else
             if components.scheme != "firefox" && components.scheme != "firefox-x-callback" {
                 return false
@@ -155,6 +152,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(application: UIApplication) {
+#if BRAVE
+        BraveApp.didEnterBackground()
+#endif
         self.profile?.syncManager.applicationDidEnterBackground()
 
         var taskId: UIBackgroundTaskIdentifier = 0
