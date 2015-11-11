@@ -3,6 +3,11 @@ import Shared
 // To disable the blur effect
 class EmptyBlurWrapper :BlurWrapper {
   override init(view: UIView) {
+
+    if BraveUX.DebugShowBorders {
+      UIView.bordersOn()
+    }
+
     super.init(view: view)
     effectView.removeFromSuperview()
     effectView = UIVisualEffectView()

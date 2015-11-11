@@ -15,10 +15,17 @@ struct BraveUX {
   static let TextFieldBorderColor_NoFocus = UIColor.blackColor()
 
   static let CancelTextColor = LocationBarTextColor
+  // The toolbar button color (for the Normal state). Using default highlight color ATM
   static let ActionButtonTintColor = LocationBarTextColor
 
   static let AutocompleteTextFieldHighlightColor = UIColor.brownColor()
 
+  static let BottomToolbarBackgroundColor = LocationBarBackgroundColor_NonPrivateMode
+
+  static let BackButtonLeftOffset = 0
+  static let BackButtonWidth = 70
+  // If set to zero, autocalculate the width
+  static let ForwardButtonWidth = 0
 
   // Internal use
   static let HeaderBackdropBackgroundColor = UIColor.blackColor()

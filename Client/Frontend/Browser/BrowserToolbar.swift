@@ -171,7 +171,7 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
     var helper: BrowserToolbarHelper?
 
     // This has to be here since init() calls it
-    private override init(frame: CGRect) {
+    override init(frame: CGRect) {
         // And these have to be initialized in here or the compiler will get angry
         backButton = UIButton()
         forwardButton = UIButton()

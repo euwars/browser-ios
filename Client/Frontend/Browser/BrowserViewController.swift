@@ -148,9 +148,9 @@ class BrowserViewController: UIViewController {
         toolbar = nil
 
         if showToolbar {
-            toolbar = BrowserToolbar()
+          toolbar = BraveBrowserToolbar()
             toolbar?.browserToolbarDelegate = self
-            footerBackground = BlurWrapper(view: toolbar!)
+            footerBackground = EmptyBlurWrapper(view: toolbar!)
             footerBackground?.translatesAutoresizingMaskIntoConstraints = false
 
             // Need to reset the proper blur style
