@@ -27,7 +27,7 @@ To find changes outside of brave/, look for #if BRAVE / #if !BRAVE (#if/#else/#e
 
 Swift coding standard is generally compiler inforced, but indentation is not. I made the mistake of having my editor set to 2-space indent, and later realize Mozilla is using 4-space indent, so code in brave/ uses 2-space. Need to decide what to do here, but 2-space seems in vogue.
 
-Obj-C standard should follow https://google.github.io/styleguide/objcguide.xml. I am not a fan of this cuddling: NSObject *object, preferring NSObject* object, but have now realized the futility of this since we are open-sourcing, and nearly open-source projects use 'NSObject *varname' cuddling. Start using this, at some point I'll switch the existing code to that standard.
+Obj-C standard should follow https://google.github.io/styleguide/objcguide.xml. I am not a fan of this cuddling: ```NSObject *object```, preferring ```NSObject* object```, but have now realized the futility of this since we are open-sourcing, and nearly all open-source projects use ```NSObject *object`` cuddling. Start using this; at some point I'll switch the existing code to that standard.
 
 
 ## Provisioning Profiles
