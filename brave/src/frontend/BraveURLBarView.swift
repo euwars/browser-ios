@@ -6,7 +6,11 @@ class HideCurveView : CurveView {
 
 class BraveURLBarView : URLBarView {
 
+  private static weak var currentInstance: BraveURLBarView?
+
   override func commonInit() {
+    BraveURLBarView.currentInstance = self
+
     locationContainer.layer.cornerRadius = CGFloat(BraveUX.TextFieldCornerRadius)
     curveShape = HideCurveView()
     super.commonInit()
@@ -19,6 +23,15 @@ class BraveURLBarView : URLBarView {
     self.backgroundColor = URLBarViewUX.backgroundColorWithAlpha(1)
   }
 
+  override func updateTabCount(count: Int, animated: Bool = true) {
+    super.updateTabCount(count, animated: animated)
+    BraveBrowserToolbar.updateTabCountDuplicatedButton(count, animated: animated)
+  }
+
+  class func tabButtonPressed() {
+    guard let instance = BraveURLBarView.currentInstance else { return }
+    instance.delegate?.urlBarDidPressTabs(instance)
+  }
 
   override var accessibilityElements: [AnyObject]? {
     get {

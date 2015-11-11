@@ -2,6 +2,7 @@ import Foundation
 
 
 struct BraveUX {
+  // set to true to show borders around views
   static let DebugShowBorders = false
 
   static let LocationBarBackgroundColor_NonPrivateMode = UIColor(white: 77/255.0, alpha: 1)
@@ -31,4 +32,5 @@ struct BraveUX {
 
   // Internal use
   static let HeaderBackdropBackgroundColor = UIColor.blackColor()
+
 }
