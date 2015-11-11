@@ -2015,33 +2015,6 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
 
 extension BrowserViewController: IntroViewControllerDelegate {
     func presentIntroViewController(force: Bool = false) -> Bool{
-        if profile.prefs.intForKey(BraveUserIdKey) == nil {
-            let uuid = NSUUID().UUIDString
-            self.profile.prefs.setString(uuid, forKey: BraveUserIdKey)
-
-            let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-            let profile = appDelegate.getProfile(UIApplication.sharedApplication())
-            var vaultServerHost = profile.prefs.stringForKey(VaultAddressSetting.prefKey) ?? VaultAddressSetting.defaultValue
-            if !vaultServerHost.startsWith("http") {
-                vaultServerHost = "http://" + vaultServerHost
-            }
-
-            let requestURL = NSURL(string:"\(vaultServerHost)/v1/users/\(uuid)")!
-            let request = NSMutableURLRequest(URL: requestURL)
-            request.HTTPMethod = "PUT"
-
-            let session = NSURLSession.sharedSession()
-            let dataTask = session.dataTaskWithRequest(request) { (data, response, error) -> Void in
-                if error != nil {
-                    print("vault error \(error)")
-                } else {
-                    let jsonStr = NSString(data: data!, encoding: NSUTF8StringEncoding)
-                    print("Parsed JSON: '\(jsonStr)'")
-                }
-            }
-            dataTask.resume()
-        }
-
         if force || profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
             let introViewController = IntroViewController()
             introViewController.delegate = self
