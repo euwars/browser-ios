@@ -57,6 +57,7 @@ struct IntroViewControllerUX {
 }
 
 let IntroViewControllerSeenProfileKey = "IntroViewControllerSeen"
+let BraveUserIdKey = "BraveUserId"
 
 protocol IntroViewControllerDelegate: class {
     func introViewControllerDidFinish(introViewController: IntroViewController)
