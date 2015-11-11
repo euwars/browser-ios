@@ -6,7 +6,6 @@ private let _singleton = BraveApp()
 
 // Any app-level hooks we need from Firefox, just add a call to here
 class BraveApp {
-
   class var singleton: BraveApp {
     return _singleton
   }
@@ -26,7 +25,6 @@ class BraveApp {
 
   @objc func didEnterBackground(_ : NSNotification) {
     VaultManager.sessionTerminate()
-
   }
 
   @objc func willEnterForeground(_ : NSNotification) {
