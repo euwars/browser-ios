@@ -685,6 +685,7 @@
 		EBD9DFF21BF295E00003F11D /* UIView+ShowBorders.m in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF11BF295E00003F11D /* UIView+ShowBorders.m */; };
 		EBD9DFF41BF3F37C0003F11D /* BraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */; };
 		EBD9DFF51BF3F37C0003F11D /* BraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */; };
+		EBD9E03D1BF4E3BC0003F11D /* VaultManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9E03C1BF4E3BB0003F11D /* VaultManager.swift */; };
 		EBF2BAE01BE413F00041A5DA /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
@@ -1889,6 +1890,7 @@
 		EBD9DFF01BF295E00003F11D /* UIView+ShowBorders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+ShowBorders.h"; sourceTree = "<group>"; };
 		EBD9DFF11BF295E00003F11D /* UIView+ShowBorders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ShowBorders.m"; sourceTree = "<group>"; };
 		EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveApp.swift; sourceTree = "<group>"; };
+		EBD9E03C1BF4E3BB0003F11D /* VaultManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VaultManager.swift; sourceTree = "<group>"; };
 		EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareTo.entitlements; sourceTree = "<group>"; };
 		EBF6A3931BD80BF4009CF0C7 /* SendTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SendTo.entitlements; sourceTree = "<group>"; };
@@ -3066,6 +3068,7 @@
 				EB34D6CC1BE169C600C08A48 /* adInfo.js */,
 				EB34D6CD1BE169C600C08A48 /* LegacyWebView+Vault.swift */,
 				EB34D6CE1BE169C600C08A48 /* VaultAddressSetting.swift */,
+				EBD9E03C1BF4E3BB0003F11D /* VaultManager.swift */,
 			);
 			path = vault;
 			sourceTree = "<group>";
@@ -4879,6 +4882,7 @@
 				E4A960061ABB9C450069AD6F /* ReaderModeUtils.swift in Sources */,
 				E4B423DD1ABA0318007E66C8 /* ReaderModeHandlers.swift in Sources */,
 				EB34D6DA1BE169C600C08A48 /* UrlProtocol.swift in Sources */,
+				EBD9E03D1BF4E3BC0003F11D /* VaultManager.swift in Sources */,
 				D308E4E41A5306F500842685 /* SearchEngines.swift in Sources */,
 				E42475E51AB73B9B00B23D33 /* SWUtilityButtonTapGestureRecognizer.m in Sources */,
 				D38B2D2E1A8D96D00040E6B5 /* GCDWebServer.m in Sources */,
