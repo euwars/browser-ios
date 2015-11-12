@@ -74,26 +74,50 @@ extension LegacyWebView {
         continue;
       }
       let divId = item["divId"] as! String
-      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-        let vaultHost = VaultManager.getVaultServerHost()
-        let userId = VaultManager.getBraveUserId()
+      let vaultHost = VaultManager.getVaultServerHost()
+      let userId = VaultManager.getBraveUserId()
+      let urlString = "\(vaultHost)/replacement?braveUserId=\(userId)" +
+                      "&intentHost=\(host)" +
+                      "&tagName=IFRAME&" +
+                      "width=\(w)&height=\(h)"
+      guard let url = NSURL(string:urlString) else {
+        print("Malformed url: \(urlString)")
+        return
+      }
+      let vaultRequest = NSURLRequest(URL: url)
 
-        let vault = "\(vaultHost)/replacement?braveUserId=\(userId)&intentHost=\(host)&tagName=IFRAME&width=\(w)&height=\(h)"
-        var vaultResponse: String
-        do {
-         // TODO use 'proper' async networking calls (NSURLConnection etc.)
-         vaultResponse = try String(contentsOfURL: NSURL(string: vault)!, encoding: NSUTF8StringEncoding)
-
-          dispatch_async(dispatch_get_main_queue(), {
-            let js = "_brave_replaceDivWithNewContent({'divId':'\(divId)'," +
-            "'width':\(w), 'height':\(h),'newContent':'\(vaultResponse)'})"
-            webView.stringByEvaluatingJavaScriptFromString(js)
-          })
-        } catch {
-          // TODO error handling
+      let session = NSURLSession.sharedSession()
+      let dataTask = session.dataTaskWithRequest(vaultRequest) {
+        (data, response, error) in
+        if error != nil {
           print("vault error \(error)")
+        } else {
+          if let data = data,
+            jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
+              #if DEBUG
+                print("Parsed JSON: '\(jsonStr)'")
+              #endif
+
+              if let httpResponse = response as? NSHTTPURLResponse {
+                if httpResponse.statusCode / 100 != 2 {
+                  // TODO: Replace with proper function to check status codes
+                  print("Vault error, status code: (\(httpResponse.statusCode))")
+                  return
+                }
+              }
+              
+              dispatch_async(dispatch_get_main_queue(), {
+                let js = "_brave_replaceDivWithNewContent({'divId':'\(divId)'," +
+                "'width':\(w), 'height':\(h),'newContent':'\(jsonStr)'})"
+                webView.stringByEvaluatingJavaScriptFromString(js)
+              })
+
+          } else {
+            print("unexpected vault error")
+          }
         }
-      })
+      }
+      dataTask.resume()
     }
   }
 }

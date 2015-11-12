@@ -4,8 +4,8 @@ class VaultManager {
   static let braveUserIdKey = "BraveUserId"
   static let sessionId: String = NSUUID().UUIDString as String
 
-  class func getBraveUserId() -> String? {
-    return getProfile().prefs.stringForKey(braveUserIdKey)
+  class func getBraveUserId() -> String {
+    return getProfile().prefs.stringForKey(braveUserIdKey) ?? "ERROR-ID"
   }
 
   class func getSessionId() -> String {
@@ -30,7 +30,7 @@ class VaultManager {
   }
 
   class func userProfileInit() {
-    if (getBraveUserId() == nil) {
+    if (getProfile().prefs.stringForKey(braveUserIdKey) != nil) {
       return
     }
 
