@@ -152,9 +152,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(application: UIApplication) {
-#if BRAVE
-        BraveApp.didEnterBackground()
-#endif
+
         self.profile?.syncManager.applicationDidEnterBackground()
 
         var taskId: UIBackgroundTaskIdentifier = 0
@@ -168,12 +166,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             application.endBackgroundTask(taskId)
         }
     }
-
-#if BRAVE
-    func applicationWillEnterForeground(application: UIApplication) {
-        BraveApp.willEnterForeground()
-    }
-#endif
 
     private func setUpWebServer(profile: Profile) {
         let server = WebServer.sharedInstance

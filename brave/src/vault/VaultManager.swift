@@ -4,6 +4,10 @@ class VaultManager {
   static let braveUserIdKey = "BraveUserId"
   static var sessionId: String? = NSUUID().UUIDString as String
 
+  static let vaultVersion = "v1"
+  static let endpointUsers = "\(vaultVersion)/users"
+
+
   class func getBraveUserId() -> String {
     return getProfile().prefs.stringForKey(braveUserIdKey) ?? "ERROR-ID"
   }
@@ -31,6 +35,39 @@ class VaultManager {
     return vaultServerHost
   }
 
+  class func simpleRequest(urlString: String, httpMethod: String, contentType: String = "", bodyData: NSData = NSData()) {
+    guard let requestURL = NSURL(string: urlString) else {
+      return
+    }
+    let request = NSMutableURLRequest(URL: requestURL)
+    request.HTTPMethod = httpMethod
+
+    if contentType.characters.count > 1 {
+      request.addValue(contentType, forHTTPHeaderField: "Content-Type")
+    }
+
+    if bodyData.length > 0 {
+      request.HTTPBody = bodyData
+    }
+
+    let session = NSURLSession.sharedSession()
+    let dataTask = session.dataTaskWithRequest(request) { (data, response, error) in
+      if error != nil {
+        print("vault error \(error)")
+      } else {
+        if let data = data,
+          jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
+            #if DEBUG
+              print("Parsed JSON: '\(jsonStr) \n request:\(urlString)'")
+            #endif
+        } else {
+          print("unexpected vault error in user init")
+        }
+      }
+    }
+    dataTask.resume()
+  }
+
   class func userProfileInit() {
     if (getProfile().prefs.stringForKey(braveUserIdKey) != nil) {
       return
@@ -40,38 +77,13 @@ class VaultManager {
     let uuid = NSUUID().UUIDString
     getProfile().prefs.setString(uuid, forKey: braveUserIdKey)
 
-    guard let requestURL = NSURL(string:"\(getVaultServerHost())/v1/users/\(uuid)") else {
-      return
-    }
-    let request = NSMutableURLRequest(URL: requestURL)
-    request.HTTPMethod = "PUT"
-
-    let session = NSURLSession.sharedSession()
-    let dataTask = session.dataTaskWithRequest(request) { (data, response, error) in
-      if error != nil {
-        print("vault error \(error)")
-      } else {
-        if let data = data,
-          jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
-#if DEBUG
-          print("Parsed JSON: '\(jsonStr)'")
-#endif
-        } else {
-          print("unexpected vault error in user init")
-        }
-      }
-    }
-    dataTask.resume()
+    let request = "\(getVaultServerHost())/\(endpointUsers)/\(uuid)"
+    simpleRequest(request, httpMethod: "PUT")
   }
 
   class func sessionLaunch() {
     sessionId = nil
-
-    sessionIntent("{ \"sessionId\" : \"\(getSessionId())\"\n"             +
-                  ", \"timestamp\" : \(round(NSDate().timeIntervalSince1970 * 1000))\n" +
-                  ", \"type\"      : \"browser.app.launch\"\n"            +
-                  ", \"payload\"   : {}\n"                                +
-                  "}\n")
+    sessionIntent("browser.app.launch")
   }
 
  class func sessionTerminate() {
@@ -79,39 +91,21 @@ class VaultManager {
       return
     }
 
-    sessionIntent("{ \"sessionId\" : \"\(getSessionId())\"\n"             +
-                  ", \"timestamp\" : \(round(NSDate().timeIntervalSince1970 * 1000))\n" +
-                  ", \"type\"      : \"browser.app.terminate\"\n"         +
-                  ", \"payload\"   : {}\n"                                +
-                  "}\n")
-
+    sessionIntent("browser.app.terminate")
     sessionId = nil
   }
 
-  private class func sessionIntent(body: String) {
-    guard let requestURL = NSURL(string:"\(getVaultServerHost())/v1/users/\(getBraveUserId())/intents") else {
-      return
-    }
-    let request = NSMutableURLRequest(URL: requestURL)
-    request.HTTPMethod = "POST"
-    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.HTTPBody = body.dataUsingEncoding(NSUTF8StringEncoding)
-
-    let session = NSURLSession.sharedSession()
-    let dataTask = session.dataTaskWithRequest(request) { (data, response, error) in
-      if error != nil {
-        print("vault error \(error)")
-      } else {
-        if let data = data,
-          jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
-#if DEBUG
-          print("Parsed JSON: '\(jsonStr)'")
-#endif
-        } else {
-          print("unexpected vault error in user init")
-        }
-      }
-    }
-    dataTask.resume()
+  private class func sessionIntent(type: String) {
+    let body =
+      "{ \"sessionId\" : \"\(getSessionId())\"\n" +
+      ", \"timestamp\" : \(round(NSDate().timeIntervalSince1970 * 1000))\n" +
+      ", \"type\"      : \"\(type)\"\n" +
+      ", \"payload\"   : {}\n" +
+    "}\n"
+    guard let bodyData = body.dataUsingEncoding(NSUTF8StringEncoding) else { return }
+    let request = "\(getVaultServerHost())/\(endpointUsers)/\(getBraveUserId())/intents"
+    simpleRequest(request, httpMethod: "POST",
+      contentType: "application/json",
+      bodyData: bodyData)
   }
 }
