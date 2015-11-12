@@ -2,24 +2,43 @@ import Foundation
 
 class VaultManager {
   static let braveUserIdKey = "BraveUserId"
+  static let sessionId: String = NSUUID().UUIDString as String
 
-  class func userProfileInit() {
-    // Register users with the vault.
+  class func getBraveUserId() -> String? {
+    return getProfile().prefs.stringForKey(braveUserIdKey)
+  }
+
+  class func getSessionId() -> String {
+    return sessionId
+  }
+
+  private class func getProfile() -> Profile {
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     let profile = appDelegate.getProfile(UIApplication.sharedApplication())
-    if profile.prefs.stringForKey(braveUserIdKey) != nil {
-      return
-    }
+    return profile
+  }
 
-    let uuid = NSUUID().UUIDString
-    profile.prefs.setString(uuid, forKey: braveUserIdKey)
-
-    var vaultServerHost = profile.prefs.stringForKey(VaultAddressSetting.prefKey) ?? VaultAddressSetting.defaultValue
+  class func getVaultServerHost() -> String {
+    var vaultServerHost = getProfile().prefs.stringForKey(VaultAddressSetting.prefKey) ?? VaultAddressSetting.defaultValue
+#if DEBUG
+    // Too lazy to type http when setting this in debug
     if !vaultServerHost.startsWith("http") {
       vaultServerHost = "http://" + vaultServerHost
     }
+#endif
+    return vaultServerHost
+  }
 
-    guard let requestURL = NSURL(string:"\(vaultServerHost)/v1/users/\(uuid)") else {
+  class func userProfileInit() {
+    if (getBraveUserId() == nil) {
+      return
+    }
+
+    // Register users with the vault.
+    let uuid = NSUUID().UUIDString
+    getProfile().prefs.setString(uuid, forKey: braveUserIdKey)
+
+    guard let requestURL = NSURL(string:"\(getVaultServerHost())/v1/users/\(uuid)") else {
       return
     }
     let request = NSMutableURLRequest(URL: requestURL)
@@ -32,7 +51,6 @@ class VaultManager {
       } else {
         if let data = data,
           jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
-          profile.prefs.setString(jsonStr as String, forKey: braveUserIdKey)
 #if DEBUG
           print("Parsed JSON: '\(jsonStr)'")
 #endif
