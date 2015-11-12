@@ -52,9 +52,13 @@ class BraveURLBarView : URLBarView {
 
   override func updateViewsForOverlayModeAndToolbarChanges() {
     super.updateViewsForOverlayModeAndToolbarChanges()
-    self.stopReloadButton.hidden = false
-    self.tabsButton.hidden = true
-    self.bookmarkButton.hidden = false
+    if !self.toolbarIsShowing {
+      self.stopReloadButton.hidden = false
+      self.tabsButton.hidden = true
+      self.bookmarkButton.hidden = false
+    } else {
+      self.tabsButton.hidden = false
+    }
   }
 
   override func updateConstraints() {
@@ -84,15 +88,22 @@ class BraveURLBarView : URLBarView {
           make.size.equalTo(UIConstants.ToolbarHeight)
         }
       }
+
+      bookmarkButton.snp_remakeConstraints { make in
+        if self.toolbarIsShowing {
+          make.right.equalTo(self.tabsButton.snp_left)
+          make.centerY.equalTo(self)
+          make.size.equalTo(backButton)
+        } else {
+          make.right.equalTo(self)
+          make.centerY.equalTo(self)
+          make.size.equalTo(backButton)
+        }
+      }
     }
   }
 
   override func setupConstraints() {
     super.setupConstraints()
-    bookmarkButton.snp_remakeConstraints { make in
-      make.right.equalTo(self)
-      make.centerY.equalTo(self)
-      make.size.equalTo(backButton)
-    }
   }
 }
