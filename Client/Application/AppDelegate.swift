@@ -169,6 +169,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+#if BRAVE
+    func applicationWillEnterForeground(application: UIApplication) {
+        BraveApp.willEnterForeground()
+    }
+#endif
+
     private func setUpWebServer(profile: Profile) {
         let server = WebServer.sharedInstance
         ReaderModeHandlers.register(server, profile: profile)
