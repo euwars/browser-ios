@@ -76,8 +76,8 @@ extension LegacyWebView {
       let divId = item["divId"] as! String
       let vaultHost = VaultManager.getVaultServerHost()
       let userId = VaultManager.getBraveUserId()
-      let urlString = "\(vaultHost)/replacement?braveUserId=\(userId)" +
-                      "&intentHost=\(host)" +
+      let sessionId = VaultManager.getSessionId()
+      let urlString = "\(vaultHost)/v1/users/\(userId)/replacement?sessionId=\(sessionId)" +
                       "&tagName=IFRAME&" +
                       "width=\(w)&height=\(h)"
       guard let url = NSURL(string:urlString) else {
