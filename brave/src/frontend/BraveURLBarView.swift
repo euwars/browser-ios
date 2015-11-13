@@ -6,7 +6,11 @@ class HideCurveView : CurveView {
 
 class BraveURLBarView : URLBarView {
 
+  private static weak var currentInstance: BraveURLBarView?
+
   override func commonInit() {
+    BraveURLBarView.currentInstance = self
+
     locationContainer.layer.cornerRadius = CGFloat(BraveUX.TextFieldCornerRadius)
     curveShape = HideCurveView()
     super.commonInit()
@@ -19,6 +23,15 @@ class BraveURLBarView : URLBarView {
     self.backgroundColor = URLBarViewUX.backgroundColorWithAlpha(1)
   }
 
+  override func updateTabCount(count: Int, animated: Bool = true) {
+    super.updateTabCount(count, animated: false)
+    BraveBrowserToolbar.updateTabCountDuplicatedButton(count, animated: animated)
+  }
+
+  class func tabButtonPressed() {
+    guard let instance = BraveURLBarView.currentInstance else { return }
+    instance.delegate?.urlBarDidPressTabs(instance)
+  }
 
   override var accessibilityElements: [AnyObject]? {
     get {
@@ -39,13 +52,25 @@ class BraveURLBarView : URLBarView {
 
   override func updateViewsForOverlayModeAndToolbarChanges() {
     super.updateViewsForOverlayModeAndToolbarChanges()
-    self.stopReloadButton.hidden = false
-    self.tabsButton.hidden = true
-    self.bookmarkButton.hidden = false
+    if !self.toolbarIsShowing {
+      self.stopReloadButton.hidden = false
+      self.tabsButton.hidden = true
+      self.bookmarkButton.hidden = false
+    } else {
+      self.tabsButton.hidden = false
+    }
+
+    if inOverlayMode {
+      self.bookmarkButton.hidden = true
+    }
   }
 
   override func updateConstraints() {
     super.updateConstraints()
+
+    // I have to set this late (as in here) as it gets overridden if set earlier
+    self.locationTextField.backgroundColor = BraveUX.LocationBarBackgroundColor_NonPrivateMode
+
     if !inOverlayMode {
       self.locationContainer.snp_remakeConstraints { make in
         if self.toolbarIsShowing {
@@ -71,15 +96,22 @@ class BraveURLBarView : URLBarView {
           make.size.equalTo(UIConstants.ToolbarHeight)
         }
       }
+
+      bookmarkButton.snp_remakeConstraints { make in
+        if self.toolbarIsShowing {
+          make.right.equalTo(self.tabsButton.snp_left)
+          make.centerY.equalTo(self)
+          make.size.equalTo(backButton)
+        } else {
+          make.right.equalTo(self)
+          make.centerY.equalTo(self)
+          make.size.equalTo(backButton)
+        }
+      }
     }
   }
 
   override func setupConstraints() {
     super.setupConstraints()
-    bookmarkButton.snp_remakeConstraints { make in
-      make.right.equalTo(self)
-      make.centerY.equalTo(self)
-      make.size.equalTo(backButton)
-    }
   }
 }

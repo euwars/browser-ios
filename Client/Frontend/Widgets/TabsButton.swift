@@ -12,7 +12,8 @@ struct TabsButtonUX {
     static let TitleFont: UIFont = UIConstants.DefaultSmallFontBold
     static let BorderStrokeWidth: CGFloat = 0
     static let BorderColor: UIColor = UIColor.clearColor()
-    static let TitleInsets = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+    static let inset = CGFloat(12)
+    static let TitleInsets = UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
 }
 
 class TabsButton: UIControl {
@@ -72,7 +73,10 @@ class TabsButton: UIControl {
             make.edges.equalTo(insideButton)
         }
         insideButton.snp_remakeConstraints { (make) -> Void in
-            make.edges.equalTo(self).inset(insets)
+          // BRAVE mod: getting layout errors with firefox method, temporary hack to bypass the errors
+          make.right.equalTo(self).inset(12)
+          make.centerY.equalTo(self)
+          make.size.equalTo(20)
         }
     }
 
@@ -97,6 +101,16 @@ class TabsButton: UIControl {
         button.borderView.strokeWidth = borderView.strokeWidth
         button.borderView.color = borderView.color
         button.borderView.cornerRadius = borderView.cornerRadius
+
+        // BRAVE added
+        for target in allTargets() {
+          if let actions = actionsForTarget(target, forControlEvent: .TouchUpInside) {
+             for action in actions {
+              button.addTarget(target, action: Selector(action), forControlEvents: .TouchUpInside)
+            }
+          }
+      }
+
         return button
     }
 }

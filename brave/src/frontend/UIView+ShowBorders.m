@@ -8,7 +8,7 @@
 - (instancetype)_initWithFrame:(CGRect)frame
 {
   UIView *obj = [self _initWithFrame:frame];
-  obj.layer.borderWidth = 0.5;
+  obj.layer.borderWidth = 1;
   obj.layer.borderColor = [[UIColor redColor] CGColor];
   return obj;
 }

@@ -74,7 +74,7 @@ public class BrowserToolbarHelper: NSObject {
         super.init()
 
         toolbar.backButton.setImage(UIImage(named: "back"), forState: .Normal)
-        toolbar.backButton.setImage(UIImage(named: "backPressed"), forState: .Highlighted)
+        //toolbar.backButton.setImage(UIImage(named: "backPressed"), forState: .Highlighted)
         toolbar.backButton.accessibilityLabel = NSLocalizedString("Back", comment: "Accessibility Label for the browser toolbar Back button")
         //toolbar.backButton.accessibilityHint = NSLocalizedString("Double tap and hold to open history", comment: "")
         let longPressGestureBackButton = UILongPressGestureRecognizer(target: self, action: "SELdidLongPressBack:")
@@ -82,7 +82,7 @@ public class BrowserToolbarHelper: NSObject {
         toolbar.backButton.addTarget(self, action: "SELdidClickBack", forControlEvents: UIControlEvents.TouchUpInside)
 
         toolbar.forwardButton.setImage(UIImage(named: "forward"), forState: .Normal)
-        toolbar.forwardButton.setImage(UIImage(named: "forwardPressed"), forState: .Highlighted)
+        //toolbar.forwardButton.setImage(UIImage(named: "forwardPressed"), forState: .Highlighted)
         toolbar.forwardButton.accessibilityLabel = NSLocalizedString("Forward", comment: "Accessibility Label for the browser toolbar Forward button")
         //toolbar.forwardButton.accessibilityHint = NSLocalizedString("Double tap and hold to open history", comment: "")
         let longPressGestureForwardButton = UILongPressGestureRecognizer(target: self, action: "SELdidLongPressForward:")

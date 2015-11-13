@@ -2,6 +2,8 @@ import Foundation
 
 
 struct BraveUX {
+
+  // set to true to show borders around views
   static let DebugShowBorders = false
 
   static let LocationBarBackgroundColor_NonPrivateMode = UIColor(white: 77/255.0, alpha: 1)
@@ -24,11 +26,12 @@ struct BraveUX {
 
   static let BottomToolbarBackgroundColor = LocationBarBackgroundColor_NonPrivateMode
 
-  static let BackButtonLeftOffset = 0
-  static let BackButtonWidth = 70
-  // If set to zero, autocalculate the width
-  static let ForwardButtonWidth = 0
+  // Yes it could be detected, just make life easier and set this number for now
+  static let BottomToolbarNumberButtonsToRightOfBackForward = 3
+  static let BackForwardButtonWidth = 140
+  static let BackForwardButtonLeftOffset = 2
 
   // Internal use
   static let HeaderBackdropBackgroundColor = UIColor.blackColor()
+
 }

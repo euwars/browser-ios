@@ -6,7 +6,6 @@ private let _singleton = BraveApp()
 
 // Any app-level hooks we need from Firefox, just add a call to here
 class BraveApp {
-
   class var singleton: BraveApp {
     return _singleton
   }
@@ -22,11 +21,16 @@ class BraveApp {
 
     NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
       selector: "willEnterForeground:", name: UIApplicationWillEnterForegroundNotification, object: nil)
+
+#if DEBUG
+    if BraveUX.DebugShowBorders {
+      UIView.bordersOn()
+    }
+#endif
   }
 
   @objc func didEnterBackground(_ : NSNotification) {
     VaultManager.sessionTerminate()
-
   }
 
   @objc func willEnterForeground(_ : NSNotification) {
