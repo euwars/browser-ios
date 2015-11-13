@@ -86,7 +86,7 @@ class VaultManager {
     sessionIntent("browser.app.launch")
   }
 
- class func sessionTerminate() {
+  class func sessionTerminate() {
     if (sessionId == nil) {
       return
     }
