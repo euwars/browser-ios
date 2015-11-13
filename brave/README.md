@@ -43,7 +43,7 @@ find . -name embedded.mobileprovision | sed 's/.*/"&"/g' | xargs rm
 
 Remove ADC account from Xcode>Preferences>Accounts. Quit and restart. Re-add account, and click to download all profiles.
 
-Verify UDID has arrived:
+Do an Archive build (I seem to have to do this first) and verify UDID has arrived:
 ```
 find  ~/Library/Developer -name embedded.mobileprovision | sed 's/.*/"&"/g' | xargs grep <a few chars of new UDID>
 ```
