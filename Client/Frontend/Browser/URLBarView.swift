@@ -347,10 +347,10 @@ class URLBarView: UIView {
     }
 
     func updateTabCount(count: Int, animated: Bool = true) {
-        URLBarView.updateTabCount(self, tabsButton: tabsButton, clonedTabsButton: &clonedTabsButton, count: count, animated: animated)
+        URLBarView.updateTabCount(tabsButton, clonedTabsButton: &clonedTabsButton, count: count, animated: animated)
     }
 
-    class func updateTabCount(parentView: UIView, tabsButton: TabsButton, inout clonedTabsButton: TabsButton?, count: Int, animated: Bool = true) {
+    class func updateTabCount(tabsButton: TabsButton, inout clonedTabsButton: TabsButton?, count: Int, animated: Bool = true) {
         let currentCount = tabsButton.titleLabel.text
         // only animate a tab count change if the tab count has actually changed
         if currentCount != count.description {
@@ -363,13 +363,16 @@ class URLBarView: UIView {
             // make a 'clone' of the tabs button
             let newTabsButton = tabsButton.clone() as! TabsButton
             clonedTabsButton = newTabsButton
-            newTabsButton.addTarget(parentView, action: "SELdidClickAddTab", forControlEvents: UIControlEvents.TouchUpInside)
+            // BRAVE: see clone(), do not to this here: newTabsButton.addTarget(parent, action: "SELdidClickAddTab", forControlEvents: UIControlEvents.TouchUpInside)
             newTabsButton.titleLabel.text = count.description
             newTabsButton.accessibilityValue = count.description
+
+            // BRAVE added
+            guard let parentView = tabsButton.superview else { return }
             parentView.addSubview(newTabsButton)
             newTabsButton.snp_makeConstraints { make in
-                make.centerY.equalTo(parentView)
-                make.trailing.equalTo(parentView)
+                make.center.equalTo(parentView)
+                // BRAVE: this will shift the button right during animation on bottom toolbar make.trailing.equalTo(parentView)
                 make.size.equalTo(UIConstants.ToolbarHeight)
             }
 

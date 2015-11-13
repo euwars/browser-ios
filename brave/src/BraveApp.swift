@@ -21,6 +21,12 @@ class BraveApp {
 
     NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
       selector: "willEnterForeground:", name: UIApplicationWillEnterForegroundNotification, object: nil)
+
+#if DEBUG
+    if BraveUX.DebugShowBorders {
+      UIView.bordersOn()
+    }
+#endif
   }
 
   @objc func didEnterBackground(_ : NSNotification) {

@@ -24,7 +24,7 @@ class BraveURLBarView : URLBarView {
   }
 
   override func updateTabCount(count: Int, animated: Bool = true) {
-    super.updateTabCount(count, animated: animated)
+    super.updateTabCount(count, animated: false)
     BraveBrowserToolbar.updateTabCountDuplicatedButton(count, animated: animated)
   }
 
@@ -59,10 +59,18 @@ class BraveURLBarView : URLBarView {
     } else {
       self.tabsButton.hidden = false
     }
+
+    if inOverlayMode {
+      self.bookmarkButton.hidden = true
+    }
   }
 
   override func updateConstraints() {
     super.updateConstraints()
+
+    // I have to set this late (as in here) as it gets overridden if set earlier
+    self.locationTextField.backgroundColor = BraveUX.LocationBarBackgroundColor_NonPrivateMode
+
     if !inOverlayMode {
       self.locationContainer.snp_remakeConstraints { make in
         if self.toolbarIsShowing {

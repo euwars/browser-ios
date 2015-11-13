@@ -3,16 +3,28 @@
 import SnapKit
 
 class BraveBrowserToolbar : BrowserToolbar {
+  static var tabsCount = 0
 
   lazy var tabsButton: TabsButton = {
     let tabsButton = TabsButton()
-    tabsButton.titleLabel.text = "0"
-    tabsButton.addTarget(self, action: "SELdidClickAddTab", forControlEvents: UIControlEvents.TouchUpInside)
-    tabsButton.accessibilityLabel = NSLocalizedString("Show Tabs", comment: "Accessibility Label for the tabs button in the browser toolbar")
+    tabsButton.titleLabel.text = "\(tabsCount)"
+    tabsButton.addTarget(self, action: "onClickShowTabs", forControlEvents: UIControlEvents.TouchUpInside)
+    tabsButton.accessibilityLabel = NSLocalizedString("Show Tabs",
+      comment: "Accessibility Label for the tabs button in the browser toolbar")
     return tabsButton
   }()
 
+  lazy var addTabButton: UIButton = {
+    let button = UIButton()
+    button.setImage(UIImage(named: "add"), forState: .Normal)
+    //TODO button.setImage(UIImage(named: "backPressed"), forState: .Highlighted)
+    //.accessibilityLabel = NSLocalizedString("Back", comment: "Accessibility Label for the browser toolbar Back button")
+    button.addTarget(self, action: "onClickAddTab", forControlEvents: UIControlEvents.TouchUpInside)
+    return button
+  }()
+
   private weak var clonedTabsButton: TabsButton?
+  var tabsContainer = UIView()
 
   private static weak var currentInstance: BraveBrowserToolbar?
 
@@ -27,11 +39,14 @@ class BraveBrowserToolbar : BrowserToolbar {
     bookmarkButton.hidden = true
     stopReloadButton.hidden = true
 
-    addSubview(tabsButton)
+    tabsContainer.addSubview(tabsButton)
+    addSubview(tabsContainer)
     addSubview(backForwardUnderlay)
 
     bringSubviewToFront(backButton)
     bringSubviewToFront(forwardButton)
+
+    addSubview(addTabButton)
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -40,11 +55,19 @@ class BraveBrowserToolbar : BrowserToolbar {
 
   class func updateTabCountDuplicatedButton(count: Int, animated: Bool) {
     guard let instance = BraveBrowserToolbar.currentInstance else { return }
+    tabsCount = count
     URLBarView.updateTabCount(instance, tabsButton: instance.tabsButton,
       clonedTabsButton: &instance.clonedTabsButton, count: count, animated: animated)
   }
 
-  func SELdidClickAddTab() {
+  func onClickAddTab() {
+    let app = UIApplication.sharedApplication().delegate as! AppDelegate
+    guard let url = app.profile?.searchEngines.defaultEngine.searchURLForQuery("") else { return }
+    let browser = app.browserViewController.tabManager.addTab(NSURLRequest(URL: url))
+    app.browserViewController.tabManager.selectTab(browser)
+  }
+
+  func onClickShowTabs() {
     BraveURLBarView.tabButtonPressed()
   }
 
@@ -66,44 +89,61 @@ class BraveBrowserToolbar : BrowserToolbar {
     hackToSetButtonColor()
     super.updateConstraints()
 
+    let numberButtonsToRightOfBackForward = 4
+
     func common(make: ConstraintMaker) {
-        make.centerY.equalTo(self)
-        make.height.equalTo(UIConstants.ToolbarHeight)
+      make.centerY.equalTo(self)
+      make.height.equalTo(UIConstants.ToolbarHeight)
+    }
+
+    func commonButtonsToRightOfBackForward(make: ConstraintMaker) {
+      common(make)
+//      make.width.equalTo(self)
+//        .inset(BraveUX.BackForwardButtonWidth)
+//        .dividedBy(numberButtonsToRightOfBackForward)
+      let bounds = UIScreen.mainScreen().bounds
+      let w = min(bounds.width, bounds.height)
+
+      make.width.equalTo((w - CGFloat(BraveUX.BackForwardButtonWidth)) /
+        CGFloat(BraveUX.BottomToolbarNumberButtonsToRightOfBackForward))
     }
 
     backForwardUnderlay.snp_remakeConstraints { make in
       common(make)
-      make.left.equalTo(backButton.snp_left)
+      make.left.equalTo(backButton.snp_left).offset(BraveUX.BackForwardButtonLeftOffset)
       make.right.equalTo(forwardButton.snp_right)
     }
 
     backButton.snp_remakeConstraints { make in
       common(make)
-      make.left.equalTo(self).offset(BraveUX.BackButtonLeftOffset)
-      make.width.equalTo(BraveUX.BackButtonWidth)
+      make.left.equalTo(self)
+      make.width.equalTo(BraveUX.BackForwardButtonWidth / 2)
     }
 
     forwardButton.snp_remakeConstraints { make in
       common(make)
       make.left.equalTo(self.backButton.snp_right)
-      if BraveUX.ForwardButtonWidth > 0 {
-        make.width.equalTo(BraveUX.ForwardButtonWidth)
-      } else {
-        make.width.equalTo(self).dividedBy(self.subviews.count - 1)
-      }
+      make.width.equalTo(BraveUX.BackForwardButtonWidth / 2)
     }
 
     shareButton.snp_remakeConstraints { make in
-      common(make)
+      commonButtonsToRightOfBackForward(make)
       make.left.equalTo(self.forwardButton.snp_right)
-      make.width.equalTo(self).dividedBy(self.subviews.count - 1)
+    }
+
+    tabsContainer.snp_remakeConstraints { make in
+      commonButtonsToRightOfBackForward(make)
+      make.left.equalTo(self.addTabButton.snp_right)
+    }
+
+    addTabButton.snp_remakeConstraints { make in
+      commonButtonsToRightOfBackForward(make)
+      make.left.equalTo(self.shareButton.snp_right)
     }
 
     tabsButton.snp_remakeConstraints { make in
-      common(make)
-      make.left.equalTo(self.shareButton.snp_right)
-      make.width.equalTo(self).dividedBy(self.subviews.count - 1)
+      commonButtonsToRightOfBackForward(make)
+      make.left.equalTo(self.addTabButton.snp_right)
     }
-
   }
 }
