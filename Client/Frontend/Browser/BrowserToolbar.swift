@@ -74,7 +74,7 @@ public class BrowserToolbarHelper: NSObject {
         super.init()
 
         toolbar.backButton.setImage(UIImage(named: "back"), forState: .Normal)
-        toolbar.backButton.setImage(UIImage(named: "backPressed"), forState: .Highlighted)
+        //toolbar.backButton.setImage(UIImage(named: "backPressed"), forState: .Highlighted)
         toolbar.backButton.accessibilityLabel = NSLocalizedString("Back", comment: "Accessibility Label for the browser toolbar Back button")
         //toolbar.backButton.accessibilityHint = NSLocalizedString("Double tap and hold to open history", comment: "")
         let longPressGestureBackButton = UILongPressGestureRecognizer(target: self, action: "SELdidLongPressBack:")

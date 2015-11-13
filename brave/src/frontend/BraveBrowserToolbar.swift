@@ -56,7 +56,7 @@ class BraveBrowserToolbar : BrowserToolbar {
   class func updateTabCountDuplicatedButton(count: Int, animated: Bool) {
     guard let instance = BraveBrowserToolbar.currentInstance else { return }
     tabsCount = count
-    URLBarView.updateTabCount(instance, tabsButton: instance.tabsButton,
+    URLBarView.updateTabCount(instance.tabsButton,
       clonedTabsButton: &instance.clonedTabsButton, count: count, animated: animated)
   }
 
@@ -75,15 +75,9 @@ class BraveBrowserToolbar : BrowserToolbar {
   // Calling this before doing the first layout is the easiest hack.
   // TODO: find less hacky-looking way
   func hackToSetButtonColor() {
-    struct runOnce { static var hasRun = false }
-    if (runOnce.hasRun) {
-      return
-    }
-    runOnce.hasRun = true
     self.actionButtonTintColor = BraveUX.ActionButtonTintColor
     self.actionButtons.forEach { $0.tintColor = self.actionButtonTintColor }
   }
-
 
   override func updateConstraints() {
     hackToSetButtonColor()
@@ -110,7 +104,7 @@ class BraveBrowserToolbar : BrowserToolbar {
 
     backForwardUnderlay.snp_remakeConstraints { make in
       common(make)
-      make.left.equalTo(backButton.snp_left).offset(BraveUX.BackForwardButtonLeftOffset)
+      make.left.equalTo(backButton.snp_left).offset(BraveUX.BackForwardButtonLeftOffset).priorityLow()
       make.right.equalTo(forwardButton.snp_right)
     }
 
@@ -142,8 +136,11 @@ class BraveBrowserToolbar : BrowserToolbar {
     }
 
     tabsButton.snp_remakeConstraints { make in
-      commonButtonsToRightOfBackForward(make)
-      make.left.equalTo(self.addTabButton.snp_right)
+      make.center.equalTo(tabsContainer)
+      let inset = CGFloat(0)
+      make.top.equalTo(tabsContainer).offset(inset)
+      make.bottom.equalTo(tabsContainer).offset(inset)
+      make.width.equalTo(tabsButton.snp_height)
     }
   }
 }
