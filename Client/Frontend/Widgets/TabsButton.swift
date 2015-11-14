@@ -75,7 +75,7 @@ class TabsButton: UIControl {
         insideButton.snp_remakeConstraints { (make) -> Void in
           // BRAVE mod: getting layout errors with firefox method, temporary hack to bypass the errors
           make.right.equalTo(self).inset(12)
-          make.centerY.equalTo(self)
+          make.centerY.equalTo(self).inset(1)
           make.size.equalTo(20)
         }
     }

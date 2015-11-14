@@ -373,7 +373,7 @@ class URLBarView: UIView {
             newTabsButton.snp_makeConstraints { make in
                 make.center.equalTo(parentView)
                 // BRAVE: this will shift the button right during animation on bottom toolbar make.trailing.equalTo(parentView)
-                make.size.equalTo(UIConstants.ToolbarHeight)
+                make.size.equalTo(tabsButton.snp_size)
             }
 
             newTabsButton.frame = tabsButton.frame

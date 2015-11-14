@@ -83,15 +83,13 @@ class BraveBrowserToolbar : BrowserToolbar {
     hackToSetButtonColor()
     super.updateConstraints()
 
-    let numberButtonsToRightOfBackForward = 4
-
-    func common(make: ConstraintMaker) {
-      make.centerY.equalTo(self)
-      make.height.equalTo(UIConstants.ToolbarHeight)
+    func common(make: ConstraintMaker, bottomInset: Int = 0) {
+      make.top.equalTo(self)
+      make.bottom.equalTo(self).inset(bottomInset)
     }
 
-    func commonButtonsToRightOfBackForward(make: ConstraintMaker) {
-      common(make)
+    func commonButtonsToRightOfBackForward(make: ConstraintMaker, bottomInset: Int = 0) {
+      common(make, bottomInset: bottomInset)
 //      make.width.equalTo(self)
 //        .inset(BraveUX.BackForwardButtonWidth)
 //        .dividedBy(numberButtonsToRightOfBackForward)
@@ -126,7 +124,7 @@ class BraveBrowserToolbar : BrowserToolbar {
     }
 
     tabsContainer.snp_remakeConstraints { make in
-      commonButtonsToRightOfBackForward(make)
+      commonButtonsToRightOfBackForward(make, bottomInset: 1)
       make.left.equalTo(self.addTabButton.snp_right)
     }
 
@@ -137,9 +135,8 @@ class BraveBrowserToolbar : BrowserToolbar {
 
     tabsButton.snp_remakeConstraints { make in
       make.center.equalTo(tabsContainer)
-      let inset = CGFloat(0)
-      make.top.equalTo(tabsContainer).offset(inset)
-      make.bottom.equalTo(tabsContainer).offset(inset)
+      make.top.equalTo(tabsContainer)
+      make.bottom.equalTo(tabsContainer)
       make.width.equalTo(tabsButton.snp_height)
     }
   }
