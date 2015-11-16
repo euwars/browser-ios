@@ -81,7 +81,7 @@ class URLBarView: UIView {
 
     var toolbarIsShowing = false
 
-    private var locationTextField: ToolbarTextField?
+    var locationTextField: ToolbarTextField?
 
     /// Overlay mode is the state where the lock/reader icons are hidden, the home panels are shown,
     /// and the Cancel button is visible (allowing the user to leave overlay mode). Overlay mode
@@ -95,23 +95,6 @@ class URLBarView: UIView {
         locationView.readerModeState = ReaderModeState.Unavailable
         locationView.delegate = self
         return locationView
-    }()
-
-    lazy var locationTextField: ToolbarTextField = {
-        let locationTextField = ToolbarTextField()
-        locationTextField.translatesAutoresizingMaskIntoConstraints = false
-        locationTextField.autocompleteDelegate = self
-        locationTextField.keyboardType = UIKeyboardType.WebSearch
-        locationTextField.autocorrectionType = UITextAutocorrectionType.No
-        locationTextField.autocapitalizationType = UITextAutocapitalizationType.None
-        locationTextField.returnKeyType = UIReturnKeyType.Go
-        locationTextField.clearButtonMode = UITextFieldViewMode.WhileEditing
-        locationTextField.backgroundColor = UIColor.whiteColor()
-        locationTextField.font = UIConstants.DefaultMediumFont
-        locationTextField.accessibilityIdentifier = "address"
-        locationTextField.accessibilityLabel = NSLocalizedString("Address and Search", comment: "Accessibility label for address and search field, both words (Address, Search) are therefore nouns.")
-        locationTextField.attributedPlaceholder = self.locationView.placeholder
-        return locationTextField
     }()
 
     lazy var locationContainer: UIView = {

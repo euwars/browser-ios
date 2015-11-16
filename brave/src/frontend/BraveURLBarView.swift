@@ -36,6 +36,7 @@ class BraveURLBarView : URLBarView {
   override var accessibilityElements: [AnyObject]? {
     get {
       if inOverlayMode {
+        guard let locationTextField = locationTextField else { return nil }
         return [locationTextField, cancelButton]
       } else {
         if toolbarIsShowing {
@@ -69,7 +70,7 @@ class BraveURLBarView : URLBarView {
     super.updateConstraints()
 
     // I have to set this late (as in here) as it gets overridden if set earlier
-    self.locationTextField.backgroundColor = BraveUX.LocationBarBackgroundColor_NonPrivateMode
+    self.locationTextField?.backgroundColor = BraveUX.LocationBarBackgroundColor_NonPrivateMode
 
     if !inOverlayMode {
       self.locationContainer.snp_remakeConstraints { make in
