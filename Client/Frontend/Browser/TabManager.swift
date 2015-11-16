@@ -296,10 +296,7 @@ class TabManager : NSObject {
 
         // There's still some time between this and the webView being destroyed.
         // We don't want to pick up any stray events.
-#if !BRAVE
-   // TODO investigate this
         tab.webView?.navigationDelegate = nil
-#endif
         if notify {
             for delegate in delegates {
                 delegate.get()?.tabManager(self, didRemoveTab: tab)
