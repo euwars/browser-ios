@@ -17,7 +17,7 @@ class LegacyBackForwardList {
 
   var currentIndex: Int = 0
   var backForwardList: [LegacyBackForwardListItem] = []
-  let webView: LegacyWebView
+  weak var webView: LegacyWebView?
 
   init(webView: LegacyWebView) {
     self.webView = webView
@@ -70,7 +70,7 @@ class LegacyBackForwardList {
   var currentItem: LegacyBackForwardListItem? {
     get {
       guard let item = itemAtIndex(currentIndex) else {
-      if let url = webView.URL {
+      if let url = webView?.URL {
         let item = LegacyBackForwardListItem()
         item.URL = url
         return item

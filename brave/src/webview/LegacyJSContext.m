@@ -55,15 +55,17 @@
 {
   JSContext* context = _context;
   NSString* script = [NSString stringWithFormat:@""
-    "if (!window.hasOwnProperty('webkit')) {"
-    "  Window.prototype.webkit = {};"
-    "  Window.prototype.webkit.messageHandlers = {};"
-    "}"
-    "if (!window.webkit.messageHandlers.hasOwnProperty('%@'))"
-    "  Window.prototype.webkit.messageHandlers.%@ = {};", handlerName, handlerName];
+                      "if (!window.hasOwnProperty('webkit')) {"
+                      "  Window.prototype.webkit = {};"
+                      "  Window.prototype.webkit.messageHandlers = {};"
+                      "}"
+                      "if (!window.webkit.messageHandlers.hasOwnProperty('%@'))"
+                      "  Window.prototype.webkit.messageHandlers.%@ = {};",
+                      handlerName, handlerName];
 
   [context evaluateScript:script];
 
+  __block NSURLRequest* request = webView.request.copy;
   context[@"Window"][@"prototype"][@"webkit"][@"messageHandlers"][handlerName][@"postMessage"] =
   ^(NSDictionary* message) {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -73,15 +75,15 @@
       LegacyScriptMessage* msg = [LegacyScriptMessage new];
       msg.writeableBody = message;
       msg.writableName = handlerName;
-      msg.request = webView.request;
+      msg.request = request;
       [handler userContentController:[WKUserContentController new] didReceiveScriptMessage:msg];
     });
   };
 }
 
 - (void)installHandlerForWebView:(UIWebView *)webView
-                    handlerName:(NSString *)handlerName
-                        handler:(id<WKScriptMessageHandler>)handler
+                     handlerName:(NSString *)handlerName
+                         handler:(id<WKScriptMessageHandler>)handler
 {
   assert([NSThread isMainThread]);
   JSContext* context = [webView valueForKeyPath:@"documentView.webView.mainFrame.javaScriptContext"];
