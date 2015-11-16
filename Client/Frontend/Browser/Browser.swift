@@ -369,7 +369,7 @@ class Browser: NSObject {
 
 private class HelperManager: NSObject, WKScriptMessageHandler {
     private var helpers = [String: BrowserHelper]()
-    private var webView: LegacyWebView?
+    private weak var webView: LegacyWebView?
 
     init(webView: LegacyWebView) {
         self.webView = webView
