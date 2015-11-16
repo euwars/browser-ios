@@ -207,7 +207,10 @@ public class BrowserProfile: Profile {
             prefs.clearAll()
         }
 
-        history.setTopSitesNeedsInvalidation()
+        // Always start by needing invalidation.
+        // This is the same as self.history.setTopSitesNeedsInvalidation, but without the
+        // side-effect of instantiating SQLiteHistory (and thus BrowserDB) on the main thread.
+        prefs.setBool(false, forKey: PrefsKeys.KeyTopSitesCacheIsValid)
     }
 
     // Extensions don't have a UIApplication.
@@ -254,8 +257,7 @@ public class BrowserProfile: Profile {
     @objc
     func onPrivateDataClearedHistory(notification: NSNotification) {
         // Immediately invalidate the top sites cache
-        history.setTopSitesNeedsInvalidation()
-        history.invalidateTopSitesIfNeeded()
+        history.refreshTopSitesCache()
     }
 
     deinit {

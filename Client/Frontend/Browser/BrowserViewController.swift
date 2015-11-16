@@ -233,12 +233,15 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidLoad() {
+        log.debug("BVC viewDidLoad…")
         super.viewDidLoad()
+        log.debug("BVC super viewDidLoad called.")
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELBookmarkStatusDidChange:", name: BookmarkStatusChangedNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappWillResignActiveNotification", name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappDidBecomeActiveNotification", name: UIApplicationDidBecomeActiveNotification, object: nil)
         KeyboardHelper.defaultHelper.addDelegate(self)
 
+        log.debug("BVC adding footer and header…")
         footerBackdrop = UIView()
         footerBackdrop.backgroundColor = UIColor.whiteColor()
         view.addSubview(footerBackdrop)
@@ -246,6 +249,7 @@ class BrowserViewController: UIViewController {
         headerBackdrop.backgroundColor = UIColor.whiteColor()
         view.addSubview(headerBackdrop)
 
+        log.debug("BVC setting up webViewContainer…")
         webViewContainerBackdrop = UIView()
         webViewContainerBackdrop.backgroundColor = UIColor.grayColor()
         webViewContainerBackdrop.alpha = 0
@@ -255,25 +259,20 @@ class BrowserViewController: UIViewController {
         webViewContainer.addSubview(webViewContainerToolbar)
         view.addSubview(webViewContainer)
 
+        log.debug("BVC setting up status bar…")
         // Temporary work around for covering the non-clipped web view content
         statusBarOverlay = UIView()
         statusBarOverlay.backgroundColor = BrowserViewControllerUX.BackgroundColor
         view.addSubview(statusBarOverlay)
 
+        log.debug("BVC setting up top touch area…")
         topTouchArea = UIButton()
         topTouchArea.isAccessibilityElement = false
         topTouchArea.addTarget(self, action: "SELtappedTopArea", forControlEvents: UIControlEvents.TouchUpInside)
         view.addSubview(topTouchArea)
 
-#if !BRAVE
         // Setup the URL bar, wrapped in a view to get transparency effect
-        urlBar = URLBarView()
-        urlBar.translatesAutoresizingMaskIntoConstraints = false
-        urlBar.delegate = self
-        urlBar.browserToolbarDelegate = self
-        header = BlurWrapper(view: urlBar)
-        view.addSubview(header)
-#else
+#if BRAVE
         // Brave: need to inject in the middle of this function, override won't work
         urlBar = BraveURLBarView()
         urlBar.translatesAutoresizingMaskIntoConstraints = false
@@ -310,6 +309,7 @@ class BrowserViewController: UIViewController {
         })
 
 
+        log.debug("BVC setting up search loader…")
         searchLoader = SearchLoader(profile: profile, urlBar: urlBar)
 
         footer = UIView()
@@ -322,9 +322,12 @@ class BrowserViewController: UIViewController {
         scrollController.footer = footer
         scrollController.snackBars = snackBars
 
+        log.debug("BVC updating toolbar state…")
         self.updateToolbarStateForTraitCollection(self.traitCollection)
 
+        log.debug("BVC setting up constraints…")
         setupConstraints()
+        log.debug("BVC done.")
     }
 
     private func setupConstraints() {
@@ -362,11 +365,13 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidLayoutSubviews() {
+        log.debug("BVC viewDidLayoutSubviews…")
         super.viewDidLayoutSubviews()
         statusBarOverlay.snp_remakeConstraints { make in
             make.top.left.right.equalTo(self.view)
             make.height.equalTo(self.topLayoutGuide.length)
         }
+        log.debug("BVC done.")
     }
 
     func loadQueuedTabs() {
@@ -404,7 +409,9 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewWillAppear(animated: Bool) {
+        log.debug("BVC viewWillAppear.")
         super.viewWillAppear(animated)
+        log.debug("BVC super.viewWillAppear done.")
 
         // On iPhone, if we are about to show the On-Boarding, blank out the browser so that it does
         // not flash before we present. This change of alpha also participates in the animation when
@@ -417,6 +424,8 @@ class BrowserViewController: UIViewController {
         tabManager.restoreTabs()
 #else
         if activeCrashReporter?.previouslyCrashed ?? false {
+            log.debug("Previously crashed.")
+
             // Reset previous crash state
             activeCrashReporter?.resetPreviousCrashState()
 
@@ -476,13 +485,19 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidAppear(animated: Bool) {
+        log.debug("BVC viewDidAppear.")
         presentIntroViewController()
+        log.debug("BVC intro presented.")
         self.webViewContainerToolbar.hidden = false
 
         screenshotHelper.viewIsVisible = true
+        log.debug("BVC taking pending screenshots….")
         screenshotHelper.takePendingScreenshots(tabManager.tabs)
+        log.debug("BVC done taking screenshots.")
 
+        log.debug("BVC calling super.viewDidAppear.")
         super.viewDidAppear(animated)
+        log.debug("BVC done.")
     }
 
     override func viewWillDisappear(animated: Bool) {
@@ -558,6 +573,7 @@ class BrowserViewController: UIViewController {
     }
 
     private func showHomePanelController(inline inline: Bool) {
+        log.debug("BVC showHomePanelController.")
         homePanelIsInline = inline
 
         if homePanelController == nil {
@@ -594,6 +610,7 @@ class BrowserViewController: UIViewController {
             }
         })
         view.setNeedsUpdateConstraints()
+        log.debug("BVC done with showHomePanelController.")
     }
 
     private func hideHomePanelController() {
@@ -1076,7 +1093,10 @@ extension BrowserViewController: BrowserToolbarDelegate {
                 printInfo.outputType = .General
                 let renderer = BrowserPrintPageRenderer(browser: selected)
 
-                let activityItems = [printInfo, renderer, selected.title ?? url.absoluteString, url]
+                var activityItems = [printInfo, renderer, url]
+                if let title = selected.title {
+                    activityItems.append(TitleActivityItemProvider(title: title))
+                }
 
                 let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
 
@@ -1439,12 +1459,12 @@ extension BrowserViewController: TabManagerDelegate {
         updateInContentHomePanel(selected?.url)
     }
 
-    func tabManager(tabManager: TabManager, didCreateTab tab: Browser, restoring: Bool) {
+    func tabManager(tabManager: TabManager, didCreateTab tab: Browser) {
     }
 
-    func tabManager(tabManager: TabManager, didAddTab tab: Browser, restoring: Bool) {
+    func tabManager(tabManager: TabManager, didAddTab tab: Browser) {
         // If we are restoring tabs then we update the count once at the end
-        if !restoring {
+        if !tabManager.isRestoring {
             updateTabCountUsingTabManager(tabManager)
         }
         tab.browserDelegate = self
@@ -2175,7 +2195,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                         // we might be overwriting something that the user has subsequently added
                         if pasteBoard.string == url.absoluteString {
                             guard let imageData = responseData where responseError == nil else { return }
-                            pasteBoard.image = UIImage(data: imageData)
+                            pasteBoard.image = UIImage.imageFromDataThreadSafe(imageData)
                             application.endBackgroundTask(taskId)
                         }
                 }
@@ -2201,7 +2221,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             .validate(statusCode: 200..<300)
             .response { _, _, data, _ in
                 if let data = data,
-                   let image = UIImage(data: data) {
+                   let image = UIImage.imageFromDataThreadSafe(data) {
                     success(image)
                 }
             }

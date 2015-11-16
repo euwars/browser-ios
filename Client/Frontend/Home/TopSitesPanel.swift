@@ -66,6 +66,8 @@ class TopSitesPanel: UIViewController {
         self.profile = profile
         super.init(nibName: nil, bundle: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "notificationReceived:", name: NotificationFirefoxAccountChanged, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "notificationReceived:", name: ProfileDidFinishSyncingNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "notificationReceived:", name: NotificationPrivateDataClearedHistory, object: nil)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -92,11 +94,13 @@ class TopSitesPanel: UIViewController {
 
     deinit {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationFirefoxAccountChanged, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: ProfileDidFinishSyncingNotification, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationPrivateDataClearedHistory, object: nil)
     }
     
     func notificationReceived(notification: NSNotification) {
         switch notification.name {
-        case NotificationFirefoxAccountChanged:
+        case NotificationFirefoxAccountChanged, ProfileDidFinishSyncingNotification, NotificationPrivateDataClearedHistory:
             refreshTopSites(maxFrecencyLimit)
             break
         default:
@@ -132,12 +136,16 @@ class TopSitesPanel: UIViewController {
     }
 
     private func deleteHistoryTileForSite(site: Site, atIndexPath indexPath: NSIndexPath) {
-        profile.history.removeSiteFromTopSites(site) >>== {
-            self.profile.history.getTopSitesWithLimit(self.layout.thumbnailCount).uponQueue(dispatch_get_main_queue(), block: { result in
-                self.updateDataSourceWithSites(result)
-                self.deleteOrUpdateSites(result, indexPath: indexPath)
-            })
+        func reloadThumbnails() {
+            self.profile.history.getTopSitesWithLimit(self.layout.thumbnailCount)
+                .uponQueue(dispatch_get_main_queue()) { result in
+                    self.deleteOrUpdateSites(result, indexPath: indexPath)
+            }
         }
+
+        profile.history.removeSiteFromTopSites(site)
+        >>> self.profile.history.refreshTopSitesCache
+        >>> reloadThumbnails
     }
 
     private func refreshTopSites(frecencyLimit: Int) {
@@ -145,7 +153,7 @@ class TopSitesPanel: UIViewController {
         // invalidate the cache and requery. This allows us to always show results right away if they are cached but
         // also load in the up-to-date results asynchronously if needed
         reloadTopSitesWithLimit(frecencyLimit) >>> {
-            return self.profile.history.invalidateTopSitesIfNeeded() >>== { result in
+            return self.profile.history.updateTopSitesCacheIfInvalidated() >>== { result in
                 return result ? self.reloadTopSitesWithLimit(frecencyLimit) : succeed()
             }
         }
@@ -165,6 +173,11 @@ class TopSitesPanel: UIViewController {
         // this is so we know how many new top sites cells to add
         // as a sync may have brought in more results than we had previously
         let previousNumOfThumbnails = collectionView.dataSource?.collectionView(collectionView, numberOfItemsInSection: 0) ?? 0
+
+        // Exit early if the query failed in some way.
+        guard result.isSuccess else {
+            return
+        }
 
         // now update the data source with the new data
         self.updateDataSourceWithSites(result)
@@ -450,16 +463,12 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         if let blurredImage = SDImageCache.sharedImageCache().imageFromMemoryCacheForKey(blurredKey) {
             cell.backgroundImage.image = blurredImage
         } else {
-            dispatch_async(self.blurQueue) {
-                let blurredImage = image.applyLightEffect()
-                SDImageCache.sharedImageCache().storeImage(blurredImage, forKey: blurredKey, toDisk: false)
-                dispatch_async(dispatch_get_main_queue()) {
-                    cell.backgroundImage.alpha = 0
-                    cell.backgroundImage.image = blurredImage
-                    UIView.animateWithDuration(self.BackgroundFadeInDuration) {
-                        cell.backgroundImage.alpha = 1
-                    }
-                }
+            let blurredImage = image.applyLightEffect()
+            SDImageCache.sharedImageCache().storeImage(blurredImage, forKey: blurredKey, toDisk: false)
+            cell.backgroundImage.alpha = 0
+            cell.backgroundImage.image = blurredImage
+            UIView.animateWithDuration(self.BackgroundFadeInDuration) {
+                cell.backgroundImage.alpha = 1
             }
         }
     }

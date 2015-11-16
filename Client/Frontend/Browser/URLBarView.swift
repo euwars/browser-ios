@@ -81,6 +81,8 @@ class URLBarView: UIView {
 
     var toolbarIsShowing = false
 
+    private var locationTextField: ToolbarTextField?
+
     /// Overlay mode is the state where the lock/reader icons are hidden, the home panels are shown,
     /// and the Cancel button is visible (allowing the user to leave overlay mode). Overlay mode
     /// is *not* tied to the location text field's editing state; for instance, when selecting
@@ -219,7 +221,6 @@ class URLBarView: UIView {
         addSubview(stopReloadButton)
 
         locationContainer.addSubview(locationView)
-        locationContainer.addSubview(locationTextField)
         addSubview(locationContainer)
 
         helper = BrowserToolbarHelper(toolbar: self)
@@ -227,7 +228,6 @@ class URLBarView: UIView {
 
         // Make sure we hide any views that shouldn't be showing in non-overlay mode.
         updateViewsForOverlayModeAndToolbarChanges()
-        self.locationTextField.hidden = !inOverlayMode
     }
 
     func setupConstraints() {
@@ -260,10 +260,6 @@ class URLBarView: UIView {
             make.top.left.bottom.equalTo(self)
             self.rightBarConstraint = make.right.equalTo(self).constraint
             self.rightBarConstraint?.updateOffset(defaultRightOffset)
-        }
-
-        locationTextField.snp_makeConstraints { make in
-            make.edges.equalTo(self.locationView.urlTextField)
         }
 
         backButton.snp_makeConstraints { make in
@@ -323,6 +319,37 @@ class URLBarView: UIView {
             }
         }
 
+    }
+
+    func createLocationTextField() {
+        guard locationTextField == nil else { return }
+
+        locationTextField = ToolbarTextField()
+
+        guard let locationTextField = locationTextField else { return }
+
+        locationTextField.translatesAutoresizingMaskIntoConstraints = false
+        locationTextField.autocompleteDelegate = self
+        locationTextField.keyboardType = UIKeyboardType.WebSearch
+        locationTextField.autocorrectionType = UITextAutocorrectionType.No
+        locationTextField.autocapitalizationType = UITextAutocapitalizationType.None
+        locationTextField.returnKeyType = UIReturnKeyType.Go
+        locationTextField.clearButtonMode = UITextFieldViewMode.WhileEditing
+        locationTextField.font = UIConstants.DefaultMediumFont
+        locationTextField.accessibilityIdentifier = "address"
+        locationTextField.accessibilityLabel = NSLocalizedString("Address and Search", comment: "Accessibility label for address and search field, both words (Address, Search) are therefore nouns.")
+        locationTextField.attributedPlaceholder = self.locationView.placeholder
+
+        locationContainer.addSubview(locationTextField)
+
+        locationTextField.snp_makeConstraints { make in
+            make.edges.equalTo(self.locationView.urlTextField)
+        }
+    }
+
+    func removeLocationTextField() {
+        locationTextField?.removeFromSuperview()
+        locationTextField = nil
     }
 
     // Ideally we'd split this implementation in two, one URLBarView with a toolbar and one without
@@ -445,10 +472,11 @@ class URLBarView: UIView {
     }
 
     func setAutocompleteSuggestion(suggestion: String?) {
-        locationTextField.setAutocompleteSuggestion(suggestion)
+        locationTextField?.setAutocompleteSuggestion(suggestion)
     }
 
     func enterOverlayMode(locationText: String?, pasted: Bool) {
+        createLocationTextField()
 
         // Show the overlay mode UI, which includes hiding the locationView and replacing it
         // with the editable locationTextField.
@@ -464,22 +492,22 @@ class URLBarView: UIView {
         if pasted {
             // Clear any existing text, focus the field, then set the actual pasted text.
             // This avoids highlighting all of the text.
-            self.locationTextField.text = ""
+            self.locationTextField?.text = ""
             dispatch_async(dispatch_get_main_queue()) {
-                self.locationTextField.becomeFirstResponder()
-                self.locationTextField.text = locationText
+                self.locationTextField?.becomeFirstResponder()
+                self.locationTextField?.text = locationText
             }
         } else {
             // Copy the current URL to the editable text field, then activate it.
-            self.locationTextField.text = locationText
+            self.locationTextField?.text = locationText
             dispatch_async(dispatch_get_main_queue()) {
-                self.locationTextField.becomeFirstResponder()
+                self.locationTextField?.becomeFirstResponder()
             }
         }
     }
 
     func leaveOverlayMode(didCancel cancel: Bool = false) {
-        locationTextField.resignFirstResponder()
+        locationTextField?.resignFirstResponder()
         animateToOverlayState(overlayMode: false, didCancel: cancel)
         delegate?.urlBarDidLeaveOverlayMode(self)
     }
@@ -516,7 +544,7 @@ class URLBarView: UIView {
             self.rightBarConstraint?.updateOffset(URLBarViewUX.URLBarCurveOffset + URLBarViewUX.URLBarCurveBounceBuffer + tabsButton.frame.width)
 
             // Make the editable text field span the entire URL bar, covering the lock and reader icons.
-            self.locationTextField.snp_remakeConstraints { make in
+            self.locationTextField?.snp_remakeConstraints { make in
                 make.leading.equalTo(self.locationContainer).offset(URLBarViewUX.LocationContentOffset)
                 make.top.bottom.trailing.equalTo(self.locationContainer)
             }
@@ -527,7 +555,7 @@ class URLBarView: UIView {
             self.rightBarConstraint?.updateOffset(defaultRightOffset)
 
             // Shrink the editable text field back to the size of the location view before hiding it.
-            self.locationTextField.snp_remakeConstraints { make in
+            self.locationTextField?.snp_remakeConstraints { make in
                 make.edges.equalTo(self.locationView.urlTextField)
             }
         }
@@ -549,8 +577,9 @@ class URLBarView: UIView {
 
         inOverlayMode = overlay
 
-        locationView.urlTextField.hidden = inOverlayMode
-        locationTextField.hidden = !inOverlayMode
+        if !overlay {
+            removeLocationTextField()
+        }
 
         UIView.animateWithDuration(0.3, delay: 0.0, usingSpringWithDamping: 0.85, initialSpringVelocity: 0.0, options: [], animations: { _ in
             self.transitionToOverlay(cancel)
@@ -607,6 +636,7 @@ extension URLBarView: BrowserToolbarProtocol {
     override var accessibilityElements: [AnyObject]? {
         get {
             if inOverlayMode {
+                guard let locationTextField = locationTextField else { return nil }
                 return [locationTextField, cancelButton]
             } else {
                 if toolbarIsShowing {
@@ -655,7 +685,7 @@ extension URLBarView: BrowserLocationViewDelegate {
 
 extension URLBarView: AutocompleteTextFieldDelegate {
     func autocompleteTextFieldShouldReturn(autocompleteTextField: AutocompleteTextField) -> Bool {
-        guard let text = locationTextField.text else { return true }
+        guard let text = locationTextField?.text else { return true }
         delegate?.urlBar(self, didSubmitText: text)
         return true
     }
