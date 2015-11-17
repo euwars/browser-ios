@@ -66,7 +66,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Add restoration class, the factory that will return the ViewController we 
         // will restore with.
-        browserViewController.restorationIdentifier = NSStringFromClass(BraveBrowserViewController.self)
+        browserViewController.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
         browserViewController.restorationClass = AppDelegate.self
         browserViewController.automaticallyAdjustsScrollViewInsets = false
 
