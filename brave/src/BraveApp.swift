@@ -11,8 +11,14 @@ class BraveApp {
     return _singleton
   }
 
+  class func setupCacheDefaults() {
+    NSURLCache.sharedURLCache().memoryCapacity = 6 * 1024 * 1024; // 6 MB
+    NSURLCache.sharedURLCache().diskCapacity = 40 * 1024 * 1024;
+  }
+
   class func willFinishLaunching() {
     Fabric.with([Crashlytics.self])
+    BraveApp.setupCacheDefaults()
     NSURLProtocol.registerClass(URLProtocol);
 
     if NSClassFromString("XCTestCase") != nil {
@@ -27,6 +33,9 @@ class BraveApp {
 
     NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
       selector: "willEnterForeground:", name: UIApplicationWillEnterForegroundNotification, object: nil)
+
+    NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
+      selector: "memoryWarning:", name: UIApplicationDidReceiveMemoryWarningNotification, object: nil)
 
     //  these quiet the logging from the core of fx ios
     GCDWebServer.setLogLevel(5)
@@ -46,7 +55,12 @@ class BraveApp {
 #endif
   }
 
-  @objc func didEnterBackground(_ : NSNotification) {
+  @objc func memoryWarning(_: NSNotification) {
+    NSURLCache.sharedURLCache().memoryCapacity = 0
+    BraveApp.setupCacheDefaults()
+  }
+
+  @objc func didEnterBackground(_: NSNotification) {
     VaultManager.sessionTerminate()
   }
 
