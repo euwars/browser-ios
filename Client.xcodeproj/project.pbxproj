@@ -687,6 +687,10 @@
 		EBD9DFF41BF3F37C0003F11D /* BraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */; };
 		EBD9DFF51BF3F37C0003F11D /* BraveApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */; };
 		EBD9E03D1BF4E3BC0003F11D /* VaultManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD9E03C1BF4E3BB0003F11D /* VaultManager.swift */; };
+		EBDFCA0F1BFB933C007F290F /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB9412BE1BD80FC900B21564 /* Fabric.framework */; };
+		EBDFCA3E1BFB9DA7007F290F /* NSString+Sha1.m in Sources */ = {isa = PBXBuildFile; fileRef = EBDFCA2B1BFB9DA7007F290F /* NSString+Sha1.m */; };
+		EBDFCA3F1BFB9DA7007F290F /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = EBDFCA2D1BFB9DA7007F290F /* Reachability.m */; };
+		EBDFCA411BFB9DA7007F290F /* RNCachingURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = EBDFCA301BFB9DA7007F290F /* RNCachingURLProtocol.m */; };
 		EBF2BAE01BE413F00041A5DA /* ABPFilterParserData.dat in Resources */ = {isa = PBXBuildFile; fileRef = EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */; };
 		F84B21DA1A090F8100AAB793 /* ClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21D91A090F8100AAB793 /* ClientTests.swift */; };
 		F84B22041A0910F600AAB793 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84B21E51A0910F600AAB793 /* AppDelegate.swift */; };
@@ -1893,6 +1897,12 @@
 		EBD9DFF11BF295E00003F11D /* UIView+ShowBorders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+ShowBorders.m"; sourceTree = "<group>"; };
 		EBD9DFF31BF3F37C0003F11D /* BraveApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveApp.swift; sourceTree = "<group>"; };
 		EBD9E03C1BF4E3BB0003F11D /* VaultManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VaultManager.swift; sourceTree = "<group>"; };
+		EBDFCA2A1BFB9DA7007F290F /* NSString+Sha1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Sha1.h"; sourceTree = "<group>"; };
+		EBDFCA2B1BFB9DA7007F290F /* NSString+Sha1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Sha1.m"; sourceTree = "<group>"; };
+		EBDFCA2C1BFB9DA7007F290F /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		EBDFCA2D1BFB9DA7007F290F /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		EBDFCA2F1BFB9DA7007F290F /* RNCachingURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCachingURLProtocol.h; sourceTree = "<group>"; };
+		EBDFCA301BFB9DA7007F290F /* RNCachingURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCachingURLProtocol.m; sourceTree = "<group>"; };
 		EBF2BADF1BE413F00041A5DA /* ABPFilterParserData.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = ABPFilterParserData.dat; sourceTree = "<group>"; };
 		EBF6A3921BD80BDC009CF0C7 /* ShareTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareTo.entitlements; sourceTree = "<group>"; };
 		EBF6A3931BD80BF4009CF0C7 /* SendTo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SendTo.entitlements; sourceTree = "<group>"; };
@@ -2058,6 +2068,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E6231C081B90A71E005ABB0D /* libz.tbd in Frameworks */,
+				EBDFCA0F1BFB933C007F290F /* Fabric.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3022,6 +3033,7 @@
 		EB1C48C71BDE8B2500D31A0A /* brave */ = {
 			isa = PBXGroup;
 			children = (
+				EBDFCA101BFB9DA7007F290F /* github_modules */,
 				EB34D6E51BE16A1400C08A48 /* abp-filterparser */,
 				EB34D6C11BE169C600C08A48 /* src */,
 			);
@@ -3133,6 +3145,27 @@
 				EB64F0761BFAA6E9006276A9 /* VaultIntentTests.swift */,
 			);
 			path = test;
+			sourceTree = "<group>";
+		};
+		EBDFCA101BFB9DA7007F290F /* github_modules */ = {
+			isa = PBXGroup;
+			children = (
+				EBDFCA111BFB9DA7007F290F /* RNCachingURLProtocol */,
+			);
+			path = github_modules;
+			sourceTree = "<group>";
+		};
+		EBDFCA111BFB9DA7007F290F /* RNCachingURLProtocol */ = {
+			isa = PBXGroup;
+			children = (
+				EBDFCA2A1BFB9DA7007F290F /* NSString+Sha1.h */,
+				EBDFCA2B1BFB9DA7007F290F /* NSString+Sha1.m */,
+				EBDFCA2C1BFB9DA7007F290F /* Reachability.h */,
+				EBDFCA2D1BFB9DA7007F290F /* Reachability.m */,
+				EBDFCA2F1BFB9DA7007F290F /* RNCachingURLProtocol.h */,
+				EBDFCA301BFB9DA7007F290F /* RNCachingURLProtocol.m */,
+			);
+			path = RNCachingURLProtocol;
 			sourceTree = "<group>";
 		};
 		F84B21B51A090F8100AAB793 = {
@@ -4895,6 +4928,7 @@
 				0B62EFD21AD63CD100ACB9CD /* Clearables.swift in Sources */,
 				E4B3345B1BBF2393004E2BFF /* ADJPackageBuilder.m in Sources */,
 				D3BE7B481B05596800641031 /* AuroraAppDelegate.swift in Sources */,
+				EBDFCA411BFB9DA7007F290F /* RNCachingURLProtocol.m in Sources */,
 				E4B334551BBF2393004E2BFF /* ADJAttribution.m in Sources */,
 				DD31E0FB1B382B520077078A /* BrowserPrintPageRenderer.swift in Sources */,
 				E4CD9E911A6897FB00318571 /* ReaderMode.swift in Sources */,
@@ -4951,6 +4985,7 @@
 				E4B334501BBF2393004E2BFF /* ADJActivityState.m in Sources */,
 				D31A0FC71A65D6D000DC8C7E /* SearchSuggestClient.swift in Sources */,
 				D38B2D311A8D96D00040E6B5 /* GCDWebServerConnection.m in Sources */,
+				EBDFCA3F1BFB9DA7007F290F /* Reachability.m in Sources */,
 				D38B2D401A8D96D00040E6B5 /* GCDWebServerFileRequest.m in Sources */,
 				0B7100481B4C72D60046AF87 /* FaviconFetcher.swift in Sources */,
 				E4B334561BBF2393004E2BFF /* ADJAttributionHandler.m in Sources */,
@@ -5008,6 +5043,7 @@
 				D38B2D491A8D96D00040E6B5 /* GCDWebServerDataResponse.m in Sources */,
 				E4C358551AF144BA00299F7E /* FSReadingList.m in Sources */,
 				E663D5781BB341C4001EF30E /* ToggleButton.swift in Sources */,
+				EBDFCA3E1BFB9DA7007F290F /* NSString+Sha1.m in Sources */,
 				E4B334571BBF2393004E2BFF /* ADJConfig.m in Sources */,
 				D38B2D521A8D96D00040E6B5 /* GCDWebServerStreamedResponse.m in Sources */,
 				E4B334531BBF2393004E2BFF /* UIDevice+ADJAdditions.m in Sources */,
@@ -6376,6 +6412,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = ClientTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(PRODUCT_NAME:rfc1034identifier)";
@@ -6522,6 +6562,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = ClientTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "-DMOZ_CHANNEL_FIREFOX";
@@ -7783,6 +7827,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -8317,6 +8365,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -8334,6 +8386,10 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = ClientTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.mozilla.ios.$(PRODUCT_NAME:rfc1034identifier)";

@@ -22,4 +22,5 @@
 #import "LegacyJSContext.h"
 #import "AdBlockCppFilter.h"
 #import "UIView+ShowBorders.h"
+#import "RNCachingURLProtocol.h"
 #endif

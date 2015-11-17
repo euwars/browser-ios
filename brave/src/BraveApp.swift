@@ -13,9 +13,15 @@ class BraveApp {
 
   class func willFinishLaunching() {
     Fabric.with([Crashlytics.self])
-    NSURLProtocol.registerClass(URLProtocol);
-    VaultManager.userProfileInit()
-    VaultManager.sessionLaunch()
+    NSURLProtocol.registerClass(RNCachingURLProtocol);
+    NSURLProtocol.registerClass(URLProtocol); // last registered gets asked first
+
+    if NSClassFromString("XCTestCase") != nil {
+      print("In test mode, bypass automatic vault registration.")
+    } else {
+      VaultManager.userProfileInit()
+      VaultManager.sessionLaunch()
+    }
 
     NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
       selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: nil)
