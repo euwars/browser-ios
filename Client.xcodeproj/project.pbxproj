@@ -666,6 +666,7 @@
 		EB64F04A1BFA4A62006276A9 /* TitleActivityItemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB64F0491BFA4A62006276A9 /* TitleActivityItemProvider.swift */; };
 		EB64F0741BFA50D4006276A9 /* UIImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB64F0711BFA4A98006276A9 /* UIImageExtensions.swift */; };
 		EB64F0751BFA50DA006276A9 /* NSFileManagerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB64F0701BFA4A98006276A9 /* NSFileManagerExtensions.swift */; };
+		EB64F0781BFAA867006276A9 /* VaultIntentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB64F0761BFAA6E9006276A9 /* VaultIntentTests.swift */; };
 		EB690C781BF1496500B4C586 /* BraveUX.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB690C771BF1496500B4C586 /* BraveUX.swift */; };
 		EB690C7B1BF1655B00B4C586 /* BraveBrowserToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB690C791BF1655B00B4C586 /* BraveBrowserToolbar.swift */; };
 		EB690C7C1BF1655B00B4C586 /* BraveURLBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB690C7A1BF1655B00B4C586 /* BraveURLBarView.swift */; };
@@ -1875,6 +1876,7 @@
 		EB64F0491BFA4A62006276A9 /* TitleActivityItemProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TitleActivityItemProvider.swift; sourceTree = "<group>"; };
 		EB64F0701BFA4A98006276A9 /* NSFileManagerExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSFileManagerExtensions.swift; sourceTree = "<group>"; };
 		EB64F0711BFA4A98006276A9 /* UIImageExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImageExtensions.swift; sourceTree = "<group>"; };
+		EB64F0761BFAA6E9006276A9 /* VaultIntentTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VaultIntentTests.swift; sourceTree = "<group>"; };
 		EB690C771BF1496500B4C586 /* BraveUX.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveUX.swift; sourceTree = "<group>"; };
 		EB690C791BF1655B00B4C586 /* BraveBrowserToolbar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveBrowserToolbar.swift; sourceTree = "<group>"; };
 		EB690C7A1BF1655B00B4C586 /* BraveURLBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BraveURLBarView.swift; sourceTree = "<group>"; };
@@ -3128,6 +3130,7 @@
 				EB429FE21BEA7AFB00681E31 /* Info.plist */,
 				EB89A5341BE80D0500A44D4B /* top500.swift */,
 				EB89A52D1BE8097100A44D4B /* WebViewLoadTest.swift */,
+				EB64F0761BFAA6E9006276A9 /* VaultIntentTests.swift */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -4860,6 +4863,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EB642A861BE90D6C0000F230 /* top500.swift in Sources */,
+				EB64F0781BFAA867006276A9 /* VaultIntentTests.swift in Sources */,
 				EB642A851BE90D680000F230 /* WebViewLoadTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

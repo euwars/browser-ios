@@ -1,6 +1,8 @@
 import Foundation
 
 class VaultManager {
+  static let kNotificationVaultSimpleResponse = "kNotificationVaultSimpleResponse"
+
   static let braveUserIdKey = "BraveUserId"
   static var sessionId: String? = NSUUID().UUIDString as String
 
@@ -59,6 +61,8 @@ class VaultManager {
           jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
             #if DEBUG
               print("Parsed JSON: '\(jsonStr) \n request:\(urlString)'")
+              NSNotificationCenter.defaultCenter().postNotificationName(kNotificationVaultSimpleResponse,
+                object: nil, userInfo: ["response": jsonStr])
             #endif
         } else {
           print("unexpected vault error in user init")
