@@ -9,6 +9,9 @@ class VaultManager {
   static let vaultVersion = "v1"
   static let endpointUsers = "\(vaultVersion)/users"
 
+  class func isHttpStatusSuccess(status: Int) -> Bool {
+    return status / 100 == 2
+  }
 
   class func getBraveUserId() -> String {
     return getProfile().prefs.stringForKey(braveUserIdKey) ?? "ERROR-ID"
@@ -20,7 +23,7 @@ class VaultManager {
     return sessionId!
   }
 
-  private class func getProfile() -> Profile {
+  class func getProfile() -> Profile {
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     let profile = appDelegate.getProfile(UIApplication.sharedApplication())
     return profile
@@ -41,6 +44,11 @@ class VaultManager {
     guard let requestURL = NSURL(string: urlString) else {
       return
     }
+
+    #if DEBUG
+    print("Vault request:\(urlString)")
+    #endif
+
     let request = NSMutableURLRequest(URL: requestURL)
     request.HTTPMethod = httpMethod
 
@@ -60,7 +68,7 @@ class VaultManager {
         if let data = data,
           jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
             #if DEBUG
-              print("Parsed JSON: '\(jsonStr) \n request:\(urlString)'")
+              print("Parsed JSON: '\(jsonStr)'")
               NSNotificationCenter.defaultCenter().postNotificationName(kNotificationVaultSimpleResponse,
                 object: nil, userInfo: ["response": jsonStr])
             #endif

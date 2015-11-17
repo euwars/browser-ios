@@ -68,9 +68,9 @@ extension LegacyWebView {
     }
 
     for item in divNamesAndSizes {
-      let w = item["width"] as? Int ?? 0
-      let h = item["height"] as? Int ?? 0
-      if (w == 0 || h == 0) {
+      let divWidth = item["width"] as? Int ?? 0
+      let divHeight = item["height"] as? Int ?? 0
+      if (divWidth == 0 || divHeight == 0) {
         continue;
       }
       let divId = item["divId"] as! String
@@ -79,7 +79,7 @@ extension LegacyWebView {
       let sessionId = VaultManager.getSessionId()
       let urlString = "\(vaultHost)/v1/users/\(userId)/replacement?sessionId=\(sessionId)" +
                       "&tagName=IFRAME&" +
-                      "width=\(w)&height=\(h)"
+                      "width=\(divWidth)&height=\(divHeight)"
       guard let url = NSURL(string:urlString) else {
         print("Malformed url: \(urlString)")
         return
@@ -99,7 +99,7 @@ extension LegacyWebView {
               #endif
 
               if let httpResponse = response as? NSHTTPURLResponse {
-                if httpResponse.statusCode / 100 != 2 {
+                if VaultManager.isHttpStatusSuccess(httpResponse.statusCode) {
                   // TODO: Replace with proper function to check status codes
                   print("Vault error, status code: (\(httpResponse.statusCode))")
                   return
@@ -108,7 +108,7 @@ extension LegacyWebView {
               
               dispatch_async(dispatch_get_main_queue(), {
                 let js = "_brave_replaceDivWithNewContent({'divId':'\(divId)'," +
-                "'width':\(w), 'height':\(h),'newContent':'\(jsonStr)'})"
+                "'width':\(divWidth), 'height':\(divHeight),'newContent':'\(jsonStr)'})"
                 webView.stringByEvaluatingJavaScriptFromString(js)
               })
 
