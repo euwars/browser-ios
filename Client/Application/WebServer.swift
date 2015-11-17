@@ -17,9 +17,19 @@ class WebServer {
         return "http://localhost:\(server.port)"
     }
 
+    static var port = 6571
+    static let kMaxPortNum = 7000
+
     func start() throws -> Bool{
         if !server.running {
-            try server.startWithOptions([GCDWebServerOption_Port: 6571, GCDWebServerOption_BindToLocalhost: true, GCDWebServerOption_AutomaticallySuspendInBackground: true])
+          do {
+            try server.startWithOptions([GCDWebServerOption_Port: WebServer.port, GCDWebServerOption_BindToLocalhost: true, GCDWebServerOption_AutomaticallySuspendInBackground: true])
+          } catch {
+            if (WebServer.port < WebServer.kMaxPortNum) {
+                WebServer.port++
+                return try start()
+            }
+          }
         }
         return server.running
     }
