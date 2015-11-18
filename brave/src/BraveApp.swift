@@ -21,7 +21,7 @@ class BraveApp {
     BraveApp.setupCacheDefaults()
     NSURLProtocol.registerClass(URLProtocol);
 
-    if NSClassFromString("XCTestCase") != nil {
+    if AppConstants.IsRunningTest {
       print("In test mode, bypass automatic vault registration.")
     } else {
       VaultManager.userProfileInit()

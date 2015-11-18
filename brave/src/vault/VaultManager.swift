@@ -1,4 +1,5 @@
 import Foundation
+import Shared
 
 class VaultManager {
   static let kNotificationVaultSimpleResponse = "kNotificationVaultSimpleResponse"
@@ -9,11 +10,17 @@ class VaultManager {
   static let vaultVersion = "v1"
   static let endpointUsers = "\(vaultVersion)/users"
 
+  static let testFakeId = "FEEDFACE-FEED-FEED-FEED-FEEDFACEFEED"
+
   class func isHttpStatusSuccess(status: Int) -> Bool {
     return status / 100 == 2
   }
 
   class func getBraveUserId() -> String {
+    if AppConstants.IsRunningTest  {
+      return testFakeId
+    }
+
     return getProfile().prefs.stringForKey(braveUserIdKey) ?? "ERROR-ID"
   }
 
@@ -86,7 +93,7 @@ class VaultManager {
     }
 
     // Register users with the vault.
-    let uuid = NSUUID().UUIDString
+    let uuid = AppConstants.IsRunningTest ? testFakeId : NSUUID().UUIDString
     getProfile().prefs.setString(uuid, forKey: braveUserIdKey)
 
     let request = "\(getVaultServerHost())/\(endpointUsers)/\(uuid)"
