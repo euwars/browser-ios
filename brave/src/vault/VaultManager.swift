@@ -20,6 +20,9 @@ class VaultManager {
     if AppConstants.IsRunningTest  {
       return testFakeId
     }
+    if (getProfile().prefs.stringForKey(braveUserIdKey) == nil) {
+      userProfileInit()
+    }
 
     return getProfile().prefs.stringForKey(braveUserIdKey) ?? "ERROR-ID"
   }
