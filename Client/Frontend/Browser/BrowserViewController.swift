@@ -2035,20 +2035,20 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
 
 extension BrowserViewController: IntroViewControllerDelegate {
     func presentIntroViewController(force: Bool = false) -> Bool{
-        if force || profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
-            let introViewController = IntroViewController()
-            introViewController.delegate = self
-            // On iPad we present it modally in a controller
-            if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
-                introViewController.preferredContentSize = CGSize(width: IntroViewControllerUX.Width, height: IntroViewControllerUX.Height)
-                introViewController.modalPresentationStyle = UIModalPresentationStyle.FormSheet
-            }
-            presentViewController(introViewController, animated: true) {
-                self.profile.prefs.setInt(1, forKey: IntroViewControllerSeenProfileKey)
-            }
-
-            return true
-        }
+//        if force || profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
+//            let introViewController = IntroViewController()
+//            introViewController.delegate = self
+//            // On iPad we present it modally in a controller
+//            if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+//                introViewController.preferredContentSize = CGSize(width: IntroViewControllerUX.Width, height: IntroViewControllerUX.Height)
+//                introViewController.modalPresentationStyle = UIModalPresentationStyle.FormSheet
+//            }
+//            presentViewController(introViewController, animated: true) {
+//                self.profile.prefs.setInt(1, forKey: IntroViewControllerSeenProfileKey)
+//            }
+//
+//            return true
+//        }
 
         return false
     }
