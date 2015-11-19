@@ -53,6 +53,11 @@ class BraveApp {
     //      defaults.registerDefaults(["UserAgent": desktop])
 
 #endif
+
+    // skip first run until we have our own
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    let profile = appDelegate.getProfile(UIApplication.sharedApplication())
+    profile.prefs.setInt(1, forKey: IntroViewControllerSeenProfileKey)
   }
 
   @objc func memoryWarning(_: NSNotification) {

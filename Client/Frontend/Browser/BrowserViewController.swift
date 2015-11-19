@@ -1815,7 +1815,7 @@ extension BrowserViewController: WKUIDelegate {
             return
         }
 
-        let error = NSError(domain: ErrorPageHelper.MozDomain, code: Int(ErrorPageHelper.MozErrorDownloadsNotEnabled), userInfo: [NSLocalizedDescriptionKey: "Downloads aren't supported in Firefox yet (but we're working on it)."])
+        let error = NSError(domain: ErrorPageHelper.MozDomain, code: Int(ErrorPageHelper.MozErrorDownloadsNotEnabled), userInfo: [NSLocalizedDescriptionKey: "Downloads aren't supported in Brave yet (but we're working on it)."])
         ErrorPageHelper().showPage(error, forUrl: navigationResponse.response.URL!, inWebView: webView)
         decisionHandler(WKNavigationResponsePolicy.Allow)
     }

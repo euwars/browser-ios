@@ -45,7 +45,7 @@ class HistoryClearable: Clearable {
     }
 }
 
-// Clear all stored passwords. This will clear both Firefox's SQLite storage and the system shared
+// Clear all stored passwords. This will clear both Brave's SQLite storage and the system shared
 // Credential storage.
 class PasswordsClearable: Clearable {
     let profile: Profile
