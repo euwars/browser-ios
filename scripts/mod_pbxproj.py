@@ -866,7 +866,17 @@ class XcodeProject(PBXDict):
 
         return self.add_file(f_path, parent, tree, create_build_files, weak, ignore_unknown_type=ignore_unknown_type)
 
-    def add_file(self, f_path, parent=None, tree='SOURCE_ROOT', create_build_files=True, weak=False, ignore_unknown_type=False):
+
+    def get_target_by_name(self, name):
+        targets = self.get_build_phases('PBXNativeTarget')
+        target = None
+        for t in targets:
+            if t.get("name") == name:
+                target = t
+                break
+        return target
+
+    def add_file(self, f_path, parent=None, tree='SOURCE_ROOT', create_build_files=True, weak=False, ignore_unknown_type=False, target=None):
         results = []
         abs_path = ''
 
@@ -893,12 +903,13 @@ class XcodeProject(PBXDict):
         # create a build file for the file ref
         if file_ref.build_phase and create_build_files:
             phases = self.get_build_phases(file_ref.build_phase)
-
+            if target:
+                target = self.get_target_by_name(target)
             for phase in phases:
-                build_file = PBXBuildFile.Create(file_ref, weak=weak)
-
-                phase.add_build_file(build_file)
-                results.append(build_file)
+                if (not target) or (phase.id in target.get('buildPhases')):
+                    build_file = PBXBuildFile.Create(file_ref, weak=weak)
+                    phase.add_build_file(build_file)
+                    results.append(build_file)
 
             if abs_path and tree == 'SOURCE_ROOT' \
                         and os.path.isfile(abs_path) \
