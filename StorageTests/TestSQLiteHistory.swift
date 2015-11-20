@@ -418,7 +418,8 @@ class TestSQLiteHistory: XCTestCase {
         let site = Site(url: "http://s\(5)ite\(5)/foo", title: "A \(5)")
         site.guid = "abc\(5)def"
         for i in 0...20 {
-            addVisitForSite(site, intoHistory: history, from: .Local, atTime: Timestamp(1438088398461 + (1000 * i)))
+          let t:UInt64 = 1438088398461
+            addVisitForSite(site, intoHistory: history, from: .Local, atTime: Timestamp(t + UInt64(1000 * i)))
         }
 
         let expectation = self.expectationWithDescription("First.")
@@ -453,7 +454,8 @@ class TestSQLiteHistory: XCTestCase {
             let site = Site(url: "http://s\(0)ite\(0)/foo", title: "A \(0)")
             site.guid = "abc\(0)def"
             for i in 0...20 {
-                addVisitForSite(site, intoHistory: history, from: .Local, atTime: Timestamp(1439088398461 + (1000 * i)))
+              let t:UInt64 = 1439088398461
+                addVisitForSite(site, intoHistory: history, from: .Local, atTime: Timestamp(t + UInt64(1000 * i)) )
             }
             return succeed()
         }
@@ -500,7 +502,8 @@ class TestSQLiteHistoryTransactionUpdate: XCTestCase {
 
         history.insertOrUpdatePlace(site.asPlace(), modified: 1234567890).value
 
-        let local = SiteVisit(site: site, date: Timestamp(1000 * 1437088398461), type: VisitType.Link)
+        let t:UInt64 = 1437088398461
+        let local = SiteVisit(site: site, date: Timestamp(1000 * t), type: VisitType.Link)
         XCTAssertTrue(history.addLocalVisit(local).value.isSuccess)
     }
 }
@@ -556,13 +559,14 @@ private enum VisitOrigin {
 }
 
 private func populateHistoryForFrecencyCalcuations(history: SQLiteHistory, siteCount count: Int) {
+    let t:UInt64 = 1437088398461
     for i in 0...count {
         let site = Site(url: "http://s\(i)ite\(i)/foo", title: "A \(i)")
         site.guid = "abc\(i)def"
 
         history.insertOrUpdatePlace(site.asPlace(), modified: 1234567890).value
         for j in 0...20 {
-            let visitTime = Timestamp(1000 * (1437088398461 + (1000 * i) + j))
+            let visitTime = Timestamp(1000 * (t + UInt64(1000 * i) + UInt64(j)))
             addVisitForSite(site, intoHistory: history, from: .Local, atTime: visitTime)
             addVisitForSite(site, intoHistory: history, from: .Remote, atTime: visitTime)
         }
