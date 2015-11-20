@@ -6,6 +6,8 @@ struct BraveUX {
   // set to true to show borders around views
   static let DebugShowBorders = false
 
+  static let DisabledButtonAlpha = 0.3
+
   static let LocationBarBackgroundColor_NonPrivateMode = UIColor(white: 77/255.0, alpha: 1)
   static let LocationBarTextColor = UIColor(white: 230/255.0, alpha: 1)
 
