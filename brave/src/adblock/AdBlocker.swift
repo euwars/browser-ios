@@ -3,30 +3,41 @@ import Shared
 private let _singleton = AdBlocker()
 
 class AdBlocker {
+  static let prefKeyAdBlockOn = "braveBlockAds"
+  static let prefKeyAdBlockOnDefaultValue = true
+
   // Store the last 500 URLs checked
   // Store 10 x 50 URLs in the array called timeOrderedCacheChunks. This is a FIFO array,
   // Throw out a 50 URL chunk when the array is full
   var fifoOfCachedUrlChunks: [NSMutableDictionary] = []
   let maxChunks = 10
   let maxUrlsPerChunk = 50
+  var isEnabled = true
 
   private init() {
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: "prefsChanged:", name: NSUserDefaultsDidChangeNotification, object: nil)
+    updateEnabledState()
   }
 
   class var singleton: AdBlocker {
     return _singleton
   }
 
-  func shouldBlock(request: NSURLRequest) -> Bool {
+  func updateEnabledState() {
+    let obj = BraveApp.getPref(AdBlocker.prefKeyAdBlockOn)
+    isEnabled = obj as? Bool ?? AdBlocker.prefKeyAdBlockOnDefaultValue
+  }
 
+  @objc func prefsChanged(info: NSNotification) {
+    updateEnabledState()
+  }
+
+  func shouldBlock(request: NSURLRequest) -> Bool {
     // synchronize code from this point on.
     objc_sync_enter(self)
     defer { objc_sync_exit(self) }
 
-    // TODO: there shouldn't be a cost to checking unchanged prefs, please confirm this
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    let profile = appDelegate.getProfile(UIApplication.sharedApplication())
-    if !(profile.prefs.boolForKey(AdBlockSetting.prefKey) ?? AdBlockSetting.defaultValue) {
+    if !isEnabled {
       return false
     }
 

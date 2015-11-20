@@ -43,6 +43,9 @@ class BraveApp {
     Logger.browserLogger.setup(.None)
 
 #if DEBUG
+    NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
+      selector: "prefsChanged_verifySuiteNameIsOk:", name: NSUserDefaultsDidChangeNotification, object: nil)
+
     if BraveUX.DebugShowBorders {
       UIView.bordersOn()
     }
@@ -77,4 +80,27 @@ class BraveApp {
     // TODO look at what x-callback is for
     return components.scheme == "brave" || components.scheme == "brave-x-callback"
   }
+
+  class func getPref(pref: String) -> AnyObject? {
+    guard let defaults = NSUserDefaults(suiteName: "group.com.brave.ios.browser") else { return nil }
+    return defaults.objectForKey(NSUserDefaultsPrefs.prefixWithDotForBrave + pref)
+  }
+
+  class func setPref(val: AnyObject, forKey: String) {
+    guard let defaults = NSUserDefaults(suiteName: "group.com.brave.ios.browser") else { return }
+    return defaults.setObject(val, forKey: NSUserDefaultsPrefs.prefixWithDotForBrave + forKey)
+  }
+
+  #if DEBUG
+  // do a debug only verification that using the correct name for getting the defaults
+  @objc func prefsChanged_verifySuiteNameIsOk(info: NSNotification) {
+    NSNotificationCenter.defaultCenter().removeObserver(self, name: NSUserDefaultsDidChangeNotification, object: nil)
+    let defaults = info.object as! NSUserDefaults
+    let defaults2 = NSUserDefaults(suiteName: "group.com.brave.ios.browser")
+    assert(defaults.dictionaryRepresentation().elementsEqual(defaults2!.dictionaryRepresentation(), isEquivalent: { (a:(String, AnyObject), b:(String, AnyObject)) -> Bool in
+      return a.1 as? String == b.1 as? String
+    }))
+  }
+  #endif
+
 }
