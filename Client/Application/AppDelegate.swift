@@ -25,9 +25,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 #if BRAVE
         BraveApp.willFinishLaunching()
 #endif
+
+#if !BRAVE
         // Set the Firefox UA for browsing.
         setUserAgent()
-
+  #endif
         log.debug("Starting keyboard helper…")
         // Start the keyboard helper to monitor and cache keyboard state.
         KeyboardHelper.defaultHelper.startObserving()
