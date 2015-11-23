@@ -355,7 +355,13 @@ class TabTrayController: UIViewController {
 
         // Update the trait collection we reference in our layout delegate
         tabLayoutDelegate.traitCollection = traitCollection
-        collectionView.collectionViewLayout.invalidateLayout()
+    }
+
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        coordinator.animateAlongsideTransition({ _ in
+            self.collectionView.collectionViewLayout.invalidateLayout()
+        }, completion: nil)
     }
 
     override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -439,7 +445,7 @@ class TabTrayController: UIViewController {
         // If we are exiting private mode and we have the close private tabs option selected, make sure
         // we clear out all of the private tabs
         if !privateMode && profile.prefs.boolForKey("settings.closePrivateTabs") ?? false {
-            tabManager.privateTabs.forEach { tabManager.removeTab($0) }
+            tabManager.removeAllPrivateTabsAndNotify(false)
         }
 
         togglePrivateMode.setSelected(privateMode, animated: true)
@@ -540,10 +546,10 @@ extension TabTrayController: TabManagerDelegate {
     func tabManager(tabManager: TabManager, didSelectedTabChange selected: Browser?, previous: Browser?) {
     }
 
-    func tabManager(tabManager: TabManager, didCreateTab tab: Browser, restoring: Bool) {
+    func tabManager(tabManager: TabManager, didCreateTab tab: Browser) {
     }
 
-    func tabManager(tabManager: TabManager, didAddTab tab: Browser, restoring: Bool) {
+    func tabManager(tabManager: TabManager, didAddTab tab: Browser) {
         // Get the index of the added tab from it's set (private or normal)
         guard let index = tabsToDisplay.indexOf(tab) else { return }
         
@@ -602,8 +608,8 @@ extension TabTrayController: UIScrollViewAccessibilityDelegate {
         // visible cells do sometimes return also not visible cells when attempting to go past the last cell with VoiceOver right-flick gesture; so make sure we have only visible cells (yeah...)
         visibleCells = visibleCells.filter { !CGRectIsEmpty(CGRectIntersection($0.frame, bounds)) }
 
-        var indexPaths = visibleCells.map { self.collectionView.indexPathForCell($0)! }
-        indexPaths.sortInPlace { $0.section < $1.section || ($0.section == $1.section && $0.row < $1.row) }
+        let indexPaths = visibleCells.map { self.collectionView.indexPathForCell($0)! }
+            .sort { $0.section < $1.section || ($0.section == $1.section && $0.row < $1.row) }
 
         if indexPaths.count == 0 {
             return NSLocalizedString("No tabs", comment: "Message spoken by VoiceOver to indicate that there are no tabs in the Tabs Tray")

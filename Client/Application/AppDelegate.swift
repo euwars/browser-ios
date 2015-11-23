@@ -7,6 +7,7 @@ import Storage
 import AVFoundation
 import XCGLogger
 import Breakpad
+import MessageUI
 
 private let log = Logger.browserLogger
 
@@ -17,23 +18,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     weak var profile: BrowserProfile?
     var tabManager: TabManager!
 
+    weak var application: UIApplication?
+    var launchOptions: [NSObject: AnyObject]?
+
     let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
 
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+
+        // Hold references to willFinishLaunching parameters for delayed app launch
+        self.application = application
+        self.launchOptions = launchOptions
+
+        log.debug("Configuring window…")
+
+        self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        self.window!.backgroundColor = UIConstants.AppBackgroundColor
+
+        // Short circuit the app if we want to email logs from the debug menu
+        if DebugSettingsBundleOptions.emailLogsOnLaunch {
+            self.window?.rootViewController = UIViewController()
+            presentEmailComposerWithLogs()
+            return true
+        } else {
+            return startApplication(application, withLaunchOptions: launchOptions)
+        }
+    }
+
+    private func startApplication(application: UIApplication,  withLaunchOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        log.debug("Setting UA…")
         // Set the Firefox UA for browsing.
         setUserAgent()
 
+        log.debug("Starting keyboard helper…")
         // Start the keyboard helper to monitor and cache keyboard state.
         KeyboardHelper.defaultHelper.startObserving()
 
-        // Create a new sync log file on cold app launch
+        log.debug("Creating Sync log file…")
+        // Create a new sync log file on cold app launch. Note that this doesn't roll old logs.
         Logger.syncLogger.newLogWithDate(NSDate())
 
+        log.debug("Getting profile…")
         let profile = getProfile(application)
 
-        // Set up a web server that serves us static content. Do this early so that it is ready when the UI is presented.
-        setUpWebServer(profile)
+        if !DebugSettingsBundleOptions.disableLocalWebServer {
+            log.debug("Starting web server…")
+            // Set up a web server that serves us static content. Do this early so that it is ready when the UI is presented.
+            setUpWebServer(profile)
+        }
 
+        log.debug("Setting AVAudioSession category…")
         do {
             // for aural progress bar: play even with silent switch on, and do not stop audio from other apps (like music)
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, withOptions: AVAudioSessionCategoryOptions.MixWithOthers)
@@ -41,17 +74,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             log.error("Failed to assign AVAudioSession category to allow playing with silent switch on for aural progress bar")
         }
 
-        self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        self.window!.backgroundColor = UIColor.whiteColor()
-
         let defaultRequest = NSURLRequest(URL: UIConstants.DefaultHomePage)
         let imageStore = DiskImageStore(files: profile.files, namespace: "TabManagerScreenshots", quality: UIConstants.ScreenshotQuality)
+
+        log.debug("Configuring tabManager…")
         self.tabManager = TabManager(defaultNewTabRequest: defaultRequest, prefs: profile.prefs, imageStore: imageStore)
         self.tabManager.stateDelegate = self
-        browserViewController = BrowserViewController(profile: profile, tabManager: self.tabManager)
 
-        // Add restoration class, the factory that will return the ViewController we 
+        // Add restoration class, the factory that will return the ViewController we
         // will restore with.
+        log.debug("Initing BVC…")
+
+        browserViewController = BrowserViewController(profile: self.profile!, tabManager: self.tabManager)
         browserViewController.restorationIdentifier = NSStringFromClass(BrowserViewController.self)
         browserViewController.restorationClass = AppDelegate.self
         browserViewController.automaticallyAdjustsScrollViewInsets = false
@@ -60,13 +94,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         rootViewController.automaticallyAdjustsScrollViewInsets = false
         rootViewController.delegate = self
         rootViewController.navigationBarHidden = true
-
         self.window!.rootViewController = rootViewController
-        self.window!.backgroundColor = UIConstants.AppBackgroundColor
 
+        log.debug("Configuring Breakpad…")
         activeCrashReporter = BreakpadCrashReporter(breakpadInstance: BreakpadController.sharedInstance())
         configureActiveCrashReporter(profile.prefs.boolForKey("crashreports.send.always"))
 
+        log.debug("Adding observers…")
         NSNotificationCenter.defaultCenter().addObserverForName(FSReadingListAddReadingListItemNotification, object: nil, queue: nil) { (notification) -> Void in
             if let userInfo = notification.userInfo, url = userInfo["URL"] as? NSURL {
                 let title = (userInfo["Title"] as? String) ?? ""
@@ -78,6 +112,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let localNotification = launchOptions?[UIApplicationLaunchOptionsLocalNotificationKey] as? UILocalNotification {
             viewURLInNewTab(localNotification)
         }
+
+        log.debug("Done with setting up the application.")
         return true
     }
 
@@ -101,10 +137,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        log.debug("Did finish launching.")
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
             AdjustIntegration.sharedInstance.triggerApplicationDidFinishLaunchingWithOptions(launchOptions)
         }
+        log.debug("Making window key and visible…")
         self.window!.makeKeyAndVisible()
+
+        // Now roll logs.
+        log.debug("Triggering log roll.")
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),
+            Logger.syncLogger.deleteOldLogsDownToSizeLimit
+        )
+
+        log.debug("Done with applicationDidFinishLaunching.")
         return true
     }
 
@@ -133,6 +179,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // We sync in the foreground only, to avoid the possibility of runaway resource usage.
     // Eventually we'll sync in response to notifications.
     func applicationDidBecomeActive(application: UIApplication) {
+        guard !DebugSettingsBundleOptions.emailLogsOnLaunch else {
+            return
+        }
+
         self.profile?.syncManager.applicationDidBecomeActive()
 
         // We could load these here, but then we have to futz with the tab counter
@@ -162,7 +212,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AboutHomeHandler.register(server)
         AboutLicenseHandler.register(server)
         SessionRestoreHandler.register(server)
-        server.start()
+        // Bug 1223009 was an issue whereby CGDWebserver crashed when moving to a background task
+        // catching and handling the error seemed to fix things, but we're not sure why.
+        // Either way, not implicitly unwrapping a try is not a great way of doing things
+        // so this is better anyway.
+        do {
+            try server.start()
+        } catch let err as NSError {
+            log.error("Unable to start WebServer \(err)")
+        }
     }
 
     private func setUserAgent() {
@@ -206,6 +264,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
         viewURLInNewTab(notification)
+    }
+
+    private func presentEmailComposerWithLogs() {
+        if let buildNumber = NSBundle.mainBundle().objectForInfoDictionaryKey(String(kCFBundleVersionKey)) as? NSString {
+            let mailComposeViewController = MFMailComposeViewController()
+            mailComposeViewController.mailComposeDelegate = self
+            mailComposeViewController.setSubject("Email logs for iOS client version v\(appVersion) (\(buildNumber))")
+            do {
+                let logNamesAndData = try Logger.diskLogFilenamesAndData()
+                logNamesAndData.forEach { nameAndData in
+                    if let data = nameAndData.1 {
+                        mailComposeViewController.addAttachmentData(data, mimeType: "text/plain", fileName: nameAndData.0)
+                    }
+                }
+            } catch _ {
+                print("Failed to retrieve logs from device")
+            }
+
+            self.window?.rootViewController?.presentViewController(mailComposeViewController, animated: true, completion: nil)
+        }
     }
 
     private func viewURLInNewTab(notification: UILocalNotification) {
@@ -260,6 +338,14 @@ extension AppDelegate: TabManagerStateDelegate {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(ProfileRemoteTabsSyncDelay * Double(NSEC_PER_MSEC))), queue) {
             self.profile?.storeTabs(storedTabs)
         }
+    }
+}
+
+extension AppDelegate: MFMailComposeViewControllerDelegate {
+    func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+        // Dismiss the view controller and start the app up
+        controller.dismissViewControllerAnimated(true, completion: nil)
+        startApplication(application!, withLaunchOptions: self.launchOptions)
     }
 }
 

@@ -40,7 +40,6 @@ class BrowserViewController: UIViewController {
     var urlBar: URLBarView!
     var readerModeBar: ReaderModeBarView?
     var readerModeCache: ReaderModeCache
-
     private var statusBarOverlay: UIView!
     private(set) var toolbar: BrowserToolbar?
     private var searchController: SearchViewController?
@@ -49,7 +48,6 @@ class BrowserViewController: UIViewController {
     private var homePanelIsInline = false
     private var searchLoader: SearchLoader!
     private let snackBars = UIView()
-    private let auralProgress = AuralProgressBar()
     private let webViewContainerToolbar = UIView()
 
     private var openInHelper: OpenInHelper?
@@ -115,7 +113,7 @@ class BrowserViewController: UIViewController {
     }
 
     private func didInit() {
-        screenshotHelper = BrowserScreenshotHelper(controller: self)
+        screenshotHelper = ScreenshotHelper(controller: self)
         tabManager.addDelegate(self)
         tabManager.addNavigationDelegate(self)
     }
@@ -234,12 +232,15 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidLoad() {
+        log.debug("BVC viewDidLoad…")
         super.viewDidLoad()
+        log.debug("BVC super viewDidLoad called.")
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELBookmarkStatusDidChange:", name: BookmarkStatusChangedNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappWillResignActiveNotification", name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappDidBecomeActiveNotification", name: UIApplicationDidBecomeActiveNotification, object: nil)
         KeyboardHelper.defaultHelper.addDelegate(self)
 
+        log.debug("BVC adding footer and header…")
         footerBackdrop = UIView()
         footerBackdrop.backgroundColor = UIColor.whiteColor()
         view.addSubview(footerBackdrop)
@@ -247,6 +248,7 @@ class BrowserViewController: UIViewController {
         headerBackdrop.backgroundColor = UIColor.whiteColor()
         view.addSubview(headerBackdrop)
 
+        log.debug("BVC setting up webViewContainer…")
         webViewContainerBackdrop = UIView()
         webViewContainerBackdrop.backgroundColor = UIColor.grayColor()
         webViewContainerBackdrop.alpha = 0
@@ -256,16 +258,19 @@ class BrowserViewController: UIViewController {
         webViewContainer.addSubview(webViewContainerToolbar)
         view.addSubview(webViewContainer)
 
+        log.debug("BVC setting up status bar…")
         // Temporary work around for covering the non-clipped web view content
         statusBarOverlay = UIView()
         statusBarOverlay.backgroundColor = BrowserViewControllerUX.BackgroundColor
         view.addSubview(statusBarOverlay)
 
+        log.debug("BVC setting up top touch area…")
         topTouchArea = UIButton()
         topTouchArea.isAccessibilityElement = false
         topTouchArea.addTarget(self, action: "SELtappedTopArea", forControlEvents: UIControlEvents.TouchUpInside)
         view.addSubview(topTouchArea)
 
+        log.debug("BVC setting up URL bar…")
         // Setup the URL bar, wrapped in a view to get transparency effect
         urlBar = URLBarView()
         urlBar.translatesAutoresizingMaskIntoConstraints = false
@@ -299,6 +304,7 @@ class BrowserViewController: UIViewController {
         })
 
 
+        log.debug("BVC setting up search loader…")
         searchLoader = SearchLoader(profile: profile, urlBar: urlBar)
 
         footer = UIView()
@@ -311,9 +317,12 @@ class BrowserViewController: UIViewController {
         scrollController.footer = footer
         scrollController.snackBars = snackBars
 
+        log.debug("BVC updating toolbar state…")
         self.updateToolbarStateForTraitCollection(self.traitCollection)
 
+        log.debug("BVC setting up constraints…")
         setupConstraints()
+        log.debug("BVC done.")
     }
 
     private func setupConstraints() {
@@ -351,11 +360,13 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidLayoutSubviews() {
+        log.debug("BVC viewDidLayoutSubviews…")
         super.viewDidLayoutSubviews()
         statusBarOverlay.snp_remakeConstraints { make in
             make.top.left.right.equalTo(self.view)
             make.height.equalTo(self.topLayoutGuide.length)
         }
+        log.debug("BVC done.")
     }
 
     func loadQueuedTabs() {
@@ -392,20 +403,10 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    func startTrackingAccessibilityStatus() {
-        NSNotificationCenter.defaultCenter().addObserverForName(UIAccessibilityVoiceOverStatusChanged, object: nil, queue: nil) { (notification) -> Void in
-            self.auralProgress.hidden = !UIAccessibilityIsVoiceOverRunning()
-        }
-        auralProgress.hidden = !UIAccessibilityIsVoiceOverRunning()
-    }
-
-    func stopTrackingAccessibilityStatus() {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: UIAccessibilityVoiceOverStatusChanged, object: nil)
-        auralProgress.hidden = true
-    }
-
     override func viewWillAppear(animated: Bool) {
+        log.debug("BVC viewWillAppear.")
         super.viewWillAppear(animated)
+        log.debug("BVC super.viewWillAppear done.")
 
         // On iPhone, if we are about to show the On-Boarding, blank out the browser so that it does
         // not flash before we present. This change of alpha also participates in the animation when
@@ -415,6 +416,8 @@ class BrowserViewController: UIViewController {
         }
 
         if activeCrashReporter?.previouslyCrashed ?? false {
+            log.debug("Previously crashed.")
+
             // Reset previous crash state
             activeCrashReporter?.resetPreviousCrashState()
 
@@ -434,10 +437,14 @@ class BrowserViewController: UIViewController {
                 showRestoreTabsAlert()
             }
         } else {
+            log.debug("Restoring tabs.")
             tabManager.restoreTabs()
+            log.debug("Done restoring tabs.")
         }
 
+        log.debug("Updating tab count.")
         updateTabCountUsingTabManager(tabManager, animated: false)
+        log.debug("BVC done.")
     }
 
     private func showCrashOptInAlert() {
@@ -461,6 +468,11 @@ class BrowserViewController: UIViewController {
     }
 
     private func showRestoreTabsAlert() {
+        guard !DebugSettingsBundleOptions.skipSessionRestore else {
+            self.tabManager.addTabAndSelect()
+            return
+        }
+
         let alert = UIAlertController.restoreTabsAlert(
             okayCallback: { _ in
                 self.tabManager.restoreTabs()
@@ -474,14 +486,25 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewDidAppear(animated: Bool) {
-        startTrackingAccessibilityStatus()
+        log.debug("BVC viewDidAppear.")
         presentIntroViewController()
+        log.debug("BVC intro presented.")
         self.webViewContainerToolbar.hidden = false
+
+        screenshotHelper.viewIsVisible = true
+        log.debug("BVC taking pending screenshots….")
+        screenshotHelper.takePendingScreenshots(tabManager.tabs)
+        log.debug("BVC done taking screenshots.")
+
+        log.debug("BVC calling super.viewDidAppear.")
         super.viewDidAppear(animated)
+        log.debug("BVC done.")
     }
 
-    override func viewDidDisappear(animated: Bool) {
-        stopTrackingAccessibilityStatus()
+    override func viewWillDisappear(animated: Bool) {
+        screenshotHelper.viewIsVisible = false
+
+        super.viewWillDisappear(animated)
     }
 
     override func updateViewConstraints() {
@@ -551,6 +574,7 @@ class BrowserViewController: UIViewController {
     }
 
     private func showHomePanelController(inline inline: Bool) {
+        log.debug("BVC showHomePanelController.")
         homePanelIsInline = inline
 
         if homePanelController == nil {
@@ -583,11 +607,11 @@ class BrowserViewController: UIViewController {
         }, completion: { finished in
             if finished {
                 self.webViewContainer.accessibilityElementsHidden = true
-                self.stopTrackingAccessibilityStatus()
                 UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil)
             }
         })
         view.setNeedsUpdateConstraints()
+        log.debug("BVC done with showHomePanelController.")
     }
 
     private func hideHomePanelController() {
@@ -601,7 +625,6 @@ class BrowserViewController: UIViewController {
                     controller.removeFromParentViewController()
                     self.homePanelController = nil
                     self.webViewContainer.accessibilityElementsHidden = false
-                    self.startTrackingAccessibilityStatus()
                     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil)
 
                     // Refresh the reading view toolbar since the article record may have changed
@@ -754,15 +777,10 @@ class BrowserViewController: UIViewController {
         case KVOEstimatedProgress:
             guard let progress = change?[NSKeyValueChangeNewKey] as? Float else { break }
             urlBar.updateProgressBar(progress)
-            // when loading is stopped, KVOLoading is fired first, and only then KVOEstimatedProgress with progress 1.0 which would leave the progress bar running
-            if progress != 1.0 || tabManager.selectedTab?.loading ?? false {
-                auralProgress.progress = Double(progress)
-            }
         case KVOLoading:
             guard let loading = change?[NSKeyValueChangeNewKey] as? Bool else { break }
             toolbar?.updateReloadStatus(loading)
             urlBar.updateReloadStatus(loading)
-            auralProgress.progress = loading ? 0 : nil
         case KVOURL:
             if let tab = tabManager.selectedTab where tab.webView?.URL == nil {
                 log.debug("URL is nil!")
@@ -870,6 +888,7 @@ extension BrowserViewController {
 }
 
 extension BrowserViewController: URLBarDelegate {
+
     func urlBarDidPressReload(urlBar: URLBarView) {
         tabManager.selectedTab?.reload()
     }
@@ -883,7 +902,7 @@ extension BrowserViewController: URLBarDelegate {
         let tabTrayController = TabTrayController(tabManager: tabManager, profile: profile)
 
         if let tab = tabManager.selectedTab {
-            tab.setScreenshot(screenshotHelper.takeScreenshot(tab, aspectRatio: 0, quality: 1))
+            screenshotHelper.takeScreenshot(tab)
         }
 
         self.navigationController?.pushViewController(tabTrayController, animated: true)
@@ -931,6 +950,15 @@ extension BrowserViewController: URLBarDelegate {
         } else {
             return [copyAddressAction]
         }
+    }
+
+    func urlBarDisplayTextForURL(url: NSURL?) -> String? {
+        // use the initial value for the URL so we can do proper pattern matching with search URLs
+        var searchURL = self.tabManager.selectedTab?.currentInitialURL
+        if searchURL == nil || ErrorPageHelper.isErrorPageURL(searchURL!) {
+            searchURL = url
+        }
+        return profile.searchEngines.queryForSearchURL(searchURL) ?? url?.absoluteString
     }
 
     func urlBarDidLongPressLocation(urlBar: URLBarView) {
@@ -1059,47 +1087,26 @@ extension BrowserViewController: BrowserToolbarDelegate {
     }
 
     func browserToolbarDidPressShare(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
-        if let selected = tabManager.selectedTab {
-            if let url = selected.displayURL {
-                let printInfo = UIPrintInfo(dictionary: nil)
-                printInfo.jobName = url.absoluteString
-                printInfo.outputType = .General
-                let renderer = BrowserPrintPageRenderer(browser: selected)
+        if let selectedTab = tabManager.selectedTab {
+            let helper = ShareExtensionHelper(tab: selectedTab)
 
-                let activityItems = [printInfo, renderer, selected.title ?? url.absoluteString, url]
+            let activityViewController = helper.createActivityViewController({
+                // We don't know what share action the user has chosen so we simply always
+                // update the toolbar and reader mode bar to refelect the latest status.
+                self.updateURLBarDisplayURL(selectedTab)
+                self.updateReaderModeBar()
+            })
 
-                let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-
-                // Hide 'Add to Reading List' which currently uses Safari.
-                // Also hide our own View Later… after all, you're in the browser!
-                let viewLater = NSBundle.mainBundle().bundleIdentifier! + ".ViewLater"
-                activityViewController.excludedActivityTypes = [
-                    UIActivityTypeAddToReadingList,
-                    viewLater,                        // Doesn't work: rdar://19430419
-                ]
-
-                activityViewController.completionWithItemsHandler = { activityType, completed, _, _ in
-                    log.debug("Selected activity type: \(activityType).")
-                    if completed {
-                        if let selectedTab = self.tabManager.selectedTab {
-                            // We don't know what share action the user has chosen so we simply always
-                            // update the toolbar and reader mode bar to refelect the latest status.
-                            self.updateURLBarDisplayURL(selectedTab)
-                            self.updateReaderModeBar()
-                        }
-                    }
-                }
-
-                if let popoverPresentationController = activityViewController.popoverPresentationController {
-                    // Using the button for the sourceView here results in this not showing on iPads.
-                    popoverPresentationController.sourceView = toolbar ?? urlBar
-                    popoverPresentationController.sourceRect = button.frame ?? button.frame
-                    popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Up
-                    popoverPresentationController.delegate = self
-                }
-                presentViewController(activityViewController, animated: true, completion: nil)
+            if let popoverPresentationController = activityViewController.popoverPresentationController {
+                // Using the button for the sourceView here results in this not showing on iPads.
+                popoverPresentationController.sourceView = self.toolbar ?? self.urlBar
+                popoverPresentationController.sourceRect = button.frame ?? button.frame
+                popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Up
+                popoverPresentationController.delegate = self
             }
+            self.presentViewController(activityViewController, animated: true, completion: nil)
         }
+
     }
 }
 
@@ -1426,12 +1433,12 @@ extension BrowserViewController: TabManagerDelegate {
         updateInContentHomePanel(selected?.url)
     }
 
-    func tabManager(tabManager: TabManager, didCreateTab tab: Browser, restoring: Bool) {
+    func tabManager(tabManager: TabManager, didCreateTab tab: Browser) {
     }
 
-    func tabManager(tabManager: TabManager, didAddTab tab: Browser, restoring: Bool) {
+    func tabManager(tabManager: TabManager, didAddTab tab: Browser) {
         // If we are restoring tabs then we update the count once at the end
-        if !restoring {
+        if !tabManager.isRestoring {
             updateTabCountUsingTabManager(tabManager)
         }
         tab.browserDelegate = self
@@ -1597,14 +1604,7 @@ extension BrowserViewController: WKNavigationDelegate {
             // forward/backward. Strange, but LayoutChanged fixes that.
             UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil)
         } else {
-            // Tab is in the backgroud, but we want to be able to see it in the TabTray.
-            // Delay 100ms to let the tab render (it doesn't work without the delay)
-            // before screenshotting.
-            let time = dispatch_time(DISPATCH_TIME_NOW, Int64(100 * NSEC_PER_MSEC))
-            dispatch_after(time, dispatch_get_main_queue()) {
-                let screenshot = self.screenshotHelper.takeScreenshot(tab, aspectRatio: 0, quality: 1)
-                tab.setScreenshot(screenshot)
-            }
+            screenshotHelper.takeDelayedScreenshot(tab)
         }
 
         addOpenInViewIfNeccessary(webView.URL)
@@ -1653,7 +1653,7 @@ extension BrowserViewController: WKUIDelegate {
 
         guard let currentTab = tabManager.selectedTab else { return nil }
 
-        currentTab.setScreenshot(screenshotHelper.takeScreenshot(currentTab, aspectRatio: 0, quality: 1))
+        screenshotHelper.takeScreenshot(currentTab)
 
         // If the page uses window.open() or target="_blank", open the page in a new tab.
         // TODO: This doesn't work for window.open() without user action (bug 1124942).
@@ -1985,29 +1985,6 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
     }
 }
 
-private class BrowserScreenshotHelper: ScreenshotHelper {
-    private weak var controller: BrowserViewController?
-
-    init(controller: BrowserViewController) {
-        self.controller = controller
-    }
-
-    func takeScreenshot(tab: Browser, aspectRatio: CGFloat, quality: CGFloat) -> UIImage? {
-        if let url = tab.url {
-            if AboutUtils.isAboutHomeURL(url) {
-                if let homePanel = controller?.homePanelController {
-                    return homePanel.view.screenshot(aspectRatio, quality: quality)
-                }
-            } else {
-                let offset = CGPointMake(0, -(tab.webView?.scrollView.contentInset.top ?? 0))
-                return tab.webView?.screenshot(aspectRatio, offset: offset, quality: quality)
-            }
-        }
-
-        return nil
-    }
-}
-
 extension BrowserViewController: IntroViewControllerDelegate {
     func presentIntroViewController(force: Bool = false) -> Bool{
         if force || profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
@@ -2093,6 +2070,12 @@ extension BrowserViewController: FxAContentViewControllerDelegate {
 
 extension BrowserViewController: ContextMenuHelperDelegate {
     func contextMenuHelper(contextMenuHelper: ContextMenuHelper, didLongPressElements elements: ContextMenuHelper.Elements, gestureRecognizer: UILongPressGestureRecognizer) {
+        // locationInView can return (0, 0) when the long press is triggered in an invalid page
+        // state (e.g., long pressing a link before the document changes, then releasing after a
+        // different page loads).
+        let touchPoint = gestureRecognizer.locationInView(view)
+        guard touchPoint != CGPointZero else { return }
+
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
         var dialogTitle: String?
 
@@ -2170,7 +2153,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                         // we might be overwriting something that the user has subsequently added
                         if pasteBoard.string == url.absoluteString {
                             guard let imageData = responseData where responseError == nil else { return }
-                            pasteBoard.image = UIImage(data: imageData)
+                            pasteBoard.image = UIImage.imageFromDataThreadSafe(imageData)
                             application.endBackgroundTask(taskId)
                         }
                 }
@@ -2181,7 +2164,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
         // If we're showing an arrow popup, set the anchor to the long press location.
         if let popoverPresentationController = actionSheetController.popoverPresentationController {
             popoverPresentationController.sourceView = view
-            popoverPresentationController.sourceRect = CGRect(origin: gestureRecognizer.locationInView(view), size: CGSizeMake(0, 16))
+            popoverPresentationController.sourceRect = CGRect(origin: touchPoint, size: CGSizeMake(0, 16))
             popoverPresentationController.permittedArrowDirections = .Any
         }
 
@@ -2196,7 +2179,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             .validate(statusCode: 200..<300)
             .response { _, _, data, _ in
                 if let data = data,
-                   let image = UIImage(data: data) {
+                   let image = UIImage.imageFromDataThreadSafe(data) {
                     success(image)
                 }
             }
