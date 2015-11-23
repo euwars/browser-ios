@@ -23,8 +23,9 @@ class SessionRestoreTests: KIFTestCase {
         jsonDict["history"] = [url1, url2, url3]
         jsonDict["currentPage"] = -1
         let escapedJSON = JSON.stringify(jsonDict, pretty: false).stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())!
-        let webView = tester().waitForViewWithAccessibilityLabel("Web content") as! WKWebView
-        let restoreURL = NSURL(string: "/about/sessionrestore?history=\(escapedJSON)", relativeToURL: webView.URL!)
+        let webView = tester().waitForViewWithAccessibilityLabel("Web content") as! UIWebView
+        let currentURL = webView.request?.URL
+        let restoreURL = NSURL(string: "/about/sessionrestore?history=\(escapedJSON)", relativeToURL: currentURL!)
 
         // Enter the restore URL and verify the back/forward history.
         // After triggering the restore, the session should look like this:
