@@ -5,9 +5,6 @@ class AdBlockSetting: Setting {
   let prefs: Prefs
   let tabManager: TabManager!
 
-  static let prefKey = "braveBlockAds"
-  static let defaultValue = true
-
   init(settings: SettingsTableViewController) {
     self.prefs = settings.profile.prefs
     self.tabManager = settings.tabManager
@@ -21,12 +18,12 @@ class AdBlockSetting: Setting {
     let control = UISwitch()
     control.onTintColor = UIConstants.ControlTintColor
     control.addTarget(self, action: "switchValueChanged:", forControlEvents: UIControlEvents.ValueChanged)
-    control.on = prefs.boolForKey(AdBlockSetting.prefKey) ?? AdBlockSetting.defaultValue
+    control.on = prefs.boolForKey(AdBlocker.prefKeyAdBlockOn) ?? AdBlocker.prefKeyAdBlockOnDefaultValue
     cell.accessoryView = control
     cell.selectionStyle = .None
   }
 
   @objc func switchValueChanged(toggle: UISwitch) {
-    prefs.setObject(toggle.on, forKey: AdBlockSetting.prefKey)
+    prefs.setObject(toggle.on, forKey: AdBlocker.prefKeyAdBlockOn)
   }
 }

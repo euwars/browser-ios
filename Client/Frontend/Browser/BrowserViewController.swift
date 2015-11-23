@@ -416,10 +416,12 @@ class BrowserViewController: UIViewController {
         // On iPhone, if we are about to show the On-Boarding, blank out the browser so that it does
         // not flash before we present. This change of alpha also participates in the animation when
         // the intro view is dismissed.
+#if !BRAVE
         if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
-
+#endif
+      
 #if BRAVE
         tabManager.restoreTabs()
 #else

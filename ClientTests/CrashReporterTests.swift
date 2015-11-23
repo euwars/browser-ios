@@ -6,6 +6,8 @@ import Foundation
 import XCTest
 import Client
 
+#if !BRAVE
+
 class MockCrashReporter: CrashReporter {
     var previouslyCrashed = false
 
@@ -34,8 +36,9 @@ class MockCrashReporter: CrashReporter {
         uploadsEnabled = enabled
     }
 }
-
+#endif
 class CrashReporterTests: XCTestCase {
+  #if !BRAVE
     var crashReporter: MockCrashReporter!
     var additionalUploadParams: [String: String]!
 
@@ -84,4 +87,5 @@ class CrashReporterTests: XCTestCase {
 
         XCTAssertTrue(crashReporter.didStop, "Stopped crash reporter")
     }
+  #endif
 }

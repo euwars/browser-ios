@@ -15,7 +15,7 @@ class VaultIntentTests: XCTestCase {
   }
 
   func setupExpectation() {
-    expectationForNotification(VaultManager.kNotificationVaultSimpleResponse, object: nil,
+    expectationForNotification(VaultManager.notificationVaultSimpleResponse, object: nil,
       handler: { notification in
         guard let response = notification.userInfo?["response"] else { XCTFail("no response"); return false }
         // Please fill in: response.contains("some expected thing")
@@ -48,12 +48,6 @@ class VaultIntentTests: XCTestCase {
     setupExpectation()
     VaultManager.userProfileInit()
     waitForExpectation()
-  }
-  
-  func getProfile() -> Profile {
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    let profile = appDelegate.getProfile(UIApplication.sharedApplication())
-    return profile
   }
 
   // test expected response against live server

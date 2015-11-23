@@ -25,7 +25,7 @@ private struct ETLDEntry: CustomStringConvertible {
 private typealias TLDEntryMap = [String:ETLDEntry]
 
 private func loadEntriesFromDisk() -> TLDEntryMap? {
-    if let data = NSString.contentsOfFileWithResourceName("effective_tld_names", ofType: "dat", fromBundle: NSBundle(identifier: "org.mozilla.Shared")!, encoding: NSUTF8StringEncoding, error: nil) {
+    if let data = NSString.contentsOfFileWithResourceName("effective_tld_names", ofType: "dat", fromBundle: NSBundle(identifier: "com.brave.ios.browser.Shared")!, encoding: NSUTF8StringEncoding, error: nil) {
         let lines = data.componentsSeparatedByString("\n")
         let trimmedLines = lines.filter { !$0.hasPrefix("//") && $0 != "\n" && $0 != "" }
 

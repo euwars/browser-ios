@@ -6,6 +6,7 @@ import Foundation
 import Shared
 
 public class NSUserDefaultsPrefs: Prefs {
+    static var prefixWithDotForBrave = ""
     private let prefixWithDot: String
     private let userDefaults: NSUserDefaults
 
@@ -16,11 +17,13 @@ public class NSUserDefaultsPrefs: Prefs {
     init(prefix: String, userDefaults: NSUserDefaults) {
         self.prefixWithDot = prefix + (prefix.endsWith(".") ? "" : ".")
         self.userDefaults = userDefaults
+        NSUserDefaultsPrefs.prefixWithDotForBrave = prefixWithDot
     }
 
     init(prefix: String) {
         self.prefixWithDot = prefix + (prefix.endsWith(".") ? "" : ".")
         self.userDefaults = NSUserDefaults(suiteName: AppInfo.sharedContainerIdentifier())!
+        NSUserDefaultsPrefs.prefixWithDotForBrave = prefixWithDot
     }
 
     public func branch(branch: String) -> Prefs {

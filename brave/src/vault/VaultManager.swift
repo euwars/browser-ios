@@ -2,7 +2,10 @@ import Foundation
 import Shared
 
 class VaultManager {
-  static let kNotificationVaultSimpleResponse = "kNotificationVaultSimpleResponse"
+  static let prefKeyServerAddress = "braveVaultServerAddress"
+  static let prefKeyServerAddressDefaultValue = "https://vault-staging.brave.com"
+
+  static let notificationVaultSimpleResponse = "notificationVaultSimpleResponse"
 
   static let braveUserIdKey = "BraveUserId"
   static var sessionId: String? = NSUUID().UUIDString as String
@@ -20,11 +23,11 @@ class VaultManager {
     if AppConstants.IsRunningTest  {
       return testFakeId
     }
-    if (getProfile().prefs.stringForKey(braveUserIdKey) == nil) {
+    if (BraveApp.getPref(braveUserIdKey) == nil) {
       userProfileInit()
     }
 
-    return getProfile().prefs.stringForKey(braveUserIdKey) ?? "ERROR-ID"
+    return BraveApp.getPref(braveUserIdKey) as? String ?? "ERROR-ID"
   }
 
   class func getSessionId() -> String {
@@ -33,14 +36,8 @@ class VaultManager {
     return sessionId!
   }
 
-  class func getProfile() -> Profile {
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    let profile = appDelegate.getProfile(UIApplication.sharedApplication())
-    return profile
-  }
-
   class func getVaultServerHost() -> String {
-    var vaultServerHost = getProfile().prefs.stringForKey(VaultAddressSetting.prefKey) ?? VaultAddressSetting.defaultValue
+    var vaultServerHost = BraveApp.getPref(VaultManager.prefKeyServerAddress) as? String ?? VaultManager.prefKeyServerAddressDefaultValue
 #if DEBUG
     // Too lazy to type http when setting this in debug
     if !vaultServerHost.startsWith("http") {
@@ -79,7 +76,7 @@ class VaultManager {
           jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
             #if DEBUG
               print("Parsed JSON: '\(jsonStr)'")
-              NSNotificationCenter.defaultCenter().postNotificationName(kNotificationVaultSimpleResponse,
+              NSNotificationCenter.defaultCenter().postNotificationName(notificationVaultSimpleResponse,
                 object: nil, userInfo: ["response": jsonStr])
             #endif
         } else {
@@ -91,13 +88,13 @@ class VaultManager {
   }
 
   class func userProfileInit() {
-    if (getProfile().prefs.stringForKey(braveUserIdKey) != nil) {
+    if (BraveApp.getPref(braveUserIdKey) != nil) {
       return
     }
 
     // Register users with the vault.
     let uuid = AppConstants.IsRunningTest ? testFakeId : NSUUID().UUIDString
-    getProfile().prefs.setString(uuid, forKey: braveUserIdKey)
+    BraveApp.setPref(uuid, forKey: braveUserIdKey)
 
     let request = "\(getVaultServerHost())/\(endpointUsers)/\(uuid)"
     simpleRequest(request, httpMethod: "PUT")

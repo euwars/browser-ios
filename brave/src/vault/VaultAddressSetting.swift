@@ -5,8 +5,6 @@ class VaultAddressSetting: Setting {
   let prefs: Prefs
   let tabManager: TabManager!
 
-  static let prefKey = "braveVaultServerAddress"
-  static let defaultValue = "https://vault-staging.brave.com"
 
   init(settings: SettingsTableViewController) {
     self.prefs = settings.profile.prefs
@@ -20,16 +18,16 @@ class VaultAddressSetting: Setting {
     super.onConfigureCell(cell)
     let control = UITextField(frame: CGRectMake(0, 0, 150,40))
     control.addTarget(self, action: "valueChanged:", forControlEvents: UIControlEvents.EditingDidEnd)
-    if let setting = prefs.stringForKey(VaultAddressSetting.prefKey) {
+    if let setting = prefs.stringForKey(VaultManager.prefKeyServerAddress) {
       control.text = setting
     } else {
-      control.text = VaultAddressSetting.defaultValue
+      control.text = VaultManager.prefKeyServerAddressDefaultValue
     }
     cell.accessoryView = control
     cell.selectionStyle = .None
   }
 
   @objc func valueChanged(textField: UITextField) {
-    prefs.setObject(textField.text, forKey: VaultAddressSetting.prefKey)
+    prefs.setObject(textField.text, forKey: VaultManager.prefKeyServerAddress)
   }
 }
