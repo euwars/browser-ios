@@ -11,11 +11,19 @@ Run setup in brave/ (this dir)
 
 Open Client.xcodeproj
 
-build ClientNoTests
+build Client or ClientNoTests
+
+## Updating Code 
+
+After a git pull (i.e. updating from the remote) run
+
+``` ./brave-proj.py ```
+
+The Xcode project is generated, so local changes won't persist. And if files are added/removed after updating, your project won't be in sync unless the above command is run. 
 
 ## Tests
 
-Tests are being added in brave/tests, and confusingly, are part of ClientNoTests; run Product>Test in Xcode to do so. The 'ClientNoTests' is Mozilla's target to not build their tests. Because sync, reading list, and a few other things are disabled, that target is not usable yet.
+Run Product>Test in Xcode to do so. Not all Firefox tests are passing yet.
 
 ## Contribution Notes
 
