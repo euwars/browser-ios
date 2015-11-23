@@ -2,6 +2,27 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+  <key>UTImportedTypeDeclarations</key>
+  <array>
+    <dict>
+      <key>UTTypeConformsTo</key>
+      <array>
+        <string>public.url</string>
+      </array>
+      <key>UTTypeDescription</key>
+      <string>1Password Fill Browser Action</string>
+      <key>UTTypeIdentifier</key>
+      <string>org.appextension.fill-browser-action</string>
+      <key>UTTypeSize64IconFile</key>
+      <string></string>
+    </dict>
+  </array>
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+    <string>itms-books</string>
+    <string>org-appextension-feature-password-management</string>
+  </array>
+  
 	<key>AdjustAppToken</key>
 	<string>$(ADJUST_APP_TOKEN)</string>
 	<key>AdjustEnvironment</key>

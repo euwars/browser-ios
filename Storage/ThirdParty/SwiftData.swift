@@ -77,6 +77,7 @@ public class SwiftData {
 
         dispatch_sync(sharedConnectionQueue) {
             if self.sharedConnection == nil {
+                log.debug(">>> Creating shared SQLiteDBConnection for \(self.filename) on thread \(NSThread.currentThread()).")
                 self.sharedConnection = SQLiteDBConnection(filename: self.filename, flags: SwiftData.Flags.ReadWriteCreate.toSQL(), key: self.key, prevKey: self.prevKey)
             }
             connection = self.sharedConnection
@@ -89,34 +90,44 @@ public class SwiftData {
      * The real meat of all the execute methods. This is used internally to open and
      * close a database connection and run a block of code inside it.
      */
-    public func withConnection(flags: SwiftData.Flags, cb: (db: SQLiteDBConnection) -> NSError?) -> NSError? {
-        var connection: SQLiteDBConnection?
+    public func withConnection(flags: SwiftData.Flags, synchronous: Bool=true, cb: (db: SQLiteDBConnection) -> NSError?) -> NSError? {
+        let conn: SQLiteDBConnection?
 
         if SwiftData.ReuseConnections {
-            connection = getSharedConnection()
+            conn = getSharedConnection()
         } else {
-            connection = SQLiteDBConnection(filename: filename, flags: flags.toSQL(), key: self.key, prevKey: self.prevKey)
+            log.debug(">>> Creating non-shared SQLiteDBConnection for \(self.filename) on thread \(NSThread.currentThread()).")
+            conn = SQLiteDBConnection(filename: filename, flags: flags.toSQL(), key: self.key, prevKey: self.prevKey)
         }
 
-        var error: NSError? = nil
-        if let connection = connection {
+        guard let connection = conn else {
+            return NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not create a connection"])
+        }
+
+        if synchronous {
+            var error: NSError? = nil
             dispatch_sync(connection.queue) {
                 error = cb(db: connection)
             }
-        } else {
-            error = NSError(domain: "mozilla", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not create a connection"])
+            return error
         }
 
+        dispatch_async(connection.queue) {
+            cb(db: connection)
+        }
+        return nil
+    }
 
-        return error
+    public func transaction(transactionClosure: (db: SQLiteDBConnection) -> Bool) -> NSError? {
+        return self.transaction(synchronous: true, transactionClosure: transactionClosure)
     }
 
     /**
      * Helper for opening a connection, starting a transaction, and then running a block of code inside it.
      * The code block can return true if the transaction should be committed. False if we should roll back.
      */
-    public func transaction(transactionClosure: (db: SQLiteDBConnection)->Bool) -> NSError? {
-        return withConnection(SwiftData.Flags.ReadWriteCreate) { db in
+    public func transaction(synchronous synchronous: Bool=true, transactionClosure: (db: SQLiteDBConnection) -> Bool) -> NSError? {
+        return withConnection(SwiftData.Flags.ReadWriteCreate, synchronous: synchronous) { db in
             if let err = db.executeChange("BEGIN EXCLUSIVE") {
                 log.warning("BEGIN EXCLUSIVE failed.")
                 return err
@@ -296,9 +307,11 @@ public class SQLiteDBConnection {
     }
 
     init?(filename: String, flags: Int32, key: String? = nil, prevKey: String? = nil) {
+        log.debug("Opening connection to \(filename).")
         self.filename = filename
         self.queue = dispatch_queue_create("SQLite connection: \(filename)", DISPATCH_QUEUE_SERIAL)
-        if let _ = openWithFlags(flags) {
+        if let failure = openWithFlags(flags) {
+            log.warning("Opening connection to \(filename) failed: \(failure).")
             return nil
         }
 
@@ -360,6 +373,7 @@ public class SQLiteDBConnection {
     }
 
     deinit {
+        log.debug("deinit: closing connection on thread \(NSThread.currentThread()).")
         closeCustomConnection()
     }
 
@@ -375,7 +389,14 @@ public class SQLiteDBConnection {
      * Blindly attempts a WAL checkpoint on all attached databases.
      */
     func checkpoint(mode: Int32 = SQLITE_CHECKPOINT_PASSIVE) {
+        guard sqliteDB != nil else {
+            log.warning("Trying to checkpoint a nil DB!")
+            return
+        }
+
+        log.debug("Running WAL checkpoint on \(self.filename) on thread \(NSThread.currentThread()).")
         sqlite3_wal_checkpoint_v2(sqliteDB, nil, mode, nil, nil)
+        log.debug("WAL checkpoint done on \(self.filename).")
     }
 
     func vacuum() -> NSError? {
@@ -413,12 +434,21 @@ public class SQLiteDBConnection {
 
     /// Closes a connection. This is called via deinit. Do not call this yourself.
     private func closeCustomConnection() -> NSError? {
-        let status = sqlite3_close(sqliteDB)
+        log.debug("Closing custom connection for \(self.filename) on \(NSThread.currentThread()).")
+        // Make sure we don't try to call sqlite3_close multiple times.
+        // TODO: add a lock here?
+        guard self.sqliteDB != nil else {
+            log.warning("Connection was nil.")
+            return nil
+        }
 
-        sqliteDB = nil
+        let status = sqlite3_close(self.sqliteDB)
+        log.debug("Closed \(self.filename).")
+        self.sqliteDB = nil
 
         if status != SQLITE_OK {
-            return createErr("During: Closing Database with Flags", status: Int(status))
+            log.error("Got \(status) while closing.")
+            return createErr("During: closing database with flags", status: Int(status))
         }
 
         return nil

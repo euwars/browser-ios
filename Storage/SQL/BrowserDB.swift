@@ -52,9 +52,9 @@ public class BrowserDB {
     }
 
     // Creates a table and writes its table info into the table-table database.
-    private func createTable(conn: SQLiteDBConnection, table: Table) -> TableResult {
+    private func createTable(conn: SQLiteDBConnection, table: SectionCreator) -> TableResult {
         log.debug("Try create \(table.name) version \(table.version)")
-        if !table.create(conn, version: table.version) {
+        if !table.create(conn) {
             // If creating failed, we'll bail without storing the table info
             log.debug("Creation failed.")
             return .Failed
@@ -66,7 +66,7 @@ public class BrowserDB {
 
     // Updates a table and writes its table into the table-table database.
     // Exposed internally for testing.
-    func updateTable(conn: SQLiteDBConnection, table: Table) -> TableResult {
+    func updateTable(conn: SQLiteDBConnection, table: SectionUpdater) -> TableResult {
         log.debug("Trying update \(table.name) version \(table.version)")
         var from = 0
         // Try to find the stored version of the table
@@ -82,7 +82,7 @@ public class BrowserDB {
             return .Exists
         }
 
-        if !table.updateTable(conn, from: from, to: table.version) {
+        if !table.updateTable(conn, from: from) {
             // If the update failed, we'll bail without writing the change to the table-table.
             log.debug("Updating failed.")
             return .Failed
@@ -167,6 +167,9 @@ public class BrowserDB {
             log.debug("Couldn't create or update \(tables.map { $0.name }).")
             log.debug("Attempting to move \(self.filename) to another location.")
 
+            // Make sure that we don't still have open the files that we want to move!
+            db.close()
+
             // Note that a backup file might already exist! We append a counter to avoid this.
             var bakCounter = 0
             var bak: String
@@ -176,6 +179,18 @@ public class BrowserDB {
 
             do {
                 try self.files.move(self.filename, toRelativePath: bak)
+
+                let shm = self.filename + "-shm"
+                let wal = self.filename + "-wal"
+                log.debug("Moving \(shm) and \(wal)…")
+                if self.files.exists(shm) {
+                    log.debug("\(shm) exists.")
+                    try self.files.move(shm, toRelativePath: bak + "-shm")
+                }
+                if self.files.exists(wal) {
+                    log.debug("\(wal) exists.")
+                    try self.files.move(wal, toRelativePath: bak + "-wal")
+                }
                 success = true
             } catch _ {
                 success = false
@@ -218,8 +233,12 @@ public class BrowserDB {
         return withConnection(flags: SwiftData.Flags.ReadOnly, err: &err, callback: callback)
     }
 
-    func transaction(inout err: NSError?, callback: (connection: SQLiteDBConnection, inout err: NSError?) -> Bool) {
-        db.transaction { connection in
+    func transaction(inout err: NSError?, callback: (connection: SQLiteDBConnection, inout err: NSError?) -> Bool) -> NSError? {
+        return self.transaction(synchronous: true, err: &err, callback: callback)
+    }
+
+    func transaction(synchronous synchronous: Bool=true, inout err: NSError?, callback: (connection: SQLiteDBConnection, inout err: NSError?) -> Bool) -> NSError? {
+        return db.transaction(synchronous: synchronous) { connection in
             var err: NSError? = nil
             return callback(connection: connection, err: &err)
         }
@@ -229,14 +248,14 @@ public class BrowserDB {
 extension BrowserDB {
     func vacuum() {
         log.debug("Vacuuming a BrowserDB.")
-        db.withConnection(SwiftData.Flags.ReadWriteCreate) { connection in
+        db.withConnection(SwiftData.Flags.ReadWriteCreate, synchronous: true) { connection in
             return connection.vacuum()
         }
     }
 
     func checkpoint() {
         log.debug("Checkpointing a BrowserDB.")
-        db.transaction { connection in
+        db.transaction(synchronous: true) { connection in
             connection.checkpoint()
             return true
         }
@@ -335,6 +354,10 @@ extension BrowserDB {
 
     func run(sql: String, withArgs args: Args? = nil) -> Success {
         return run([(sql, args)])
+    }
+
+    func run(commands: [String]) -> Success {
+        return self.run(commands.map { (sql: $0, args: nil) })
     }
 
     /**
