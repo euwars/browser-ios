@@ -30,8 +30,7 @@ struct BraveUX {
 
   // Yes it could be detected, just make life easier and set this number for now
   static let BottomToolbarNumberButtonsToRightOfBackForward = 3
-  static let BackForwardButtonWidth = 140
-  static let BackForwardButtonLeftOffset = 2
+  static let BackForwardButtonLeftOffset = CGFloat(5)
 
   // Internal use
   static let HeaderBackdropBackgroundColor = UIColor.blackColor()

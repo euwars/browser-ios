@@ -83,6 +83,9 @@ class BraveBrowserToolbar : BrowserToolbar {
     hackToSetButtonColor()
     super.updateConstraints()
 
+    var backButtonWidth = backButton.imageView?.image?.size.width ?? 0
+    var forwardButtonWidth = backButton.imageView?.image?.size.width ?? 0
+
     func common(make: ConstraintMaker, bottomInset: Int = 0) {
       make.top.equalTo(self)
       make.bottom.equalTo(self).inset(bottomInset)
@@ -96,26 +99,26 @@ class BraveBrowserToolbar : BrowserToolbar {
       let bounds = UIScreen.mainScreen().bounds
       let w = min(bounds.width, bounds.height)
 
-      make.width.equalTo((w - CGFloat(BraveUX.BackForwardButtonWidth)) /
+      make.width.equalTo((w - backButtonWidth - forwardButtonWidth - BraveUX.BackForwardButtonLeftOffset) /
         CGFloat(BraveUX.BottomToolbarNumberButtonsToRightOfBackForward))
     }
 
     backForwardUnderlay.snp_remakeConstraints { make in
       common(make)
-      make.left.equalTo(backButton.snp_left).offset(BraveUX.BackForwardButtonLeftOffset).priorityLow()
+      make.left.equalTo(backButton.snp_left)
       make.right.equalTo(forwardButton.snp_right)
     }
 
     backButton.snp_remakeConstraints { make in
       common(make)
-      make.left.equalTo(self)
-      make.width.equalTo(BraveUX.BackForwardButtonWidth / 2)
+      make.left.equalTo(self).offset(BraveUX.BackForwardButtonLeftOffset).priorityLow()
+      make.width.equalTo(backButtonWidth)
     }
 
     forwardButton.snp_remakeConstraints { make in
       common(make)
       make.left.equalTo(self.backButton.snp_right)
-      make.width.equalTo(BraveUX.BackForwardButtonWidth / 2)
+      make.width.equalTo(forwardButtonWidth)
     }
 
     shareButton.snp_remakeConstraints { make in
