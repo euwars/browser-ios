@@ -90,9 +90,11 @@ private extension TrayToBrowserAnimator {
             let buttonOffset = tabTray.addTabButton.frame.width + TabTrayControllerUX.ToolbarButtonOffset
             tabTray.addTabButton.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, buttonOffset , 0)
             tabTray.settingsButton.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, -buttonOffset , 0)
-            if #available(iOS 9, *) {
+#if !BRAVE
+          if #available(iOS 9, *) {
                 tabTray.togglePrivateMode.transform = CGAffineTransformTranslate(CGAffineTransformIdentity, buttonOffset , 0)
             }
+#endif
         }, completion: { finished in
             // Remove any of the views we used for the animation
             cell.removeFromSuperview()
@@ -187,9 +189,11 @@ private extension BrowserToTrayAnimator {
                 tabCollectionViewSnapshot.alpha = 1
 
                 var viewsToReset: [UIView?] = [tabCollectionViewSnapshot, tabTray.addTabButton, tabTray.settingsButton]
-                if #available(iOS 9, *) {
+#if !BRAVE
+              if #available(iOS 9, *) {
                     viewsToReset.append(tabTray.togglePrivateMode)
                 }
+#endif
                 resetTransformsForViews(viewsToReset)
             }, completion: { finished in
                 // Remove any of the views we used for the animation

@@ -235,19 +235,21 @@ class TabTrayController: UIViewController {
 
     private(set) internal var privateMode: Bool = false {
         didSet {
+#if !BRAVE
             if #available(iOS 9, *) {
                 togglePrivateMode.selected = privateMode
                 togglePrivateMode.accessibilityValue = privateMode ? PrivateModeStrings.toggleAccessibilityValueOn : PrivateModeStrings.toggleAccessibilityValueOff
                 tabDataSource.tabs = tabsToDisplay
                 collectionView.reloadData()
             }
+#endif
         }
     }
 
     private var tabsToDisplay: [Browser] {
         return self.privateMode ? tabManager.privateTabs : tabManager.normalTabs
     }
-
+#if !BRAVE
     @available(iOS 9, *)
     lazy var togglePrivateMode: ToggleButton = {
         let button = ToggleButton()
@@ -265,7 +267,7 @@ class TabTrayController: UIViewController {
         emptyView.learnMoreButton.addTarget(self, action: "SELdidTapLearnMore", forControlEvents: UIControlEvents.TouchUpInside)
         return emptyView
     }()
-
+#endif
     private lazy var tabDataSource: TabManagerDataSource = {
         return TabManagerDataSource(tabs: self.tabsToDisplay, cellDelegate: self)
     }()
@@ -326,7 +328,7 @@ class TabTrayController: UIViewController {
         view.addSubview(settingsButton)
 
         makeConstraints()
-
+#if !BRAVE
         if #available(iOS 9, *) {
             view.addSubview(togglePrivateMode)
             togglePrivateMode.snp_makeConstraints { make in
@@ -345,6 +347,7 @@ class TabTrayController: UIViewController {
                 privateMode = true
             }
         }
+#endif
 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappWillResignActiveNotification", name: UIApplicationWillResignActiveNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELappDidBecomeActiveNotification", name: UIApplicationDidBecomeActiveNotification, object: nil)
@@ -417,7 +420,7 @@ class TabTrayController: UIViewController {
     func SELdidClickAddTab() {
         openNewTab()
     }
-
+  #if !BRAVE
     @available(iOS 9, *)
     func SELdidTapLearnMore() {
         let appVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as! String
@@ -486,23 +489,29 @@ class TabTrayController: UIViewController {
     private func privateTabsAreEmpty() -> Bool {
         return privateMode && tabManager.privateTabs.count == 0
     }
+#endif
 
     private func openNewTab(request: NSURLRequest? = nil) {
+#if !BRAVE
         if #available(iOS 9, *) {
             if privateMode {
                 emptyPrivateTabsView.hidden = true
             }
         }
-
+#endif
         // We're only doing one update here, but using a batch update lets us delay selecting the tab
         // until after its insert animation finishes.
         self.collectionView.performBatchUpdates({ _ in
             var tab: Browser
+#if !BRAVE
             if #available(iOS 9, *) {
                 tab = self.tabManager.addTab(request, isPrivate: self.privateMode)
             } else {
-                tab = self.tabManager.addTab(request)
+              tab = self.tabManager.addTab(request)
             }
+#else
+            tab = self.tabManager.addTab(request)
+#endif
             self.tabManager.selectTab(tab)
         }, completion: { finished in
             if finished {
@@ -585,12 +594,13 @@ extension TabTrayController: TabManagerDelegate {
             }
             self.collectionView.reloadItemsAtIndexPaths(offscreenIndexPaths)
         }
-
+#if !BRAVE
         if #available(iOS 9, *) {
             if privateTabsAreEmpty() {
                 emptyPrivateTabsView.alpha = 1
             }
         }
+#endif
     }
 
     func tabManagerDidAddTabs(tabManager: TabManager) {
