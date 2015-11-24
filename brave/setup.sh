@@ -11,7 +11,7 @@ echo GENERATED_BUILD_ID=1  > xcconfig/build-id.xcconfig
 ## cp xcconfig/build-id.xcconfig ../Client/Configuration
 
 #create the xcode project
-python brave-proj.py > /dev/null 2>&1
+python brave-proj.py 
 
 echo ""
 echo "If files are added/removed from the project, regenerate it with ./brave-proj.py"
