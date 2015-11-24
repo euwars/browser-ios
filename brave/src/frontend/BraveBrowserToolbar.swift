@@ -71,12 +71,10 @@ class BraveBrowserToolbar : BrowserToolbar {
     addSubview(addTabButton)
 
     if let img = forwardButton.imageView?.image {
-      img.alpha(BraveUX.DisabledButtonAlpha)
-      forwardButton.setImage(img, forState: .Disabled)
+      forwardButton.setImage(img.alpha(BraveUX.BackForwardDisabledButtonAlpha), forState: .Disabled)
     }
     if let img = backButton.imageView?.image {
-      img.alpha(BraveUX.DisabledButtonAlpha)
-      backButton.setImage(img, forState: .Disabled)
+      backButton.setImage(img.alpha(BraveUX.BackForwardDisabledButtonAlpha), forState: .Disabled)
     }
   }
 
