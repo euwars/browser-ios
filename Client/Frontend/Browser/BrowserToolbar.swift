@@ -95,7 +95,9 @@ public class BrowserToolbarHelper: NSObject {
         toolbar.stopReloadButton.addTarget(self, action: "SELdidClickStopReload", forControlEvents: UIControlEvents.TouchUpInside)
 
         toolbar.shareButton.setImage(UIImage(named: "send"), forState: .Normal)
+#if !BRAVE // we use the default press state for now. 
         toolbar.shareButton.setImage(UIImage(named: "sendPressed"), forState: .Highlighted)
+#endif
         toolbar.shareButton.accessibilityLabel = NSLocalizedString("Share", comment: "Accessibility Label for the browser toolbar Share button")
         toolbar.shareButton.addTarget(self, action: "SELdidClickShare", forControlEvents: UIControlEvents.TouchUpInside)
         toolbar.bookmarkButton.contentMode = UIViewContentMode.Center
