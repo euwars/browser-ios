@@ -2,6 +2,28 @@
 
 import SnapKit
 
+extension UIImage{
+
+  func alpha(value:CGFloat)->UIImage
+  {
+    UIGraphicsBeginImageContextWithOptions(self.size, false, 0.0)
+
+    let ctx = UIGraphicsGetCurrentContext();
+    let area = CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height);
+
+    CGContextScaleCTM(ctx, 1, -1);
+    CGContextTranslateCTM(ctx, 0, -area.size.height);
+    CGContextSetBlendMode(ctx, .Multiply);
+    CGContextSetAlpha(ctx, value);
+    CGContextDrawImage(ctx, area, self.CGImage);
+
+    let newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return newImage;
+  }
+}
+
 class BraveBrowserToolbar : BrowserToolbar {
   static var tabsCount = 0
 
@@ -47,6 +69,15 @@ class BraveBrowserToolbar : BrowserToolbar {
     bringSubviewToFront(forwardButton)
 
     addSubview(addTabButton)
+
+    if let img = forwardButton.imageView?.image {
+      img.alpha(BraveUX.DisabledButtonAlpha)
+      forwardButton.setImage(img, forState: .Disabled)
+    }
+    if let img = backButton.imageView?.image {
+      img.alpha(BraveUX.DisabledButtonAlpha)
+      backButton.setImage(img, forState: .Disabled)
+    }
   }
 
   required init?(coder aDecoder: NSCoder) {
