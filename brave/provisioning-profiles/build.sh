@@ -1,0 +1,1 @@
+ xcodebuild archive -scheme Brave
