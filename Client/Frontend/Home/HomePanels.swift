@@ -47,15 +47,16 @@ class HomePanels {
             },
             imageName: "History",
             accessibilityLabel: NSLocalizedString("History", comment: "Panel accessibility label")),
+// BRAVE: No cloud button for us please. #if !BRAVE won't work here, need to comment it out.
+//        HomePanelDescriptor(
+//            makeViewController: { profile in
+//                let controller = RemoteTabsPanel()
+//                controller.profile = profile
+//                return controller
+//            },
+//            imageName: "SyncedTabs",
+//            accessibilityLabel: NSLocalizedString("Synced tabs", comment: "Panel accessibility label")),
 
-        HomePanelDescriptor(
-            makeViewController: { profile in
-                let controller = RemoteTabsPanel()
-                controller.profile = profile
-                return controller
-            },
-            imageName: "SyncedTabs",
-            accessibilityLabel: NSLocalizedString("Synced tabs", comment: "Panel accessibility label")),
 
         HomePanelDescriptor(
             makeViewController: { profile in
