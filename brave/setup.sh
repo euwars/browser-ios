@@ -1,7 +1,8 @@
-# Replace the removed xcconfigs with ours
-(cd ../Client && ln -sfn ../brave/xcconfig Configuration)
-
 [[ -e setup.sh  ]] || { echo 'setup.sh must be run from brave directory'; exit 1; }
+
+# Replace the removed xcconfigs with ours
+(cd ../Client && rm -rf Configuration &&  ln -sfn ../brave/xcconfig Configuration)
+
 npm update
 (cd node_modules/abp-filter-parser-cpp && build/Release/sample)
 
