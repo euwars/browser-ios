@@ -1,0 +1,10 @@
+# Install with: cp post-checkout ../.git/hooks
+# A handy git hook for auto updating the project
+# It is called 'post-checkout' but runs on a git pull in addition to checkout (for me anyway)
+
+refprevhead="$1"
+refnewhead="$2"
+[[ -e brave ]] && \
+( git log --diff-filter=A --diff-filter=D --summary $refprevhead..$refnewhead | egrep -q "create|delete" ) && (cd brave; python brave-proj.py)
+
+exit 0
