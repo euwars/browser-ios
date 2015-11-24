@@ -40,18 +40,9 @@ Obj-C standard should follow https://google.github.io/styleguide/objcguide.xml. 
 
 ## Provisioning Profiles
 
-For the first time, I am using "Xcode managed profiles" (Apple now recommends this).
-However, adding a new tester's device is buggy. After adding a device UDID in ADC, Xcode managed profiles aren't getting the new device.
+These are in brave/provisioning-profiles. Do not use 'Xcode managed profiles', there is no advantage to this, and debugging problems with that system is a dead end due to lack of transparency in that system. 
+brave/provisioning-profiles has some handy scripts:
+* setup-profile.sh: copies the profiles to the correct directory in ~Library so that Xcode will find them. Also, *deletes* all other profiles to prevent conflicts.
+* checkdevices.sh: verifies the UDIDS in devices.txt are in all the profiles. In terms of workflow, do the following in the Apple Dev portal: 1) add test user devices, 2) add the devices to the Ad Hoc provisioning profile and download the 4 Ad Hoc profiles (broswer and 3 extension profiles), 3) copy the device list off the portal and update devices.txt. Finally, run checkdevices.sh.
 
-Remove old embedded.mobileprovision
-```
-cd ~/Library/Developer
-find . -name embedded.mobileprovision | sed 's/.*/"&"/g' | xargs rm
-```
 
-Remove ADC account from Xcode>Preferences>Accounts. Quit and restart. Re-add account, and click to download all profiles.
-
-Do an Archive build (I seem to have to do this first) and verify UDID has arrived:
-```
-find  ~/Library/Developer -name embedded.mobileprovision | sed 's/.*/"&"/g' | xargs grep <a few chars of new UDID>
-```
