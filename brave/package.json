@@ -1,6 +1,6 @@
 {
   "name": "brave",
   "dependencies": {
-    "abp-filter-parser-cpp": "0.2.8"
+    "abp-filter-parser-cpp": "0.2.9"
   }
 }
