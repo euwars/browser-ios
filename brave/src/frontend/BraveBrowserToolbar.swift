@@ -91,9 +91,8 @@ class BraveBrowserToolbar : BrowserToolbar {
 
   func onClickAddTab() {
     let app = UIApplication.sharedApplication().delegate as! AppDelegate
-    guard let url = app.profile?.searchEngines.defaultEngine.searchURLForQuery("") else { return }
-    let browser = app.browserViewController.tabManager.addTab(NSURLRequest(URL: url))
-    app.browserViewController.tabManager.selectTab(browser)
+    app.tabManager.addTabAndSelect()
+    app.browserViewController.urlBar.browserLocationViewDidTapLocation(app.browserViewController.urlBar.locationView)
   }
 
   func onClickShowTabs() {
