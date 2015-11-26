@@ -2104,10 +2104,15 @@ extension BrowserViewController: ContextMenuHelperDelegate {
         // state (e.g., long pressing a link before the document changes, then releasing after a
         // different page loads).
         let touchPoint = gestureRecognizer.locationInView(view)
-        guard touchPoint != CGPointZero else { return }
-
+#if BRAVE
+        if touchPoint == CGPointZero && UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad {
+            print("zero touchpoint for context menu: \(elements)")
+            return
+          }
+#endif
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
         var dialogTitle: String?
+        actionSheetController.view.tag = LegacyWebView.kContextMenuBlockNavigation
 
         if let url = elements.link, currentTab = tabManager.selectedTab {
             dialogTitle = url.absoluteString
@@ -2115,13 +2120,13 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             if !isPrivate {
                 let newTabTitle = NSLocalizedString("Open In New Tab", comment: "Context menu item for opening a link in a new tab")
                 let openNewTabAction =  UIAlertAction(title: newTabTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) in
+                    actionSheetController.view.tag = 0 // BRAVE: clear this to allow navigation
                     self.scrollController.showToolbars(animated: !self.scrollController.toolbarsShowing, completion: { _ in
                         self.tabManager.addTab(NSURLRequest(URL: url))
                     })
                 }
                 actionSheetController.addAction(openNewTabAction)
             }
-
 #if !BRAVE
             if #available(iOS 9, *) {
                 let openNewPrivateTabTitle = NSLocalizedString("Open In New Private Tab", tableName: "PrivateBrowsing", comment: "Context menu option for opening a link in a new private tab")

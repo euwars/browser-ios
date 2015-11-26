@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import WebKit
+import Shared
 
 protocol ContextMenuHelperDelegate: class {
     func contextMenuHelper(contextMenuHelper: ContextMenuHelper, didLongPressElements elements: ContextMenuHelper.Elements, gestureRecognizer: UILongPressGestureRecognizer)
@@ -12,7 +13,7 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
     private weak var browser: Browser?
     weak var delegate: ContextMenuHelperDelegate?
     private let gestureRecognizer = UILongPressGestureRecognizer()
-    private weak var selectionGestureRecognizer: UIGestureRecognizer?
+    private var selectionGestureRecognizer = WeakList<UIGestureRecognizer>()
 
     struct Elements {
         let link: NSURL?
@@ -60,8 +61,10 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
         // user is long-pressing a link.
         if let handled = data["handled"] as? Bool where handled {
             // Setting `enabled = false` cancels the current gesture for this recognizer.
-            selectionGestureRecognizer?.enabled = false
-            selectionGestureRecognizer?.enabled = true
+          for item in selectionGestureRecognizer {
+            item.enabled = false
+            item.enabled = true
+          }
         }
 
         var linkURL: NSURL?
@@ -83,7 +86,14 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
-#if !BRAVE // This seems to suppress the text selection context menu on long press, which we don't need
+#if BRAVE
+    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailByGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+      if otherGestureRecognizer is UILongPressGestureRecognizer {
+        selectionGestureRecognizer.insert(otherGestureRecognizer)
+      }
+      return false
+    }
+#else
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailByGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         // Hack to detect the built-in text selection gesture recognizer.
         if let otherDelegate = otherGestureRecognizer.delegate where String(otherDelegate).contains("_UIKeyboardBasedNonEditableTextSelectionGestureController") {

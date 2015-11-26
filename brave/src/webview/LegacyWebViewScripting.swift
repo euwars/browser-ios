@@ -76,6 +76,22 @@ class LegacyUserContentController
       }
     }
   }
+
+  static func injectJsIntoAllFrames(webView: LegacyWebView, script: String) {
+    webView.stringByEvaluatingJavaScriptFromString(script)
+    let js = LegacyJSContext()
+    let contexts = js.findNewFramesForWebView(webView, withFrameContexts: webView.knownFrameContexts)
+
+    for ctx in contexts {
+      webView.knownFrameContexts.insert(ctx.hash)
+      js.callOnContext(ctx, script: script)
+    }
+  }
+
+  func injectJsIntoPage() {
+    injectIntoMain()
+    injectIntoSubFrame()
+  }
 }
 
 class LegacyWebViewConfiguration

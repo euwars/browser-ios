@@ -27,6 +27,7 @@ enum KVOStrings: String {
 
 class LegacyWebView: UIWebView {
   static let kNotificationWebViewLoadCompleteOrFailed = "kNotificationWebViewLoadCompleteOrFailed"
+  static let kContextMenuBlockNavigation = 8675309
   lazy var configuration: LegacyWebViewConfiguration = { return LegacyWebViewConfiguration(webView: self) }()
   weak var navigationDelegate: WKNavigationDelegate?
   weak var UIDelegate: WKUIDelegate?
@@ -210,6 +211,15 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
   func webView(webView: UIWebView,shouldStartLoadWithRequest request: NSURLRequest,
     navigationType: UIWebViewNavigationType ) -> Bool {
       guard let _parent = parent else { return false }
+
+      if let contextMenu = _parent.window?.rootViewController?.presentedViewController
+        where contextMenu.view.tag == LegacyWebView.kContextMenuBlockNavigation {
+        // When showing a context menu, the webview will often still navigate (ex. news.google.com)
+        // We need to block navigation using this tag. 
+        return false
+      }
+
+
       var result = _parent.progress.shouldStartLoadWithRequest(request, navigationType: navigationType)
       if !result {
         return false
@@ -267,8 +277,9 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     }
 
     if (!webView.loading) {
-      _parent.configuration.userContentController.injectIntoMain()
-      _parent.configuration.userContentController.injectIntoSubFrame()
+      _parent.configuration.userContentController.injectJsIntoPage()
+      // Stop built-in context menu
+      LegacyUserContentController.injectJsIntoAllFrames(_parent, script: "document.body.style.webkitTouchCallout='none'")
       _parent.replaceImagesUsingTheVault(webView)
     }
 

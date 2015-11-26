@@ -76,10 +76,7 @@
 			</dict>
 		</array>
 	</dict>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>itms-books</string>
-	</array>
+	
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
