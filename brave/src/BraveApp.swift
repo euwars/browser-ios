@@ -5,8 +5,14 @@ import Shared
 
 private let _singleton = BraveApp()
 
+let kAppBootingIncompleteFlag = "kAppBootingIncompleteFlag"
+
 // Any app-level hooks we need from Firefox, just add a call to here
 class BraveApp {
+  static var isSafeToRestoreTabs = true
+  // If app runs for this long, clear the saved pref that indicates it is safe to restore tabs
+  static let kDelayBeforeDecidingAppHasBootedOk = (Int64(NSEC_PER_SEC) * 10) // 10 sec
+
   class var singleton: BraveApp {
     return _singleton
   }
@@ -16,17 +22,11 @@ class BraveApp {
     NSURLCache.sharedURLCache().diskCapacity = 40 * 1024 * 1024;
   }
 
-  class func willFinishLaunching() {
+  // Be aware: the Prefs object has not been created yet
+  class func willFinishLaunching_begin() {
     Fabric.with([Crashlytics.self])
     BraveApp.setupCacheDefaults()
     NSURLProtocol.registerClass(URLProtocol);
-
-    if AppConstants.IsRunningTest {
-      print("In test mode, bypass automatic vault registration.")
-    } else {
-      VaultManager.userProfileInit()
-      VaultManager.sessionLaunch()
-    }
 
     NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
       selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: nil)
@@ -58,6 +58,34 @@ class BraveApp {
 #endif
   }
 
+  // Prefs are created at this point
+  class func willFinishLaunching_end() {
+    if AppConstants.IsRunningTest {
+      print("In test mode, bypass automatic vault registration.")
+    } else {
+      VaultManager.userProfileInit()
+      VaultManager.sessionLaunch()
+    }
+
+    BraveApp.isSafeToRestoreTabs = BraveApp.getPref(kAppBootingIncompleteFlag) == nil
+    BraveApp.setPref("remove me when booted", forKey: kAppBootingIncompleteFlag)
+    BraveApp.getPrefs()?.synchronize()
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, BraveApp.kDelayBeforeDecidingAppHasBootedOk),
+      dispatch_get_main_queue(), {
+      BraveApp.removePref(kAppBootingIncompleteFlag)
+    })
+  }
+
+  // This can only be checked ONCE, the flag is cleared after this.
+  // This is because BrowserViewController asks this question after the startup phase, 
+  // when tabs are being created by user actions. So without more refactoring of the
+  // Firefox logic, this is the simplest solution.
+  class func shouldRestoreTabs() -> Bool {
+    let ok = BraveApp.isSafeToRestoreTabs
+    BraveApp.isSafeToRestoreTabs = true
+    return ok
+  }
+
   @objc func memoryWarning(_: NSNotification) {
     NSURLCache.sharedURLCache().memoryCapacity = 0
     BraveApp.setupCacheDefaults()
@@ -76,14 +104,21 @@ class BraveApp {
     return components.scheme == "brave" || components.scheme == "brave-x-callback"
   }
 
+  class func getPrefs() -> NSUserDefaults? {
+    assert(NSUserDefaultsPrefs.prefixWithDotForBrave.characters.count > 0)
+    return NSUserDefaults(suiteName: "group.com.brave.ios.browser")
+  }
+
   class func getPref(pref: String) -> AnyObject? {
-    guard let defaults = NSUserDefaults(suiteName: "group.com.brave.ios.browser") else { return nil }
-    return defaults.objectForKey(NSUserDefaultsPrefs.prefixWithDotForBrave + pref)
+    return getPrefs()?.objectForKey(NSUserDefaultsPrefs.prefixWithDotForBrave + pref)
   }
 
   class func setPref(val: AnyObject, forKey: String) {
-    guard let defaults = NSUserDefaults(suiteName: "group.com.brave.ios.browser") else { return }
-    return defaults.setObject(val, forKey: NSUserDefaultsPrefs.prefixWithDotForBrave + forKey)
+    getPrefs()?.setObject(val, forKey: NSUserDefaultsPrefs.prefixWithDotForBrave + forKey)
+  }
+
+  class func removePref(pref: String) {
+    getPrefs()?.removeObjectForKey(NSUserDefaultsPrefs.prefixWithDotForBrave + pref)
   }
 
   #if DEBUG

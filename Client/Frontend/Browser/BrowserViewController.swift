@@ -422,7 +422,11 @@ class BrowserViewController: UIViewController {
 #endif
       
 #if BRAVE
-        tabManager.restoreTabs()
+        if BraveApp.shouldRestoreTabs() {
+          tabManager.restoreTabs()
+        } else {
+          tabManager.addTabAndSelect();
+       }
 #else
         if activeCrashReporter?.previouslyCrashed ?? false {
             log.debug("Previously crashed.")

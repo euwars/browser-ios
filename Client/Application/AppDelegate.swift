@@ -28,7 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 #if BRAVE
-        BraveApp.willFinishLaunching()
+        BraveApp.willFinishLaunching_begin()
 #endif
 
         // Hold references to willFinishLaunching parameters for delayed app launch
@@ -118,6 +118,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         log.debug("Done with setting up the application.")
+
+#if BRAVE
+        BraveApp.willFinishLaunching_end()
+#endif
         return true
     }
 
@@ -397,46 +401,3 @@ extension AppDelegate: MFMailComposeViewControllerDelegate {
         startApplication(application!, withLaunchOptions: self.launchOptions)
     }
 }
-
-
-#if !BRAVE
-var activeCrashReporter: CrashReporter?
-func configureActiveCrashReporter(optedIn: Bool?) {
-    if let reporter = activeCrashReporter {
-        configureCrashReporter(reporter, optedIn: optedIn)
-    }
-}
-
-public func configureCrashReporter(reporter: CrashReporter, optedIn: Bool?) {
-    let configureReporter: () -> () = {
-        let addUploadParameterForKey: String -> Void = { key in
-            if let value = NSBundle.mainBundle().objectForInfoDictionaryKey(key) as? String {
-                reporter.addUploadParameter(value, forKey: key)
-            }
-        }
-
-        addUploadParameterForKey("AppID")
-        addUploadParameterForKey("BuildID")
-        addUploadParameterForKey("ReleaseChannel")
-        addUploadParameterForKey("Vendor")
-    }
-
-    if let optedIn = optedIn {
-        // User has explicitly opted-in for sending crash reports. If this is not true, then the user has
-        // explicitly opted-out of crash reporting so don't bother starting breakpad or stop if it was running
-        if optedIn {
-            reporter.start(true)
-            configureReporter()
-            reporter.setUploadingEnabled(true)
-        } else {
-            reporter.stop()
-        }
-    }
-    // We haven't asked the user for their crash reporting preference yet. Log crashes anyways but don't send them.
-    else {
-        reporter.start(true)
-        configureReporter()
-    }
-}
-#endif
-
