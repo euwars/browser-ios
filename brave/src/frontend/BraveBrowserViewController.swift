@@ -14,8 +14,8 @@ class EmptyBlurWrapper :BlurWrapper {
 }
 
 class BraveBrowserViewController : BrowserViewController {
-  override func applyNormalModeTheme() {
-    super.applyNormalModeTheme()
+  override func applyNormalModeTheme(force force:Bool) {
+    super.applyNormalModeTheme(force:false)
 
     BrowserLocationView.appearance().baseURLFontColor = BraveUX.LocationBarTextColor_URLBaseComponent
     BrowserLocationView.appearance().hostFontColor =  BraveUX.LocationBarTextColor_URLHostComponent

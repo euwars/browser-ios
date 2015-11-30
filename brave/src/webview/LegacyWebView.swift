@@ -40,6 +40,23 @@ class LegacyWebView: UIWebView {
   var internalIsLoadingEndedFlag: Bool = false;
   var knownFrameContexts = Set<NSObject>()
 
+  // To mimic WKWebView we need this property. And, to easily overrride where Firefox code is setting it, we hack the setter,
+  // so that a custom agent is set always to our kDesktopUserAgent.
+  // A nil customUserAgent means to use the default which is correct.
+  //TODO setting the desktop agent doesn't currently work, see note below)
+  var customUserAgent:String? {
+    willSet {
+      if self.customUserAgent == newValue || newValue == nil {
+        return
+      }
+      self.customUserAgent = newValue == nil ? nil : kDesktopUserAgent
+      // The following doesn't work, we need to kill and restart the webview, and restore its history state
+      // for this setting to take effect
+      //      let defaults = NSUserDefaults(suiteName: AppInfo.sharedContainerIdentifier())!
+      //      defaults.registerDefaults(["UserAgent": (self.customUserAgent ?? "")])
+    }
+  }
+
   override init(frame: CGRect) {
     #if DEBUG
       // TODO move to better spot, these quiet the logging from the core of fx ios

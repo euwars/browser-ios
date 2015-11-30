@@ -5,6 +5,15 @@ class LegacyBackForwardListItem {
   var URL: NSURL = NSURL()
   var initialURL: NSURL = NSURL()
   var title:String = ""
+
+  init(url: NSURL) {
+    URL = url
+    // In order to mimic the built-in API somewhat, the initial url is stripped of mobile site
+    // parts of the host (mobile.nytimes.com -> initial url is nytimes.com). The initial url
+    // is the pre-page-forwarding url
+    let normal = url.scheme + "://" + (url.normalizedHostAndPath() ?? url.absoluteString)
+    initialURL = NSURL(string: normal) ?? url
+  }
 }
 
 extension LegacyBackForwardListItem: Equatable {}
@@ -48,9 +57,7 @@ class LegacyBackForwardList {
     var foundCurrent = false
     for match in result {
       guard let url = NSURL(string: nsHistory.substringWithRange(match.rangeAtIndex(1))) else { continue }
-      let item = LegacyBackForwardListItem()
-      item.URL = url
-      item.initialURL = item.URL
+      let item = LegacyBackForwardListItem(url: url)
       backForwardList.append(item)
 
       let currIndicator = ">>>"
@@ -71,8 +78,7 @@ class LegacyBackForwardList {
     get {
       guard let item = itemAtIndex(currentIndex) else {
       if let url = webView?.URL {
-        let item = LegacyBackForwardListItem()
-        item.URL = url
+        let item = LegacyBackForwardListItem(url: url)
         return item
       } else {
         return nil

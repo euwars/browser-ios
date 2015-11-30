@@ -123,9 +123,6 @@ class BrowserLocationView: UIView {
         longPressRecognizer = UILongPressGestureRecognizer(target: self, action: "SELlongPressLocation:")
         tapRecognizer = UITapGestureRecognizer(target: self, action: "SELtapLocation:")
 
-#if !BRAVE // I don't see how this is ever used
-        self.backgroundColor = UIColor.whiteColor()
-#endif
         addSubview(urlTextField)
         addSubview(lockImageView)
         addSubview(readerModeButton)

@@ -49,17 +49,13 @@ public extension NSFileManager {
         guard let itemURL = url as? NSURL else {
             throw errorWithCode(.EnumeratorElementNotURL)
         }
-      /// TODO: Brave commented this out. It is for XCGLogging and uses 9.1 API.
-      return 0
-//        // Skip files that are not regular and don't match our prefix
-//        guard itemURL.isRegularFile && itemURL.lastComponentIsPrefixedBy(prefix) else {
-//            return 0
-//        }
-//
-//        // First try to get the total allocated size and in failing that, get the file allocated size
-//        return itemURL.getResourceLongLongForKey(NSURLTotalFileAllocatedSizeKey)
-//            ?? itemURL.getResourceLongLongForKey(NSURLFileAllocatedSizeKey)
-//            ?? 0
+
+        // Skip files that are not regular and don't match our prefix
+        guard itemURL.isRegularFile && itemURL.lastComponentIsPrefixedBy(prefix) else {
+            return 0
+        }
+
+        return (url as? NSURL)?.allocatedFileSize() ?? 0
     }
 
     func allocatedSizeOfDirectoryAtURL(url: NSURL, forFilesPrefixedWith prefix: String, isLargerThanBytes threshold: Int64) throws -> Bool {

@@ -50,6 +50,10 @@ class BrowserViewController: UIViewController {
     private let snackBars = UIView()
     private let webViewContainerToolbar = UIView()
 
+    // popover rotation handling
+    private var displayedPopoverController: UIViewController?
+    private var updateDisplayedPopoverProperties: (() -> ())?
+
     private var openInHelper: OpenInHelper?
 
     // location label actions
@@ -104,6 +108,17 @@ class BrowserViewController: UIViewController {
             return UIInterfaceOrientationMask.AllButUpsideDown
         } else {
             return UIInterfaceOrientationMask.All
+        }
+    }
+
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        displayedPopoverController?.dismissViewControllerAnimated(true, completion: nil)
+
+        coordinator.animateAlongsideTransition(nil) { context in
+            if let displayedPopoverController = self.displayedPopoverController {
+                self.updateDisplayedPopoverProperties?()
+                self.presentViewController(displayedPopoverController, animated: true, completion: nil)
+            }
         }
     }
 
@@ -182,6 +197,8 @@ class BrowserViewController: UIViewController {
             updateToolbarStateForTraitCollection(newCollection)
         }
 
+        displayedPopoverController?.dismissViewControllerAnimated(true, completion: nil)
+
         // WKWebView looks like it has a bug where it doesn't invalidate it's visible area when the user
         // performs a device rotation. Since scrolling calls
         // _updateVisibleContentRects (https://github.com/WebKit/webkit/blob/master/Source/WebKit2/UIProcess/API/Cocoa/WKWebView.mm#L1430)
@@ -202,7 +219,7 @@ class BrowserViewController: UIViewController {
     }
 
     func SELappWillResignActiveNotification() {
-        // If we are displying a private tab, hide any elements in the browser that we wouldn't want shown 
+        // If we are displying a private tab, hide any elements in the browser that we wouldn't want shown
         // when the app is in the home switcher
         guard let privateTab = tabManager.selectedTab where privateTab.isPrivate else {
             return
@@ -301,8 +318,8 @@ class BrowserViewController: UIViewController {
             return false
         })
         copyAddressAction = AccessibleAction(name: NSLocalizedString("Copy Address", comment: "Copy the URL from the location bar"), handler: { () -> Bool in
-            if let urlString = self.urlBar.currentURL?.absoluteString {
-                UIPasteboard.generalPasteboard().string = urlString
+            if let url = self.urlBar.currentURL {
+                UIPasteboard.generalPasteboard().URL = url
             }
             return true
         })
@@ -856,13 +873,31 @@ class BrowserViewController: UIViewController {
     }
 
     func openURLInNewTab(url: NSURL) {
-        let tab: Browser
         if #available(iOS 9, *) {
-            tab = tabManager.addTab(NSURLRequest(URL: url), isPrivate: tabTrayController?.privateMode ?? false)
+            openURLInNewTab(url, isPrivate: tabTrayController?.privateMode ?? false)
         } else {
-            tab = tabManager.addTab(NSURLRequest(URL: url))
+            tabManager.addTabAndSelect(NSURLRequest(URL: url))
         }
-        tabManager.selectTab(tab)
+    }
+
+    @available(iOS 9, *)
+    func openURLInNewTab(url: NSURL?, isPrivate: Bool) {
+        let request: NSURLRequest?
+        if let url = url {
+            request = NSURLRequest(URL: url)
+        } else {
+            request = nil
+        }
+        let tabTrayController = self.tabTrayController ?? TabTrayController(tabManager: tabManager, profile: profile)
+        tabTrayController.changePrivacyMode(isPrivate)
+        self.tabTrayController = tabTrayController
+        tabManager.addTabAndSelect(request, isPrivate: isPrivate)
+    }
+
+    @available(iOS 9, *)
+    func openBlankNewTabAndFocus(isPrivate isPrivate: Bool = false) {
+        openURLInNewTab(nil, isPrivate: isPrivate)
+        urlBar.browserLocationViewDidTapLocation(urlBar.locationView)
     }
 }
 
@@ -1057,6 +1092,30 @@ extension BrowserViewController: BrowserToolbarDelegate {
         tabManager.selectedTab?.reload()
     }
 
+    func browserToolbarDidLongPressReload(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
+        guard #available(iOS 9.0, *) else {
+            return
+        }
+
+        guard let tab = tabManager.selectedTab where tab.webView?.URL != nil else {
+            return
+        }
+
+        let toggleActionTitle: String
+        if tab.desktopSite {
+            toggleActionTitle = NSLocalizedString("Request Mobile Site", comment: "Action Sheet Button for Requesting the Mobile Site")
+        } else {
+            toggleActionTitle = NSLocalizedString("Request Desktop Site", comment: "Action Sheet Button for Requesting the Desktop Site")
+        }
+
+        let controller = UIAlertController(title: nil, message: nil, preferredStyle: .ActionSheet)
+        controller.addAction(UIAlertAction(title: toggleActionTitle, style: .Default, handler: { _ in tab.toggleDesktopSite() }))
+        controller.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment:"Action Sheet Cancel Button"), style: .Cancel, handler: nil))
+        controller.popoverPresentationController?.sourceView = toolbar ?? urlBar
+        controller.popoverPresentationController?.sourceRect = button.frame
+        presentViewController(controller, animated: true, completion: nil)
+    }
+
     func browserToolbarDidPressStop(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
         tabManager.selectedTab?.stop()
     }
@@ -1106,13 +1165,23 @@ extension BrowserViewController: BrowserToolbarDelegate {
                 self.updateReaderModeBar()
             })
 
-            if let popoverPresentationController = activityViewController.popoverPresentationController {
-                // Using the button for the sourceView here results in this not showing on iPads.
-                popoverPresentationController.sourceView = self.toolbar ?? self.urlBar
-                popoverPresentationController.sourceRect = button.frame ?? button.frame
-                popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Up
-                popoverPresentationController.delegate = self
+            let setupPopover = { [unowned self] in
+                if let popoverPresentationController = activityViewController.popoverPresentationController {
+                    let sourceView = self.navigationToolbar.shareButton
+                    popoverPresentationController.sourceView = sourceView.superview
+                    popoverPresentationController.sourceRect = sourceView.frame
+                    popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Up
+                    popoverPresentationController.delegate = self
+                }
             }
+
+            setupPopover()
+
+            if activityViewController.popoverPresentationController != nil {
+                displayedPopoverController = activityViewController
+                updateDisplayedPopoverProperties = setupPopover
+            }
+
             self.presentViewController(activityViewController, animated: true, completion: nil)
         }
 
@@ -1153,7 +1222,7 @@ extension BrowserViewController: BrowserDelegate {
 
         let favicons = FaviconManager(browser: browser, profile: profile)
         browser.addHelper(favicons, name: FaviconManager.name())
-        
+
         // only add the logins helper if the tab is not a private browsing tab
         if !browser.isPrivate {
             let logins = LoginsHelper(browser: browser, profile: profile)
@@ -1569,23 +1638,24 @@ extension BrowserViewController: WKNavigationDelegate {
         }
     }
 
-    func webView(webView: WKWebView,
-        didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge,
-        completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
- //           if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest {
-//                if let tab = tabManager[webView] {
-//                    let helper = tab.getHelper(name: LoginsHelper.name()) as! LoginsHelper
-//                    helper.handleAuthRequest(self, challenge: challenge).uponQueue(dispatch_get_main_queue()) { res in
-//                        if let credentials = res.successValue {
-//                            completionHandler(.UseCredential, credentials.credentials)
-//                        } else {
-//                            completionHandler(NSURLSessionAuthChallengeDisposition.RejectProtectionSpace, nil)
-//                        }
-//                    }
-//                }
-//            } else {
-//                completionHandler(NSURLSessionAuthChallengeDisposition.PerformDefaultHandling, nil)
-//            }
+    func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
+      #if !BRAVE
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
+              challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest,
+              let tab = tabManager[webView] else {
+            completionHandler(NSURLSessionAuthChallengeDisposition.PerformDefaultHandling, nil)
+            return
+        }
+
+        let loginsHelper = tab.getHelper(name: LoginsHelper.name()) as? LoginsHelper
+        Authenticator.handleAuthRequest(self, challenge: challenge, loginsHelper: loginsHelper).uponQueue(dispatch_get_main_queue()) { res in
+            if let credentials = res.successValue {
+                completionHandler(.UseCredential, credentials.credentials)
+            } else {
+                completionHandler(NSURLSessionAuthChallengeDisposition.RejectProtectionSpace, nil)
+            }
+        }
+      #endif
     }
 
     func webView(_webView: WKWebView, didFinishNavigation navigation: WKNavigation!) {
@@ -1623,6 +1693,12 @@ extension BrowserViewController: WKNavigationDelegate {
         }
 
         addOpenInViewIfNeccessary(webView.URL)
+
+        // Remember whether or not a desktop site was requested and reset potentially spoofed user agent
+        if #available(iOS 9.0, *) {
+            tab.desktopSite = webView.customUserAgent?.isEmpty == false
+          //  webView.customUserAgent = nil
+        }
     }
 
     private func addOpenInViewIfNeccessary(url: NSURL?) {
@@ -1807,7 +1883,7 @@ extension BrowserViewController: WKUIDelegate {
     }
 }
 
-extension BrowserViewController: ReaderModeDelegate, UIPopoverPresentationControllerDelegate {
+extension BrowserViewController: ReaderModeDelegate {
     func readerMode(readerMode: ReaderMode, didChangeReaderModeState state: ReaderModeState, forBrowser browser: Browser) {
         // If this reader mode availability state change is for the tab that we currently show, then update
         // the button. Otherwise do nothing and the button will be updated when the tab is made active.
@@ -1827,6 +1903,17 @@ extension BrowserViewController: ReaderModeDelegate, UIPopoverPresentationContro
         return UIModalPresentationStyle.None
     }
 }
+
+// MARK: - UIPopoverPresentationControllerDelegate
+
+extension BrowserViewController: UIPopoverPresentationControllerDelegate {
+    func popoverPresentationControllerDidDismissPopover(popoverPresentationController: UIPopoverPresentationController) {
+        displayedPopoverController = nil
+        updateDisplayedPopoverProperties = nil
+    }
+}
+
+// MARK: - ReaderModeStyleViewControllerDelegate
 
 extension BrowserViewController: ReaderModeStyleViewControllerDelegate {
     func readerModeStyleViewController(readerModeStyleViewController: ReaderModeStyleViewController, didConfigureStyle style: ReaderModeStyle) {
@@ -1967,19 +2054,19 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
                         readerModeStyle = style
                     }
                 }
-                
+
                 let readerModeStyleViewController = ReaderModeStyleViewController()
                 readerModeStyleViewController.delegate = self
                 readerModeStyleViewController.readerModeStyle = readerModeStyle
                 readerModeStyleViewController.modalPresentationStyle = UIModalPresentationStyle.Popover
-                
+
                 let popoverPresentationController = readerModeStyleViewController.popoverPresentationController
                 popoverPresentationController?.backgroundColor = UIColor.whiteColor()
                 popoverPresentationController?.delegate = self
                 popoverPresentationController?.sourceView = readerModeBar
                 popoverPresentationController?.sourceRect = CGRect(x: readerModeBar.frame.width/2, y: UIConstants.ToolbarHeight, width: 1, height: 1)
                 popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.Up
-                
+
                 self.presentViewController(readerModeStyleViewController, animated: true, completion: nil)
             }
 
@@ -2145,7 +2232,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             let copyTitle = NSLocalizedString("Copy Link", comment: "Context menu item for copying a link URL to the clipboard")
             let copyAction = UIAlertAction(title: copyTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) -> Void in
                 let pasteBoard = UIPasteboard.generalPasteboard()
-                pasteBoard.string = url.absoluteString
+                pasteBoard.URL = url
             }
             actionSheetController.addAction(copyAction)
         }
@@ -2161,7 +2248,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 if photoAuthorizeStatus == PHAuthorizationStatus.Authorized || photoAuthorizeStatus == PHAuthorizationStatus.NotDetermined {
                     self.getImage(url) { UIImageWriteToSavedPhotosAlbum($0, nil, nil, nil) }
                 } else {
-                    let accessDenied = UIAlertController(title: NSLocalizedString("Firefox would like to access your Photos", comment: "See http://mzl.la/1G7uHo7"), message: NSLocalizedString("This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7"), preferredStyle: UIAlertControllerStyle.Alert)
+                    let accessDenied = UIAlertController(title: NSLocalizedString("Brave would like to access your Photos", comment: "See http://mzl.la/1G7uHo7"), message: NSLocalizedString("This allows you to save the image to your Camera Roll.", comment: "See http://mzl.la/1G7uHo7"), preferredStyle: UIAlertControllerStyle.Alert)
                     let dismissAction = UIAlertAction(title: CancelString, style: UIAlertActionStyle.Default, handler: nil)
                     accessDenied.addAction(dismissAction)
                     let settingsAction = UIAlertAction(title: NSLocalizedString("Open Settings", comment: "See http://mzl.la/1G7uHo7"), style: UIAlertActionStyle.Default ) { (action: UIAlertAction!) -> Void in
@@ -2176,10 +2263,11 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 
             let copyImageTitle = NSLocalizedString("Copy Image", comment: "Context menu item for copying an image to the clipboard")
             let copyAction = UIAlertAction(title: copyImageTitle, style: UIAlertActionStyle.Default) { (action: UIAlertAction) -> Void in
-                let pasteBoard = UIPasteboard.generalPasteboard()
-                pasteBoard.string = url.absoluteString
                 // put the actual image on the clipboard
-                // do this be asyncronously just in case we're in a low bandwidth situation
+                // do this asynchronously just in case we're in a low bandwidth situation
+                let pasteboard = UIPasteboard.generalPasteboard()
+                pasteboard.URL = url
+                let changeCount = pasteboard.changeCount
                 let application = UIApplication.sharedApplication()
                 var taskId: UIBackgroundTaskIdentifier = 0
                 taskId = application.beginBackgroundTaskWithExpirationHandler { _ in
@@ -2187,15 +2275,22 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 }
 
                 Alamofire.request(.GET, url)
+                    .validate(statusCode: 200..<300)
                     .response { responseRequest, responseResponse, responseData, responseError in
-                        // only set the image onto pasteboard if the thing currently in pasteboard is
-                        // the URL of this image, otherwise, in low bandwidth situations,
-                        // we might be overwriting something that the user has subsequently added
-                        if pasteBoard.string == url.absoluteString {
-                            guard let imageData = responseData where responseError == nil else { return }
-                            pasteBoard.image = UIImage.imageFromDataThreadSafe(imageData)
-                            application.endBackgroundTask(taskId)
+                        // Only set the image onto the pasteboard if the pasteboard hasn't changed since
+                        // fetching the image; otherwise, in low-bandwidth situations,
+                        // we might be overwriting something that the user has subsequently added.
+                        if changeCount == pasteboard.changeCount,
+                           let imageData = responseData where responseError == nil,
+                           let image = UIImage.imageFromDataThreadSafe(imageData) {
+                            // Setting pasteboard.items allows us to set multiple representations for the same item.
+                            pasteboard.items = [[
+                                kUTTypeURL as String: url,
+                                kUTTypePNG as String: image
+                            ]]
                         }
+
+                        application.endBackgroundTask(taskId)
                 }
             }
             actionSheetController.addAction(copyAction)
@@ -2261,7 +2356,7 @@ extension BrowserViewController: SessionRestoreHelperDelegate {
 // MARK: Browser Chrome Theming
 extension BrowserViewController {
 
-    func applyPrivateModeTheme() {
+    func applyPrivateModeTheme(force force: Bool = false) {
         BrowserLocationView.appearance().baseURLFontColor = UIColor.lightGrayColor()
         BrowserLocationView.appearance().hostFontColor = UIColor.whiteColor()
         BrowserLocationView.appearance().backgroundColor = UIConstants.PrivateModeLocationBackgroundColor
@@ -2289,11 +2384,15 @@ extension BrowserViewController {
         ReaderModeBarView.appearance().backgroundColor = UIConstants.PrivateModeReaderModeBackgroundColor
         ReaderModeBarView.appearance().buttonTintColor = UIColor.whiteColor()
 
+        if force {
+            forceApplyTheme()
+        }
+
         header.blurStyle = .Dark
         footerBackground?.blurStyle = .Dark
     }
 
-    func applyNormalModeTheme() {
+    func applyNormalModeTheme(force force: Bool = false) {
         BrowserLocationView.appearance().baseURLFontColor = BrowserLocationViewUX.BaseURLFontColor
         BrowserLocationView.appearance().hostFontColor = BrowserLocationViewUX.HostFontColor
         BrowserLocationView.appearance().backgroundColor = UIColor.whiteColor()
@@ -2321,8 +2420,18 @@ extension BrowserViewController {
         ReaderModeBarView.appearance().backgroundColor = UIColor.whiteColor()
         ReaderModeBarView.appearance().buttonTintColor = UIColor.darkGrayColor()
 
+        if force {
+            forceApplyTheme()
+        }
+
         header.blurStyle = .ExtraLight
         footerBackground?.blurStyle = .ExtraLight
+    }
+
+    func forceApplyTheme() {
+        urlBar.forceApplyTheme()
+        toolbar?.forceApplyTheme()
+        readerModeBar?.forceApplyTheme()
     }
 }
 
@@ -2363,4 +2472,8 @@ class BlurWrapper: UIView {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
+
+protocol Themeable {
+    func forceApplyTheme()
 }

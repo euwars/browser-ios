@@ -10,13 +10,12 @@ import UIKit
 // Needs to be in sync with Client Clearables.
 private enum Clearable: String {
     case History = "Browsing History"
-    case Logins = "Saved Logins"
     case Cache = "Cache"
     case OfflineData = "Offline Website Data"
     case Cookies = "Cookies"
 }
 
-private let AllClearables = Set([Clearable.History, Clearable.Logins, Clearable.Cache, Clearable.OfflineData, Clearable.Cookies])
+private let AllClearables = Set([Clearable.History, Clearable.Cache, Clearable.OfflineData, Clearable.Cookies])
 
 class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
     private var webRoot: String!
@@ -42,9 +41,8 @@ class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
     }
 
     private func clearPrivateData(clearables: Set<Clearable>) {
-        let webView = tester().waitForViewWithAccessibilityLabel("Web content") as! UIWebView
-        let title = webView.stringByEvaluatingJavaScriptFromString("document.title")
-        let lastTabLabel = title == nil ? "home" : title!
+        let webView = tester().waitForViewWithAccessibilityLabel("Web content") as! WKWebView
+        let lastTabLabel = webView.title!.isEmpty ? "home" : webView.title!
 
         openClearPrivateDataDialog()
 
@@ -86,7 +84,7 @@ class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
     }
 
     func testRemembersToggles() {
-        clearPrivateData([Clearable.History, Clearable.Logins])
+        clearPrivateData([Clearable.History])
 
         openClearPrivateDataDialog()
 
@@ -96,7 +94,6 @@ class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
             (Clearable.Cookies, "0"),
             (Clearable.OfflineData, "0"),
             (Clearable.History, "1"),
-            (Clearable.Logins, "1"),
         ].forEach { clearable, value in
             XCTAssertEqual(value, tester().waitForViewWithAccessibilityLabel(clearable.rawValue).accessibilityValue)
         }
@@ -165,7 +162,7 @@ class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
         tester().clearTextFromAndThenEnterTextIntoCurrentFirstResponder("\(url)\n")
         tester().waitForWebViewElementWithAccessibilityLabel("Page 1")
 
-        let webView = tester().waitForViewWithAccessibilityLabel("Web content") as! UIWebView
+        let webView = tester().waitForViewWithAccessibilityLabel("Web content") as! WKWebView
 
         // Set and verify a dummy cookie value.
         setCookies(webView, cookie: "foo=bar")
@@ -198,7 +195,7 @@ class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
         tester().clearTextFromAndThenEnterTextIntoCurrentFirstResponder("\(url)\n")
         tester().waitForWebViewElementWithAccessibilityLabel("Cache test")
 
-        let webView = tester().waitForViewWithAccessibilityLabel("Web content") as! UIWebView
+        let webView = tester().waitForViewWithAccessibilityLabel("Web content") as! WKWebView
         let requests = cachedServer.requests
 
         // Verify that clearing non-cache items will keep the page in the cache.
@@ -212,57 +209,22 @@ class ClearPrivateDataTests: KIFTestCase, UITextFieldDelegate {
         XCTAssertEqual(cachedServer.requests, requests + 1)
     }
 
-    func testClearsLogins() {
-        tester().tapViewWithAccessibilityIdentifier("url")
-        let url = "\(webRoot)/loginForm.html"
-        tester().clearTextFromAndThenEnterTextIntoCurrentFirstResponder("\(url)\n")
-        tester().waitForWebViewElementWithAccessibilityLabel("Submit")
-
-        // The form should be empty when we first load it.
-        XCTAssertFalse(tester().hasWebViewElementWithAccessibilityLabel("foo"))
-        XCTAssertFalse(tester().hasWebViewElementWithAccessibilityLabel("bar"))
-
-        // Fill it in and submit.
-        tester().enterText("foo", intoWebViewInputWithName: "username")
-        tester().enterText("bar", intoWebViewInputWithName: "password")
-        tester().tapWebViewElementWithAccessibilityLabel("Submit")
-
-        // Say "Yes" to the remember password prompt.
-        tester().tapViewWithAccessibilityLabel("Yes")
-
-        // Verify that the form is autofilled after reloading.
-        tester().tapViewWithAccessibilityLabel("Reload")
-        XCTAssert(tester().hasWebViewElementWithAccessibilityLabel("foo"))
-        XCTAssert(tester().hasWebViewElementWithAccessibilityLabel("bar"))
-
-        // Ensure that clearing other data has no effect on the saved logins.
-        clearPrivateData(AllClearables.subtract([Clearable.Logins]))
-        tester().tapViewWithAccessibilityLabel("Reload")
-        XCTAssert(tester().hasWebViewElementWithAccessibilityLabel("foo"))
-        XCTAssert(tester().hasWebViewElementWithAccessibilityLabel("bar"))
-
-        // Ensure that clearing logins clears the form.
-        clearPrivateData([Clearable.Logins])
-        tester().tapViewWithAccessibilityLabel("Reload")
-        XCTAssertFalse(tester().hasWebViewElementWithAccessibilityLabel("foo"))
-        XCTAssertFalse(tester().hasWebViewElementWithAccessibilityLabel("bar"))
+    private func setCookies(webView: WKWebView, cookie: String) {
+        let expectation = expectationWithDescription("Set cookie")
+        webView.evaluateJavaScript("document.cookie = \"\(cookie)\"; localStorage.cookie = \"\(cookie)\"; sessionStorage.cookie = \"\(cookie)\";") { result, _ in
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(10, handler: nil)
     }
 
-    private func setCookies(webView: UIWebView, cookie: String) {
-        // let expectation = expectationWithDescription("Set cookie")
-        webView.stringByEvaluatingJavaScriptFromString("document.cookie = \"\(cookie)\"; localStorage.cookie = \"\(cookie)\"; sessionStorage.cookie = \"\(cookie)\";")
-        //waitForExpectationsWithTimeout(10, handler: nil)
-    }
-
-    private func getCookies(webView: UIWebView) -> (cookie: String, localStorage: String?, sessionStorage: String?) {
+    private func getCookies(webView: WKWebView) -> (cookie: String, localStorage: String?, sessionStorage: String?) {
         var cookie: (String, String?, String?)!
         let expectation = expectationWithDescription("Got cookie")
-        let result = webView.stringByEvaluatingJavaScriptFromString("JSON.stringify([document.cookie, localStorage.cookie, sessionStorage.cookie])")
-
-        let cookies = JSON.parse(result!).asArray!
-        cookie = (cookies[0].asString!, cookies[1].asString, cookies[2].asString)
-        expectation.fulfill()
-
+        webView.evaluateJavaScript("JSON.stringify([document.cookie, localStorage.cookie, sessionStorage.cookie])") { result, _ in
+            let cookies = JSON.parse(result as! String).asArray!
+            cookie = (cookies[0].asString!, cookies[1].asString, cookies[2].asString)
+            expectation.fulfill()
+        }
         waitForExpectationsWithTimeout(10, handler: nil)
         return cookie
     }
