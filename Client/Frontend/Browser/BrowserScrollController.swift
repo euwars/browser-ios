@@ -194,7 +194,11 @@ private extension BrowserScrollingController {
 
     func animateToolbarsWithOffsets(animated animated: Bool, duration: NSTimeInterval, headerOffset: CGFloat,
         footerOffset: CGFloat, alpha: CGFloat, completion: ((finished: Bool) -> Void)?) {
-
+#if BRAVE
+          if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+            return;
+          }
+#endif
         let animation: () -> Void = {
             self.headerTopOffset = headerOffset
             self.footerBottomOffset = footerOffset
