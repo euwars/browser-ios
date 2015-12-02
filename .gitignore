@@ -1,3 +1,4 @@
+*.mobileprovision
 xcuserdata/
 
 fastlane/scripts/upload.sh
