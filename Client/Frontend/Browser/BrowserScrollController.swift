@@ -21,11 +21,21 @@ class BrowserScrollingController: NSObject {
 
     weak var browser: Browser? {
         willSet {
+          #if BRAVE
+            if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+              return;
+            }
+          #endif
             self.scrollView?.delegate = nil
             self.scrollView?.removeGestureRecognizer(panGesture)
         }
 
         didSet {
+          #if BRAVE
+            if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+              return;
+            }
+          #endif
             self.scrollView?.addGestureRecognizer(panGesture)
             scrollView?.delegate = self
         }
