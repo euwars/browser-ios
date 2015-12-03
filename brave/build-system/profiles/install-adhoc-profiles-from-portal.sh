@@ -1,6 +1,11 @@
 rm -rf ~/Library/MobileDevice/Provisioning\ Profiles/*
+rm adhoc/*.mobileprovision*
 
-(cd adhoc && ios profiles:download:all --team 9Y996D6DTQ --type distribution)
+USER=
+PASS=
+[[ -n $1 ]] && [[ -n $2 ]] && USER=" -u $1 " && PASS=" -p $2 " && echo "User and Pass specified"
+
+(cd adhoc && ios profiles:download:all --team 9Y996D6DTQ --type distribution $USER $PASS)
 
 for f in `ls adhoc/*.mobileprovision`
 do
