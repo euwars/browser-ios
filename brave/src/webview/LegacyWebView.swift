@@ -154,10 +154,13 @@ class LegacyWebView: UIWebView {
   }
 
   override func goBack() {
+    // stop scrolling so the web view will respond faster
+    scrollView.setContentOffset(scrollView.contentOffset, animated: false)
     super.goBack()
   }
 
   override func goForward() {
+    scrollView.setContentOffset(scrollView.contentOffset, animated: false)
     super.goForward()
   }
 
