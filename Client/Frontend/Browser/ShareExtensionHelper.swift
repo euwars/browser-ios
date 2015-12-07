@@ -22,7 +22,7 @@ class ShareExtensionHelper: NSObject {
         printInfo.outputType = .General
         let renderer = BrowserPrintPageRenderer(browser: selectedTab)
 
-        var activityItems = [printInfo, renderer, url]
+        var activityItems = [printInfo, renderer]
         if let title = selectedTab.title {
             activityItems.append(TitleActivityItemProvider(title: title))
         }
@@ -72,8 +72,12 @@ extension ShareExtensionHelper: UIActivityItemSource {
             // Return the 1Password extension item
             return onePasswordExtensionItem
         } else {
-            // Return the selected tab's URL
-            return selectedTab.displayURL!
+            // Return the URL for the selected tab. If we are in reader view then decode
+            // it so that we copy the original and not the internal localhost one.
+            if let url = selectedTab.displayURL where ReaderModeUtils.isReaderModeURL(url) {
+                return ReaderModeUtils.decodeURL(url)
+            }
+            return selectedTab.displayURL
         }
     }
 

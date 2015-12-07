@@ -267,17 +267,17 @@ private class SyncNowSetting: WithAccountSetting {
     }
 
     override var status: NSAttributedString? {
-        if let timestamp = profile.prefs.timestampForKey(PrefsKeys.KeyLastSyncFinishTime) {
-            let label = NSLocalizedString("Last synced: %@", comment: "Last synced time label beside Sync Now setting option. Argument is the relative date string.")
-            let formattedLabel = String(format: label, NSDate.fromTimestamp(timestamp).toRelativeTimeString())
-            let attributedString = NSMutableAttributedString(string: formattedLabel)
-            let attributes = [NSForegroundColorAttributeName: UIColor.grayColor(), NSFontAttributeName: UIFont.systemFontOfSize(12, weight: UIFontWeightRegular)]
-            let range = NSMakeRange(0, attributedString.length)
-            attributedString.setAttributes(attributes, range: range)
-            return attributedString
+        guard let timestamp = profile.syncManager.lastSyncFinishTime else {
+            return nil
         }
 
-        return nil
+        let label = NSLocalizedString("Last synced: %@", comment: "Last synced time label beside Sync Now setting option. Argument is the relative date string.")
+        let formattedLabel = String(format: label, NSDate.fromTimestamp(timestamp).toRelativeTimeString())
+        let attributedString = NSMutableAttributedString(string: formattedLabel)
+        let attributes = [NSForegroundColorAttributeName: UIColor.grayColor(), NSFontAttributeName: UIFont.systemFontOfSize(12, weight: UIFontWeightRegular)]
+        let range = NSMakeRange(0, attributedString.length)
+        attributedString.setAttributes(attributes, range: range)
+        return attributedString
     }
 
     override func onConfigureCell(cell: UITableViewCell) {
@@ -467,8 +467,14 @@ private class DeleteExportedDataSetting: HiddenSetting {
 
     override func onClick(navigationController: UINavigationController?) {
         let documentsPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
+        let fileManager = NSFileManager.defaultManager()
         do {
-            try NSFileManager.defaultManager().removeItemInDirectory(documentsPath, named: "browser.db")
+            let files = try fileManager.contentsOfDirectoryAtPath(documentsPath)
+            for file in files {
+                if file.startsWith("browser.") || file.startsWith("logins.") {
+                    try fileManager.removeItemInDirectory(documentsPath, named: file)
+                }
+            }
         } catch {
             print("Couldn't delete exported data: \(error).")
         }
@@ -483,12 +489,14 @@ private class ExportBrowserDataSetting: HiddenSetting {
 
     override func onClick(navigationController: UINavigationController?) {
         let documentsPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
-        if let browserDB = NSURL.fileURLWithPath(documentsPath).URLByAppendingPathComponent("browser.db").path {
-            do {
-                try self.settings.profile.files.copy("browser.db", toAbsolutePath: browserDB)
-            } catch {
-                print("Couldn't export browser data: \(error).")
+        do {
+            let log = Logger.syncLogger
+            try self.settings.profile.files.copyMatching(fromRelativeDirectory: "", toAbsoluteDirectory: documentsPath) { file in
+                log.debug("Matcher: \(file)")
+                return file.startsWith("browser.") || file.startsWith("logins.")
             }
+        } catch {
+            print("Couldn't export browser data: \(error).")
         }
     }
 }
@@ -778,8 +786,8 @@ class SettingsTableViewController: UITableViewController {
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELsyncDidChangeState", name: ProfileDidStartSyncingNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELsyncDidChangeState", name: ProfileDidFinishSyncingNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELsyncDidChangeState", name: NotificationProfileDidStartSyncing, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELsyncDidChangeState", name: NotificationProfileDidFinishSyncing, object: nil)
     }
 
     override func viewDidAppear(animated: Bool) {
@@ -789,8 +797,8 @@ class SettingsTableViewController: UITableViewController {
 
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: ProfileDidStartSyncingNotification, object: nil)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: ProfileDidFinishSyncingNotification, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationProfileDidStartSyncing, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationProfileDidFinishSyncing, object: nil)
     }
 
     @objc private func SELsyncDidChangeState() {

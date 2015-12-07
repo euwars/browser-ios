@@ -112,6 +112,7 @@ class BrowserViewController: UIViewController {
     }
 
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
         displayedPopoverController?.dismissViewControllerAnimated(true, completion: nil)
 
         coordinator.animateAlongsideTransition(nil) { context in
@@ -451,14 +452,6 @@ class BrowserViewController: UIViewController {
             // Reset previous crash state
             activeCrashReporter?.resetPreviousCrashState()
 
-            // Only ask to restore tabs from a crash if we had non-home tabs or tabs with some kind of history in them
-            guard let tabsToRestore = tabManager.tabsToRestore() else { return }
-            let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 }
-            if onlyNoHistoryTabs {
-                tabManager.addTabAndSelect();
-                return
-            }
-
             let optedIntoCrashReporting = profile.prefs.boolForKey("crashreports.send.always")
             if optedIntoCrashReporting == nil {
                 // Offer a chance to allow the user to opt into crash reporting
@@ -494,7 +487,7 @@ class BrowserViewController: UIViewController {
     }
 
     private func showRestoreTabsAlert() {
-        guard !DebugSettingsBundleOptions.skipSessionRestore else {
+        guard shouldRestoreTabs() else {
             self.tabManager.addTabAndSelect()
             return
         }
@@ -509,6 +502,12 @@ class BrowserViewController: UIViewController {
         )
 
         self.presentViewController(alert, animated: true, completion: nil)
+    }
+
+    private func shouldRestoreTabs() -> Bool {
+        guard let tabsToRestore = tabManager.tabsToRestore() else { return false }
+        let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 || !AboutUtils.isAboutHomeURL($0.sessionData?.urls.first) }
+        return !onlyNoHistoryTabs && !DebugSettingsBundleOptions.skipSessionRestore
     }
 
     override func viewDidAppear(animated: Bool) {
@@ -712,8 +711,16 @@ class BrowserViewController: UIViewController {
         urlBar.currentURL = url
         urlBar.leaveOverlayMode()
 
-        if let tab = tabManager.selectedTab,
-           let nav = tab.loadRequest(NSURLRequest(URL: url)) {
+        guard let tab = tabManager.selectedTab else {
+            return
+        }
+
+#if !BRAVE // TODO hookup when adding desktop AU
+        if let webView = tab.webView {
+            resetSpoofedUserAgentIfRequired(webView, newURL: url)
+        }
+#endif
+        if let nav = tab.loadRequest(NSURLRequest(URL: url)) {
             self.recordNavigationInTab(tab, navigation: nav, visitType: visitType)
         }
     }
@@ -899,6 +906,18 @@ class BrowserViewController: UIViewController {
         openURLInNewTab(nil, isPrivate: isPrivate)
         urlBar.browserLocationViewDidTapLocation(urlBar.locationView)
     }
+
+  #if !BRAVE // TODO hookup when adding desktop AU
+    private func resetSpoofedUserAgentIfRequired(webView: WKWebView, newURL: NSURL) {
+        guard #available(iOS 9.0, *) else {
+            return
+        }
+        // Reset the UA when a different domain is being loaded
+        if webView.URL?.host != newURL.host {
+            webView.customUserAgent = nil
+        }
+    }
+  #endif
 }
 
 /**
@@ -1611,7 +1630,6 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     func webView(webView: WKWebView, decidePolicyForNavigationAction navigationAction: WKNavigationAction, decisionHandler: (WKNavigationActionPolicy) -> Void) {
-
         guard let url = navigationAction.request.URL else {
             decisionHandler(WKNavigationActionPolicy.Cancel)
             return
@@ -1625,14 +1643,24 @@ extension BrowserViewController: WKNavigationDelegate {
                 openExternal(url, prompt: navigationAction.navigationType == WKNavigationType.Other)
                 decisionHandler(WKNavigationActionPolicy.Cancel)
             } else {
+                if navigationAction.navigationType == .LinkActivated {
+#if !BRAVE // TODO hookup when adding desktop AU
+                   resetSpoofedUserAgentIfRequired(webView, newURL: url)
+#endif
+                }
                 decisionHandler(WKNavigationActionPolicy.Allow)
             }
         case "tel":
             callExternal(url)
             decisionHandler(WKNavigationActionPolicy.Cancel)
         default:
+            // If this is a scheme that we don't know how to handle, see if an external app
+            // can handle it. If not then we show an error page. In either case we cancel
+            // the request so that the webview does not see it.
             if UIApplication.sharedApplication().canOpenURL(url) {
                 openExternal(url)
+            } else {
+                ErrorPageHelper().showPage(NSError(domain: kCFErrorDomainCFNetwork as String, code: Int(CFNetworkErrors.CFErrorHTTPBadURL.rawValue), userInfo: [:]), forUrl: url, inWebView: webView)
             }
             decisionHandler(WKNavigationActionPolicy.Cancel)
         }
@@ -1694,10 +1722,9 @@ extension BrowserViewController: WKNavigationDelegate {
 
         addOpenInViewIfNeccessary(webView.URL)
 
-        // Remember whether or not a desktop site was requested and reset potentially spoofed user agent
+        // Remember whether or not a desktop site was requested
         if #available(iOS 9.0, *) {
             tab.desktopSite = webView.customUserAgent?.isEmpty == false
-          //  webView.customUserAgent = nil
         }
     }
 
@@ -1739,12 +1766,14 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 }
 
+/// List of schemes that are allowed to open a popup window
+private let SchemesAllowedToOpenPopups = ["http", "https", "javascript", "data"]
+
 extension BrowserViewController: WKUIDelegate {
 
 #if !BRAVE
   /// THIS IS FOR _blank TARGETS
     func webView(webView: WKWebView, createWebViewWithConfiguration configuration: WKWebViewConfiguration, forNavigationAction navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-
         guard let currentTab = tabManager.selectedTab else { return nil }
 
         screenshotHelper.takeScreenshot(currentTab)
@@ -1758,16 +1787,42 @@ extension BrowserViewController: WKUIDelegate {
             newTab = tabManager.addTab(navigationAction.request, configuration: configuration)
         }
         tabManager.selectTab(newTab)
+        
+        // If the page we just opened has a bad scheme, we return nil here so that JavaScript does not
+        // get a reference to it which it can return from window.open() - this will end up as a
+        // CFErrorHTTPBadURL being presented.
+        guard let scheme = navigationAction.request.URL?.scheme.lowercaseString where SchemesAllowedToOpenPopups.contains(scheme) else {
+            return nil
+        }
+        
         return newTab.webView
     }
 #endif
 #if !BRAVE
-  func webView(webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: () -> Void) {
+    /// Show a title for a JavaScript Panel (alert) based on the WKFrameInfo. On iOS9 we will use the new securityOrigin
+    /// and on iOS 8 we will fall back to the request URL. If the request URL is nil, which happens for JavaScript pages,
+    /// we fall back to "JavaScript" as a title.
+    private func titleForJavaScriptPanelInitiatedByFrame(frame: WKFrameInfo) -> String {
+        var title: String = "JavaScript"
+        if #available(iOS 9, *) {
+            title = "\(frame.securityOrigin.`protocol`)://\(frame.securityOrigin.host)"
+            if frame.securityOrigin.port != 0 {
+                title += ":\(frame.securityOrigin.port)"
+            }
+        } else {
+            if let url = frame.request.URL {
+                title = "\(url.scheme)://\(url.hostPort))"
+            }
+        }
+        return title
+    }
+
+    func webView(webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: () -> Void) {
         tabManager.selectTab(tabManager[webView])
 
         // Show JavaScript alerts.
-        let title = frame.request.URL!.host
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+
+        let alertController = UIAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame), message: message, preferredStyle: UIAlertControllerStyle.Alert)
         alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
             completionHandler()
         }))
@@ -1779,8 +1834,7 @@ extension BrowserViewController: WKUIDelegate {
         tabManager.selectTab(tabManager[webView])
 
         // Show JavaScript confirm dialogs.
-        let title = frame.request.URL!.host
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.Alert)
+        let alertController = UIAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame), message: message, preferredStyle: UIAlertControllerStyle.Alert)
         alertController.addAction(UIAlertAction(title: OKString, style: UIAlertActionStyle.Default, handler: { _ in
             completionHandler(true)
         }))
@@ -1795,8 +1849,7 @@ extension BrowserViewController: WKUIDelegate {
         tabManager.selectTab(tabManager[webView])
 
         // Show JavaScript input dialogs.
-        let title = frame.request.URL!.host
-        let alertController = UIAlertController(title: title, message: prompt, preferredStyle: UIAlertControllerStyle.Alert)
+        let alertController = UIAlertController(title: titleForJavaScriptPanelInitiatedByFrame(frame), message: prompt, preferredStyle: UIAlertControllerStyle.Alert)
         var input: UITextField!
         alertController.addTextFieldWithConfigurationHandler({ (textField: UITextField) in
             textField.text = defaultText

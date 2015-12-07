@@ -12,6 +12,7 @@ import XCTest
 
 public class MockSyncManager: SyncManager {
     public var isSyncing = false
+    public var lastSyncFinishTime: Timestamp? = nil
 
     public func syncClients() -> SyncResult { return deferMaybe(.Completed) }
     public func syncClientsThenTabs() -> SyncResult { return deferMaybe(.Completed) }
@@ -63,9 +64,6 @@ public class MockProfile: Profile {
     }
 
     func shutdown() {
-        if dbCreated {
-            db.close()
-        }
     }
 
     private var dbCreated = false
