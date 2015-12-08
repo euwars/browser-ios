@@ -216,7 +216,8 @@ private extension BraveBrowserScrollController {
     urlBar?.updateAlphaForSubviews(alpha)
 
     guard let scrollView = self.scrollView else { return }
-    scrollView.contentInset = UIEdgeInsetsMake(UIConstants.ToolbarHeight + self.headerTopOffset, 0, footerBottomOffset	,0)
+    scrollView.contentInset = UIEdgeInsetsMake(UIConstants.ToolbarHeight + self.headerTopOffset, 0,
+      UIConstants.ToolbarHeight - footerBottomOffset, 0)
     scrollView.scrollIndicatorInsets = scrollView.contentInset
   }
 
