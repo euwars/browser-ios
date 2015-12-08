@@ -95,13 +95,11 @@ public class LegacyWebViewProgress
     startProgress()
   }
 
-  public func webViewDidFinishLoad() {
+  public func webViewDidFinishLoad(documentReadyState documentReadyState:String?) {
     _loadingCount--;
     incrementProgress()
 
-    let readyState = webView?.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
-
-    if let readyState = readyState {
+    if let readyState = documentReadyState {
       switch readyState {
       case "loaded":
         completeProgress()
@@ -135,6 +133,6 @@ public class LegacyWebViewProgress
   }
 
   public func didFailLoadWithError() {
-    webViewDidFinishLoad()
+    webViewDidFinishLoad(documentReadyState: nil)
   }
 }

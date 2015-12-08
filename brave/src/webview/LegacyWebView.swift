@@ -279,8 +279,9 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     assert(NSThread.isMainThread())
 
     guard let _parent = parent else { return }
+    let readyState = _parent.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
 
-    _parent.progress.webViewDidFinishLoad()
+    _parent.progress.webViewDidFinishLoad(documentReadyState: readyState)
 
     _parent.title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? ""
     if let item = _parent.backForwardList.currentItem {
@@ -312,8 +313,7 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     }
 
     // For testing
-    if let readyState = _parent.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
-      where readyState == "complete" {
+    if readyState == "complete" {
       NSNotificationCenter.defaultCenter()
         .postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
     }
