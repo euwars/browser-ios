@@ -71,13 +71,13 @@ class BrowserViewController: UIViewController {
     var headerBackdrop: UIView!
     var footer: UIView!
     var footerBackdrop: UIView!
-    private var footerBackground: BlurWrapper?
+    var footerBackground: BlurWrapper?
     private var topTouchArea: UIButton!
 
     // Backdrop used for displaying greyed background for private tabs
     var webViewContainerBackdrop: UIView!
 
-    private var scrollController = BrowserScrollingController()
+    private var scrollController = BraveBrowserScrollController()
 
     private var keyboardState: KeyboardState?
 
@@ -163,15 +163,19 @@ class BrowserViewController: UIViewController {
         toolbar = nil
 
         if showToolbar {
-          toolbar = BraveBrowserToolbar()
+            toolbar = BraveBrowserToolbar()
             toolbar?.browserToolbarDelegate = self
-            footerBackground = EmptyBlurWrapper(view: toolbar!)
+            footerBackground = BlurWrapper(view: toolbar!)
             footerBackground?.translatesAutoresizingMaskIntoConstraints = false
 
+#if !BRAVE
             // Need to reset the proper blur style
             if let selectedTab = tabManager.selectedTab where selectedTab.isPrivate {
                 footerBackground!.blurStyle = .Dark
             }
+#else
+            footerBackground!.blurStyle = .Dark
+#endif
             footer.addSubview(footerBackground!)
         }
 
@@ -295,7 +299,7 @@ class BrowserViewController: UIViewController {
         urlBar.translatesAutoresizingMaskIntoConstraints = false
         urlBar.delegate = self
         urlBar.browserToolbarDelegate = self
-        header = EmptyBlurWrapper(view: urlBar)
+        header = BlurWrapper(view: urlBar)
         view.addSubview(header)
 
         headerBackdrop.backgroundColor = BraveUX.HeaderBackdropBackgroundColor
@@ -547,8 +551,10 @@ class BrowserViewController: UIViewController {
         }
 
         webViewContainer.snp_remakeConstraints { make in
-            make.left.right.equalTo(self.view)
-
+          make.left.right.bottom.equalTo(self.view)
+          make.top.equalTo(self.statusBarOverlay.snp_bottom)
+          return
+#if !BRAVE
             if let readerModeBarBottom = readerModeBar?.snp_bottom {
                 make.top.equalTo(readerModeBarBottom)
             } else {
@@ -560,6 +566,7 @@ class BrowserViewController: UIViewController {
             } else {
                 make.bottom.equalTo(self.view)
             }
+#endif
         }
 
         // Setup the bottom toolbar
@@ -834,9 +841,11 @@ class BrowserViewController: UIViewController {
     }
 
     private func updateUIForReaderHomeStateForTab(tab: Browser) {
-        updateURLBarDisplayURL(tab)
+#if BRAVE
+        return // TODO Reader Mode hookup. Beware showToolbars is a performance killer.
+#endif
+      updateURLBarDisplayURL(tab)
         scrollController.showToolbars(animated: false)
-
         if let url = tab.url {
             if ReaderModeUtils.isReaderModeURL(url) {
                 showReaderModeBar(animated: false)

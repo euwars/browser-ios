@@ -57,7 +57,6 @@ class BraveBrowserToolbar : BrowserToolbar {
 
     BraveBrowserToolbar.currentInstance = self
 
-    backgroundColor = BraveUX.BottomToolbarBackgroundColor
     bookmarkButton.hidden = true
     stopReloadButton.hidden = true
 
@@ -109,6 +108,8 @@ class BraveBrowserToolbar : BrowserToolbar {
 
   override func updateConstraints() {
     hackToSetButtonColor()
+    backgroundColor = UIColor.clearColor()
+
     super.updateConstraints()
 
     var backButtonWidth = backButton.imageView?.image?.size.width ?? 0

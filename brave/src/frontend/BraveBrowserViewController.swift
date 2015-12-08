@@ -1,21 +1,23 @@
 import Shared
 
 // To disable the blur effect
-class EmptyBlurWrapper :BlurWrapper {
-  override init(view: UIView) {
-    super.init(view: view)
-    effectView.removeFromSuperview()
-    effectView = UIVisualEffectView()
-  }
-
-  required init?(coder aDecoder: NSCoder) {
-    super.init(coder: aDecoder)
-  }
-}
+//class EmptyBlurWrapper :BlurWrapper {
+//  override init(view: UIView) {
+//    super.init(view: view)
+//    effectView.removeFromSuperview()
+//    effectView = UIVisualEffectView()
+//  }
+//
+//  required init?(coder aDecoder: NSCoder) {
+//    super.init(coder: aDecoder)
+//  }
+//}
 
 class BraveBrowserViewController : BrowserViewController {
   override func applyNormalModeTheme(force force:Bool) {
     super.applyNormalModeTheme(force:false)
+    header.blurStyle = .Dark
+    footerBackground?.blurStyle = .Dark
 
     BrowserLocationView.appearance().baseURLFontColor = BraveUX.LocationBarTextColor_URLBaseComponent
     BrowserLocationView.appearance().hostFontColor =  BraveUX.LocationBarTextColor_URLHostComponent

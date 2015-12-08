@@ -10,17 +10,14 @@ class BraveURLBarView : URLBarView {
 
   override func commonInit() {
     BraveURLBarView.currentInstance = self
-
     locationContainer.layer.cornerRadius = CGFloat(BraveUX.TextFieldCornerRadius)
     curveShape = HideCurveView()
     super.commonInit()
-    self.backgroundColor = URLBarViewUX.backgroundColorWithAlpha(1)
   }
 
   override func updateAlphaForSubviews(alpha: CGFloat) {
     super.updateAlphaForSubviews(alpha)
-    // without this the background is gray
-    self.backgroundColor = URLBarViewUX.backgroundColorWithAlpha(1)
+    self.superview?.alpha = alpha
   }
 
   override func updateTabCount(count: Int, animated: Bool = true) {
