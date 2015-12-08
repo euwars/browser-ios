@@ -77,7 +77,7 @@ class BrowserViewController: UIViewController {
     // Backdrop used for displaying greyed background for private tabs
     var webViewContainerBackdrop: UIView!
 
-    private var scrollController = BraveBrowserScrollController()
+    var scrollController = BraveBrowserScrollController()
 
     private var keyboardState: KeyboardState?
 
@@ -841,10 +841,10 @@ class BrowserViewController: UIViewController {
     }
 
     private func updateUIForReaderHomeStateForTab(tab: Browser) {
+      updateURLBarDisplayURL(tab)
 #if BRAVE
         return // TODO Reader Mode hookup. Beware showToolbars is a performance killer.
 #endif
-      updateURLBarDisplayURL(tab)
         scrollController.showToolbars(animated: false)
         if let url = tab.url {
             if ReaderModeUtils.isReaderModeURL(url) {
