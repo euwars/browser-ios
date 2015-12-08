@@ -146,6 +146,7 @@ private extension BraveBrowserScrollController {
 
   @objc func handlePan(gesture: UIPanGestureRecognizer) {
     if browserIsLoading() {
+      showToolbars(animated: true)
       return
     }
 
@@ -306,5 +307,4 @@ extension BraveBrowserScrollController: UIScrollViewDelegate {
       }
     }
   }
-
 }
