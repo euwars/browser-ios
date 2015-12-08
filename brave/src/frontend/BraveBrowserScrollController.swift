@@ -29,7 +29,6 @@ class BraveBrowserScrollController: NSObject {
       guard let scrollView = self.scrollView else { return }
       scrollView.addGestureRecognizer(panGesture)
       scrollView.delegate = self
-      setupInsetsForTransparentBars(show: true)
     }
   }
 
@@ -120,11 +119,12 @@ class BraveBrowserScrollController: NSObject {
   }
 
   override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
-//    if keyPath == "contentSize" {
-//      if !checkScrollHeightIsLargeEnoughForScrolling() && !toolbarsShowing {
-//        showToolbars(animated: true, completion: nil)
-//      }
-//    }
+    if keyPath == "contentSize" {
+      if browserIsLoading() ||
+        scrollViewHeight >= contentHeight {
+        setupInsetsForTransparentBars(show: true)
+      }
+    }
   }
 
 
