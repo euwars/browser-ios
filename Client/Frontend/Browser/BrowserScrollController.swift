@@ -21,17 +21,11 @@ class BrowserScrollingController: NSObject {
 
     weak var browser: Browser? {
         willSet {
-          #if BRAVE
-              return;
-          #endif
             self.scrollView?.delegate = nil
             self.scrollView?.removeGestureRecognizer(panGesture)
         }
 
         didSet {
-          #if BRAVE
-              return;
-          #endif
             self.scrollView?.addGestureRecognizer(panGesture)
             scrollView?.delegate = self
         }
@@ -200,11 +194,6 @@ private extension BrowserScrollingController {
 
     func animateToolbarsWithOffsets(animated animated: Bool, duration: NSTimeInterval, headerOffset: CGFloat,
         footerOffset: CGFloat, alpha: CGFloat, completion: ((finished: Bool) -> Void)?) {
-#if BRAVE
-          if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
-            return;
-          }
-#endif
         let animation: () -> Void = {
             self.headerTopOffset = headerOffset
             self.footerBottomOffset = footerOffset

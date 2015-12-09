@@ -61,10 +61,7 @@ private extension TrayToBrowserAnimator {
         container.layoutIfNeeded()
 
 
-        var finalFrame = calculateExpandedCellFrameFromBVC(bvc)
-#if BRAVE
-        finalFrame.origin.y += UIConstants.ToolbarHeight
-#endif
+        let finalFrame = calculateExpandedCellFrameFromBVC(bvc)
         bvc.footer.alpha = shouldDisplayFooterForBVC(bvc) ? 1 : 0
         bvc.urlBar.isTransitioning = true
 
@@ -145,10 +142,8 @@ private extension BrowserToTrayAnimator {
         tabTray.collectionView.scrollToItemAtIndexPath(NSIndexPath(forItem: scrollToIndex, inSection: 0), atScrollPosition: .CenteredVertically, animated: false)
 
         // Build a tab cell that we will use to animate the scaling of the browser to the tab
-        var expandedFrame = calculateExpandedCellFrameFromBVC(bvc)
-#if BRAVE
-        expandedFrame.origin.y += UIConstants.ToolbarHeight
-#endif
+        let expandedFrame = calculateExpandedCellFrameFromBVC(bvc)
+
         let cell = createTransitionCellFromBrowser(bvc.tabManager.selectedTab, withFrame: expandedFrame)
         cell.backgroundHolder.layer.cornerRadius = TabTrayControllerUX.CornerRadius
         cell.innerStroke.hidden = true

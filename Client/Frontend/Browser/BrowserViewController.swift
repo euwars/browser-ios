@@ -77,7 +77,7 @@ class BrowserViewController: UIViewController {
     // Backdrop used for displaying greyed background for private tabs
     var webViewContainerBackdrop: UIView!
 
-    var scrollController = BraveBrowserScrollController()
+    var scrollController = BrowserScrollingController()
 
     private var keyboardState: KeyboardState?
 
@@ -551,10 +551,8 @@ class BrowserViewController: UIViewController {
         }
 
         webViewContainer.snp_remakeConstraints { make in
-          make.left.right.bottom.equalTo(self.view)
-          make.top.equalTo(self.statusBarOverlay.snp_bottom)
-          return
-#if !BRAVE
+          make.left.right.equalTo(self.view)
+
             if let readerModeBarBottom = readerModeBar?.snp_bottom {
                 make.top.equalTo(readerModeBarBottom)
             } else {
@@ -566,7 +564,6 @@ class BrowserViewController: UIViewController {
             } else {
                 make.bottom.equalTo(self.view)
             }
-#endif
         }
 
         // Setup the bottom toolbar

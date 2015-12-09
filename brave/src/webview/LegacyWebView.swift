@@ -75,7 +75,7 @@ class LegacyWebView: UIWebView {
     scalesPageToFit = true
     let selectorName = String(format: "_%@WebThread:", "setDrawIn") // avoid Apple Store static analyzer
     performSelector(NSSelectorFromString(selectorName), withObject:Bool(true))
-    scrollView.decelerationRate = UIScrollViewDecelerationRateFast;
+    scrollView.decelerationRate = UIScrollViewDecelerationRateNormal;
     setupSwipeGesture()
   }
 
