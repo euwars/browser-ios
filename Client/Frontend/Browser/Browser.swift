@@ -288,7 +288,10 @@ class Browser: NSObject {
 #if !BRAVE
             return webView.loadRequest(request)
 #else
-            webView.loadRequest(request); return nil;
+            struct DangerousReturnWKNavigation {
+              static let emptyNav = WKNavigation()
+            }
+            webView.loadRequest(request); return DangerousReturnWKNavigation.emptyNav;
 #endif
           }
         return nil

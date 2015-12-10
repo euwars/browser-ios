@@ -716,6 +716,10 @@ class BrowserViewController: UIViewController {
             return
         }
 
+        tab.webView?.URL = url
+        urlBar.currentURL = url
+        urlBar.leaveOverlayMode()
+
 #if !BRAVE // TODO hookup when adding desktop AU
         if let webView = tab.webView {
             resetSpoofedUserAgentIfRequired(webView, newURL: url)
@@ -724,16 +728,7 @@ class BrowserViewController: UIViewController {
         if let nav = tab.loadRequest(NSURLRequest(URL: url)) {
             self.recordNavigationInTab(tab, navigation: nav, visitType: visitType)
         }
-
-      #if BRAVE
-        // we return nil from load request, we still want to record the navigation
-        self.recordNavigationInTab(tab, navigation: WKNavigation(), visitType: visitType)
-      #endif
-
-      // BRAVE: must happen AFTER loadRequest
-      urlBar.currentURL = url
-      urlBar.leaveOverlayMode()
-}
+    }
 
     func addBookmark(url: String, title: String?) {
         let shareItem = ShareItem(url: url, title: title, favicon: nil)
