@@ -839,8 +839,9 @@ class BrowserViewController: UIViewController {
     }
 
     private func updateUIForReaderHomeStateForTab(tab: Browser) {
-      updateURLBarDisplayURL(tab)
 #if BRAVE
+        updateURLBarDisplayURL(tab)
+        updateInContentHomePanel(tab.url)
         return // TODO Reader Mode hookup. Beware showToolbars is a performance killer.
 #endif
         scrollController.showToolbars(animated: false)
