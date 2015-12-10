@@ -46,6 +46,12 @@ public class LegacyWebViewProgress
   }
 
   func completeProgress() {
+    if let nd = webView?.navigationDelegate {
+      let container = ContainerWebView()
+      container.legacyWebView = webView
+      nd.webView?(container, didFinishNavigation: nullWKNavigation)
+    }
+
     webView?.internalIsLoadingEndedFlag = true
     setProgress(1.0)
   }

@@ -93,6 +93,11 @@ class LegacyWebView: UIWebView {
       fatalError("init(coder:) has not been implemented")
   }
 
+  override func loadRequest(request: NSURLRequest) {
+    URL = request.URL
+    super.loadRequest(request)
+  }
+
   func kvoBroadcast(kvos: [KVOStrings]? = nil) {
     if let _kvos = kvos {
       for item in _kvos {
@@ -306,16 +311,11 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
 
     _parent.kvoBroadcast()
 
-    if let nd = _parent.navigationDelegate {
-      let container = ContainerWebView()
-      container.legacyWebView = parent
-      nd.webView?(container, didFinishNavigation: nullWKNavigation)
-    }
-
     // For testing
     if readyState == "complete" {
       NSNotificationCenter.defaultCenter()
         .postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
+
     }
   }
 

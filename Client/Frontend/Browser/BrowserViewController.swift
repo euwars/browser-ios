@@ -712,9 +712,6 @@ class BrowserViewController: UIViewController {
     }
 
     private func finishEditingAndSubmit(url: NSURL, visitType: VisitType) {
-        urlBar.currentURL = url
-        urlBar.leaveOverlayMode()
-
         guard let tab = tabManager.selectedTab else {
             return
         }
@@ -727,7 +724,16 @@ class BrowserViewController: UIViewController {
         if let nav = tab.loadRequest(NSURLRequest(URL: url)) {
             self.recordNavigationInTab(tab, navigation: nav, visitType: visitType)
         }
-    }
+
+      #if BRAVE
+        // we return nil from load request, we still want to record the navigation
+        self.recordNavigationInTab(tab, navigation: WKNavigation(), visitType: visitType)
+      #endif
+
+      // BRAVE: must happen AFTER loadRequest
+      urlBar.currentURL = url
+      urlBar.leaveOverlayMode()
+}
 
     func addBookmark(url: String, title: String?) {
         let shareItem = ShareItem(url: url, title: title, favicon: nil)
@@ -1462,15 +1468,15 @@ extension BrowserViewController: TabManagerDelegate {
             // more than one scroll view in the view hierarchy
             // we therefore have to hide all the scrollViews that we are no actually interesting in interacting with
             // to ensure that scrollsToTop actually works
-            wv.scrollView.hidden = true
+            ///wv.scrollView.hidden = true
         }
 
         if let tab = selected, webView = tab.webView {
             // if we have previously hidden this scrollview in order to make scrollsToTop work then
             // we should ensure that it is not hidden now that it is our foreground scrollView
-            if webView.scrollView.hidden {
-                webView.scrollView.hidden = false
-            }
+//            if webView.scrollView.hidden {
+//                webView.scrollView.hidden = false
+//            }
 
             updateURLBarDisplayURL(tab)
 
