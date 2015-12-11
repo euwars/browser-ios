@@ -50,11 +50,5 @@ class VaultIntentTests: XCTestCase {
     waitForExpectation()
   }
 
-  // test expected response against live server
-  func testLiveSessionIntent() {
-    testLiveUserProfileInit() // required to do further calls?
-    setupExpectation()
-    VaultManager.sessionLaunch()
-    waitForExpectation()
-   }
+
 }

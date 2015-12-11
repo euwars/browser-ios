@@ -67,7 +67,6 @@ class BraveApp {
       print("In test mode, bypass automatic vault registration.")
     } else {
       VaultManager.userProfileInit()
-      VaultManager.sessionLaunch()
     }
 
     BraveApp.isSafeToRestoreTabs = BraveApp.getPref(kAppBootingIncompleteFlag) == nil
@@ -95,11 +94,9 @@ class BraveApp {
   }
 
   @objc func didEnterBackground(_: NSNotification) {
-    VaultManager.sessionTerminate()
   }
 
   @objc func willEnterForeground(_ : NSNotification) {
-    VaultManager.sessionLaunch()
   }
 
   class func shouldHandleOpenURL(components: NSURLComponents) -> Bool {

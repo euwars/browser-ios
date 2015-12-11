@@ -100,20 +100,6 @@ class VaultManager {
     simpleRequest(request, httpMethod: "PUT")
   }
 
-  class func sessionLaunch() {
-    sessionId = nil
-    sessionIntent("browser.app.launch")
-  }
-
-  class func sessionTerminate() {
-    if (sessionId == nil) {
-      return
-    }
-
-    sessionIntent("browser.app.terminate")
-    sessionId = nil
-  }
-
   private class func sessionIntent(type: String) {
     let body =
       "{ \"sessionId\" : \"\(getSessionId())\"\n" +
