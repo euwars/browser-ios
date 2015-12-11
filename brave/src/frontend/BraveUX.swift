@@ -3,6 +3,8 @@ import Foundation
 
 struct BraveUX {
 
+  static var IsHighLoadAnimationAllowed = false
+
   // set to true to show borders around views
   static let DebugShowBorders = false
 

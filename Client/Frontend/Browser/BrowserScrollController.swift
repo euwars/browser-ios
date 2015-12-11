@@ -11,6 +11,7 @@ class BrowserScrollingController: NSObject {
     enum ScrollDirection {
         case Up
         case Down
+        case None  // Brave added
     }
 
     enum ToolbarState {
@@ -75,28 +76,57 @@ class BrowserScrollingController: NSObject {
     private var scrollDirection: ScrollDirection = .Down
     private var toolbarState: ToolbarState = .Visible
 
+    // Brave added
+    // What I am seeing on older devices is when scroll direction is changed quickly, and the toolbar show/hides,
+    // the first or second pan gesture after that will report the wrong direction (the gesture handling seems bugging during janky scrolling)
+    // This added check is a secondary validator of the scroll direction, however one can no longer scroll up and down in a single gesture
+    // to show and hide toolbars, they must be separate gestures.
+    // This all avoids a worst case where the toolbar hides/shows, triggers some jank, user swipes during jank, and the toolbar wrongly shows (and triggers more jank)
+    private var scrollViewWillBeginDragPoint: CGFloat = 0
+
     override init() {
         super.init()
     }
 
-    func showToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
-        toolbarState = .Visible
-        let durationRatio = abs(headerTopOffset / headerFrame.height)
-        let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
-        self.animateToolbarsWithOffsets(
-            animated: animated,
-            duration: actualDuration,
-            headerOffset: 0,
-            footerOffset: 0,
-            alpha: 1,
-            completion: completion)
+  func showToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
+    showToolbars(adjustContentOffset: false, animated: animated, completion: completion)
+  }
+
+    func showToolbars(adjustContentOffset adjustContentOffset: Bool, animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
+        if toolbarState == .Visible || toolbarsShowing {
+        return
+      }
+      toolbarState = .Visible
+      let durationRatio = abs(headerTopOffset / headerFrame.height)
+      let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
+      self.animateToolbarsWithOffsets(
+        adjustContentOffset: adjustContentOffset,
+        animated: animated,
+        duration: actualDuration,
+        headerOffset: 0,
+        footerOffset: 0,
+        alpha: 1,
+        completion: completion)
     }
 
     func hideToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
-        toolbarState = .Collapsed
+      hideToolbars(adjustContentOffset:false, animated: animated, completion: completion)
+    }
+
+    func hideToolbars(adjustContentOffset adjustContentOffset: Bool, animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
+      if toolbarState == .Collapsed || !toolbarsShowing {
+        return
+      }
+
+      if !checkScrollHeightIsLargeEnoughForScrolling() {
+        return
+      }
+
+      toolbarState = .Collapsed
         let durationRatio = abs((headerFrame.height + headerTopOffset) / headerFrame.height)
         let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
         self.animateToolbarsWithOffsets(
+            adjustContentOffset: adjustContentOffset,
             animated: animated,
             duration: actualDuration,
             headerOffset: -headerFrame.height,
@@ -124,34 +154,34 @@ private extension BrowserScrollingController {
             return
         }
 
-        if let containerView = scrollView?.superview {
-            let translation = gesture.translationInView(containerView)
-            let delta = lastContentOffset - translation.y
+        guard let containerView = scrollView?.superview else { return }
 
-            if delta > 0 {
-                scrollDirection = .Down
-            } else if delta < 0 {
-                scrollDirection = .Up
+        let translation = gesture.translationInView(containerView)
+        let delta = lastContentOffset - translation.y
+
+        if delta > 0 && contentOffset.y - scrollViewWillBeginDragPoint >= 1.0 {
+            scrollDirection = .Down
+        } else if delta < 0 && scrollViewWillBeginDragPoint - contentOffset.y >= 1.0 {
+            scrollDirection = .Up
+        }
+
+        lastContentOffset = translation.y
+        if checkRubberbandingForDelta(delta) && checkScrollHeightIsLargeEnoughForScrolling() {
+            if toolbarState != .Collapsed || contentOffset.y <= 0 {
+                scrollWithDelta(delta)
             }
 
-            lastContentOffset = translation.y
-            if checkRubberbandingForDelta(delta) && checkScrollHeightIsLargeEnoughForScrolling() {
-                if toolbarState != .Collapsed || contentOffset.y <= 0 {
-                    scrollWithDelta(delta)
-                }
-
-                if headerTopOffset == -headerFrame.height {
-                    toolbarState = .Collapsed
-                } else if headerTopOffset == 0 {
-                    toolbarState = .Visible
-                } else {
-                    toolbarState = .Animating
-                }
+            if headerTopOffset == -headerFrame.height {
+                toolbarState = .Collapsed
+            } else if headerTopOffset == 0 {
+                toolbarState = .Visible
+            } else {
+                toolbarState = .Animating
             }
+        }
 
-            if gesture.state == .Ended || gesture.state == .Cancelled {
-                lastContentOffset = 0
-            }
+        if gesture.state == .Ended || gesture.state == .Cancelled {
+            lastContentOffset = 0
         }
     }
 
@@ -162,6 +192,10 @@ private extension BrowserScrollingController {
     }
 
     func scrollWithDelta(delta: CGFloat) {
+      if (!BraveUX.IsHighLoadAnimationAllowed) {
+        return
+      }
+
         if scrollViewHeight >= contentSize.height {
             return
         }
@@ -192,17 +226,28 @@ private extension BrowserScrollingController {
         return y
     }
 
-    func animateToolbarsWithOffsets(animated animated: Bool, duration: NSTimeInterval, headerOffset: CGFloat,
+  func animateToolbarsWithOffsets(adjustContentOffset adjustContentOffset: Bool,
+     animated: Bool, var duration: NSTimeInterval, headerOffset: CGFloat,
         footerOffset: CGFloat, alpha: CGFloat, completion: ((finished: Bool) -> Void)?) {
         let animation: () -> Void = {
+            if (adjustContentOffset) {
+              self.scrollView?.contentOffset.y += headerOffset != 0 ? headerOffset : UIConstants.ToolbarHeight
+            }
             self.headerTopOffset = headerOffset
             self.footerBottomOffset = footerOffset
             self.urlBar?.updateAlphaForSubviews(alpha)
             self.header?.superview?.layoutIfNeeded()
         }
 
+        // Reset the scroll direction now that it is handled
+        scrollDirection = .None
+
+          if !BraveUX.IsHighLoadAnimationAllowed {
+            duration /= 2.0
+          }
+
         if animated {
-            UIView.animateWithDuration(duration, animations: animation, completion: completion)
+          UIView.animateWithDuration(duration, delay:0.0, options: .AllowUserInteraction, animations: animation, completion: completion)
         } else {
             animation()
             completion?(finished: true)
@@ -227,14 +272,42 @@ extension BrowserScrollingController: UIScrollViewDelegate {
             return
         }
 
+      if (BraveUX.IsHighLoadAnimationAllowed) {
         if (decelerate || (toolbarState == .Animating && !decelerate)) && checkScrollHeightIsLargeEnoughForScrolling() {
             if scrollDirection == .Up {
-                showToolbars(animated: true)
+               showToolbars(animated: true)
             } else if scrollDirection == .Down {
                 hideToolbars(animated: true)
             }
         }
+      } else {
+        if (!decelerate) {
+          if scrollDirection == .Down && scrollView.contentOffset.y > UIConstants.ToolbarHeight {
+            hideToolbars(adjustContentOffset: true, animated: true)
+          }
+
+          if (scrollDirection == .Up) {
+            showToolbars(adjustContentOffset: true, animated: true)
+          }
+        }
+      }
     }
+
+  func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+    self.scrollViewWillBeginDragPoint = scrollView.contentOffset.y
+  }
+
+  func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    if (!BraveUX.IsHighLoadAnimationAllowed) {
+      if scrollDirection == .Down {
+        hideToolbars(adjustContentOffset: true, animated: true)
+      }
+
+      if scrollDirection == .Up {
+        showToolbars(adjustContentOffset: true, animated: true)
+      }
+    }
+  }
 
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
         showToolbars(animated: true)
