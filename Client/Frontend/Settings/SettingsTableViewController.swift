@@ -254,9 +254,9 @@ private class WithoutAccountSetting: AccountSetting {
 //}
 
 private class SyncNowSetting: WithAccountSetting {
-    private let syncNowTitle = NSAttributedString(string: NSLocalizedString("Sync Now", comment: "Sync Firefox Account"), attributes: [NSForegroundColorAttributeName: UIColor.blackColor(), NSFontAttributeName: UIConstants.DefaultStandardFont])
+    private let syncNowTitle = NSAttributedString(string: NSLocalizedString("Sync Now", comment: "Sync Firefox Account"), attributes: [NSForegroundColorAttributeName: UIColor.blackColor(), NSFontAttributeName: DynamicFontHelper.defaultHelper.DefaultStandardFont])
 
-    private let syncingTitle = NSAttributedString(string: NSLocalizedString("Syncing…", comment: "Syncing Firefox Account"), attributes: [NSForegroundColorAttributeName: UIColor.grayColor(), NSFontAttributeName: UIFont.systemFontOfSize(UIConstants.DefaultStandardFontSize, weight: UIFontWeightRegular)])
+    private let syncingTitle = NSAttributedString(string: NSLocalizedString("Syncing…", comment: "Syncing Firefox Account"), attributes: [NSForegroundColorAttributeName: UIColor.grayColor(), NSFontAttributeName: UIFont.systemFontOfSize(DynamicFontHelper.defaultHelper.DefaultStandardFontSize, weight: UIFontWeightRegular)])
 
     override var accessoryType: UITableViewCellAccessoryType { return .None }
 
@@ -314,7 +314,7 @@ private class AccountStatusSetting: WithAccountSetting {
 
     override var title: NSAttributedString? {
         if let account = profile.getAccount() {
-            return NSAttributedString(string: account.email, attributes: [NSFontAttributeName: UIConstants.DefaultStandardFontBold, NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+            return NSAttributedString(string: account.email, attributes: [NSFontAttributeName: DynamicFontHelper.defaultHelper.DefaultStandardFontBold, NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
         }
         return nil
     }
@@ -637,41 +637,70 @@ private class SearchSetting: Setting {
     }
 }
 
-//private class ClearPrivateDataSetting: Setting {
-//    let profile: Profile
-//    var tabManager: TabManager!
-//
-//    override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
-//
-//    init(settings: SettingsTableViewController) {
-//        self.profile = settings.profile
-//        self.tabManager = settings.tabManager
-//
-//        let clearTitle = NSLocalizedString("Clear Private Data", comment: "Label used as an item in Settings. When touched it will open a dialog prompting the user to make sure they want to clear all of their private data.")
-//        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
-//    }
-//
-//    override func onClick(navigationController: UINavigationController?) {
-//        let viewController = ClearPrivateDataTableViewController()
-//        viewController.profile = profile
-//        viewController.tabManager = tabManager
-//        navigationController?.pushViewController(viewController, animated: true)
-//    }
-//}
 
-//private class PrivacyPolicySetting: Setting {
-//    override var title: NSAttributedString? {
-//        return NSAttributedString(string: NSLocalizedString("Privacy Policy", comment: "Show Firefox Browser Privacy Policy page from the Privacy section in the settings. See https://www.mozilla.org/privacy/firefox/"), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
-//    }
-//
-//    override var url: NSURL? {
-//        return NSURL(string: "https://www.mozilla.org/privacy/firefox/")
-//    }
-//
-//    override func onClick(navigationController: UINavigationController?) {
-//        setUpAndPushSettingsContentViewController(navigationController)
-//    }
-//}
+private class ClearPrivateDataSetting: Setting {
+    let profile: Profile
+    var tabManager: TabManager!
+
+    override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
+
+    init(settings: SettingsTableViewController) {
+        self.profile = settings.profile
+        self.tabManager = settings.tabManager
+
+        let clearTitle = NSLocalizedString("Clear Private Data", comment: "Label used as an item in Settings. When touched it will open a dialog prompting the user to make sure they want to clear all of their private data.")
+        super.init(title: NSAttributedString(string: clearTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+    }
+
+    override func onClick(navigationController: UINavigationController?) {
+        let viewController = ClearPrivateDataTableViewController()
+        viewController.profile = profile
+        viewController.tabManager = tabManager
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+}
+
+private class PrivacyPolicySetting: Setting {
+    override var title: NSAttributedString? {
+        return NSAttributedString(string: NSLocalizedString("Privacy Policy", comment: "Show Firefox Browser Privacy Policy page from the Privacy section in the settings. See https://www.mozilla.org/privacy/firefox/"), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+    }
+
+    override var url: NSURL? {
+        return NSURL(string: "https://www.mozilla.org/privacy/firefox/")
+    }
+
+    override func onClick(navigationController: UINavigationController?) {
+        setUpAndPushSettingsContentViewController(navigationController)
+    }
+}
+
+private class ChinaSyncServiceSetting: WithoutAccountSetting {
+    override var accessoryType: UITableViewCellAccessoryType { return .None }
+    var prefs: Prefs { return settings.profile.prefs }
+    let prefKey = "useChinaSyncService"
+
+    override var title: NSAttributedString? {
+        return NSAttributedString(string: "本地同步服务", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor])
+    }
+
+    override var status: NSAttributedString? {
+        return NSAttributedString(string: "本地服务使用火狐通行证同步数据", attributes: [NSForegroundColorAttributeName: UIConstants.TableViewHeaderTextColor])
+    }
+
+    override func onConfigureCell(cell: UITableViewCell) {
+        super.onConfigureCell(cell)
+        let control = UISwitch()
+        control.onTintColor = UIConstants.ControlTintColor
+        control.addTarget(self, action: "switchValueChanged:", forControlEvents: UIControlEvents.ValueChanged)
+        control.on = prefs.boolForKey(prefKey) ?? true
+        cell.accessoryView = control
+        cell.selectionStyle = .None
+    }
+
+    @objc func switchValueChanged(toggle: UISwitch) {
+        prefs.setObject(toggle.on, forKey: prefKey)
+    }
+}
 
 // The base settings view controller.
 class SettingsTableViewController: UITableViewController {

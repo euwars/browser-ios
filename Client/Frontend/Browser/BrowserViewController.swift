@@ -848,8 +848,10 @@ class BrowserViewController: UIViewController {
         if let url = tab.url {
             if ReaderModeUtils.isReaderModeURL(url) {
                 showReaderModeBar(animated: false)
+                NSNotificationCenter.defaultCenter().addObserver(self, selector: "SELDynamicFontChanged:", name: NotificationDynamicFontChanged, object: nil)
             } else {
                 hideReaderModeBar(animated: false)
+                NSNotificationCenter.defaultCenter().removeObserver(self, name: NotificationDynamicFontChanged, object: nil)
             }
 
             updateInContentHomePanel(url)
@@ -925,7 +927,17 @@ class BrowserViewController: UIViewController {
             webView.customUserAgent = nil
         }
     }
-  #endif
+
+    private func restoreSpoofedUserAgentIfRequired(webView: WKWebView, newRequest: NSURLRequest) {
+        guard #available(iOS 9.0, *) else {
+            return
+        }
+
+        // Restore any non-default UA from the request's header
+        let ua = newRequest.valueForHTTPHeaderField("User-Agent")
+        webView.customUserAgent = ua != UserAgent.defaultUserAgent() ? ua : nil
+    }
+#endif
 }
 
 /**
@@ -1651,11 +1663,13 @@ extension BrowserViewController: WKNavigationDelegate {
                 openExternal(url, prompt: navigationAction.navigationType == WKNavigationType.Other)
                 decisionHandler(WKNavigationActionPolicy.Cancel)
             } else {
+#if !BRAVE
                 if navigationAction.navigationType == .LinkActivated {
-#if !BRAVE // TODO hookup when adding desktop AU
-                   resetSpoofedUserAgentIfRequired(webView, newURL: url)
-#endif
+                    resetSpoofedUserAgentIfRequired(webView, newURL: url)
+                } else if navigationAction.navigationType == .BackForward {
+                    restoreSpoofedUserAgentIfRequired(webView, newRequest: navigationAction.request)
                 }
+#endif
                 decisionHandler(WKNavigationActionPolicy.Allow)
             }
         case "tel":
@@ -2102,6 +2116,19 @@ extension BrowserViewController {
             }
         }
     }
+
+    func SELDynamicFontChanged(notification: NSNotification) {
+        guard notification.name == NotificationDynamicFontChanged else { return }
+
+        var readerModeStyle = DefaultReaderModeStyle
+        if let dict = profile.prefs.dictionaryForKey(ReaderModeProfileKeyStyle) {
+            if let style = ReaderModeStyle(dict: dict) {
+                readerModeStyle = style
+            }
+        }
+        readerModeStyle.fontSize = ReaderModeFontSize.defaultSize
+        self.readerModeStyleViewController(ReaderModeStyleViewController(), didConfigureStyle: readerModeStyle)
+    }
 }
 
 extension BrowserViewController: ReaderModeBarViewDelegate {
@@ -2437,7 +2464,7 @@ extension BrowserViewController {
 
         TabsButton.appearance().borderColor = UIConstants.PrivateModePurple
         TabsButton.appearance().borderWidth = 1
-        TabsButton.appearance().titleFont = UIConstants.DefaultMediumBoldFont
+        TabsButton.appearance().titleFont = UIConstants.DefaultChromeBoldFont
         TabsButton.appearance().titleBackgroundColor = UIConstants.AppBackgroundColor
         TabsButton.appearance().textColor = UIConstants.PrivateModePurple
         TabsButton.appearance().insets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)

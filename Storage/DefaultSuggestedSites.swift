@@ -6,6 +6,7 @@ import Foundation
 
 public class DefaultSuggestedSites {
     public static let sites = [
+      "default" : [
         SuggestedSiteData(
             url: "https://www.brave.com",
             bgColor: "0xf37c00",
@@ -22,7 +23,6 @@ public class DefaultSuggestedSites {
             trackingId: 631,
             title: NSLocalizedString("Brave Help and Support", comment: "Tile title for App Help")
         )
-    ]
+      ]
+     ]
 }
-
-
