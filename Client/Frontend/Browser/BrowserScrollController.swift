@@ -150,7 +150,7 @@ private extension BrowserScrollingController {
     }
 
     @objc func handlePan(gesture: UIPanGestureRecognizer) {
-        if browserIsLoading() {
+        if browserIsLoading() || BraveUX.IsToolbarHidingOff {
             return
         }
 

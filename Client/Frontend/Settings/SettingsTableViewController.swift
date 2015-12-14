@@ -715,17 +715,17 @@ class SettingsTableViewController: UITableViewController {
         super.viewDidLoad()
 
         //let privacyTitle = NSLocalizedString("Privacy", comment: "Privacy section title")
-        let accountDebugSettings: [Setting]
-        if AppConstants.BuildChannel != .Aurora {
-            accountDebugSettings = [
-                // Debug settings:
-                RequirePasswordDebugSetting(settings: self),
-                RequireUpgradeDebugSetting(settings: self),
-                ForgetSyncAuthStateDebugSetting(settings: self),
-            ]
-        } else {
-            accountDebugSettings = []
-        }
+//        let accountDebugSettings: [Setting]
+//        if AppConstants.BuildChannel != .Aurora {
+//            accountDebugSettings = [
+//                // Debug settings:
+//                RequirePasswordDebugSetting(settings: self),
+//                RequireUpgradeDebugSetting(settings: self),
+//                ForgetSyncAuthStateDebugSetting(settings: self),
+//            ]
+//        } else {
+//            accountDebugSettings = []
+//        }
 
         let prefs = profile.prefs
         var generalSettings = [
@@ -738,7 +738,20 @@ class SettingsTableViewController: UITableViewController {
 
       #if BRAVE
         generalSettings += [AdBlockSetting(settings:self),
-                            VaultAddressSetting(settings: self)]
+                            VaultAddressSetting(settings: self),
+          BoolSetting(prefs: prefs, prefKey: "•hidingoff•", defaultValue: false, titleText: "Debug: Turn off toolbar hiding", statusText: "", settingDidChange: {
+            value in
+            BraveUX.IsToolbarHidingOff = value
+          }),
+          BoolSetting(prefs: prefs, prefKey: "•forcescrollslow•", defaultValue: false, titleText: "Debug: Force slow scrolling", statusText: "Takes effect on new tab.", settingDidChange: {
+            value in
+            BraveUX.IsOverrideScrollingSpeedAndMakeSlower = value
+          }),
+          BoolSetting(prefs: prefs, prefKey: "•simulateslowdevice•", defaultValue: BraveUX.IsHighLoadAnimationAllowed, titleText: "Debug: Set scrolling mode for older device type", statusText: "Changes toolbar hide/show behaviour.", settingDidChange: {
+            value in
+            BraveUX.IsHighLoadAnimationAllowed = !value
+          })
+          ]
       #endif
 
 

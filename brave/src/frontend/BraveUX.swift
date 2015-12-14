@@ -5,6 +5,10 @@ struct BraveUX {
 
   static var IsHighLoadAnimationAllowed = false
 
+  // debug settings
+  static var IsToolbarHidingOff = false
+  static var IsOverrideScrollingSpeedAndMakeSlower = false // overrides IsHighLoadAnimationAllowed effect
+
   // set to true to show borders around views
   static let DebugShowBorders = false
 
