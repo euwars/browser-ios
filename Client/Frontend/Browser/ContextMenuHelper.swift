@@ -34,10 +34,6 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
     required init(browser: Browser) {
         super.init()
 
-#if BRAVE // shutting this off to investigate scrolling problems
- return
-#endif
-
         self.browser = browser
 
         let path = NSBundle.mainBundle().pathForResource("ContextMenu", ofType: "js")!

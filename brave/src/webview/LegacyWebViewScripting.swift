@@ -51,7 +51,9 @@ class LegacyUserContentController
 
     let js = LegacyJSContext()
     for (name, handler) in scriptHandlersMainFrame {
-      js.installHandlerForWebView(webView, handlerName: name, handler:handler)
+      if !name.lowercaseString.contains("reader") {
+        js.installHandlerForWebView(webView, handlerName: name, handler:handler)
+      }
     }
 
     for script in scripts {

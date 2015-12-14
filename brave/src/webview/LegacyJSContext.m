@@ -1,7 +1,6 @@
 #import "LegacyJSContext.h"
 #import <JavaScriptCore/JavaScriptCore.h>
 
-
 @interface FrameInfoWrapper : WKFrameInfo
 @property (atomic, retain) NSURLRequest* writableRequest;
 @end
@@ -39,7 +38,9 @@
 
 -(WKFrameInfo *)frameInfo
 {
-  FrameInfoWrapper* f = [FrameInfoWrapper new];
+  static FrameInfoWrapper* f = 0;
+  if (!f)
+    f = [FrameInfoWrapper new];
   f.writableRequest = self.request;
   return f;
 }
@@ -47,6 +48,9 @@
 @end
 
 @implementation LegacyJSContext
+
+LegacyScriptMessage *message_ = 0;
+WKUserContentController *userContentController_ = 0;
 
 - (void)installHandlerForContext:(id)_context
                      handlerName:(NSString *)handlerName
@@ -72,11 +76,15 @@
 #ifdef DEBUG
       //NSLog(@"%@ %@", handlerName, message);
 #endif
-      LegacyScriptMessage* msg = [LegacyScriptMessage new];
-      msg.writeableBody = message;
-      msg.writableName = handlerName;
-      msg.request = request;
-      [handler userContentController:[WKUserContentController new] didReceiveScriptMessage:msg];
+      if (!message_) {
+        message_ = [LegacyScriptMessage new];
+        userContentController_ = [WKUserContentController new];
+      }
+
+      message_.writeableBody = message;
+      message_.writableName = handlerName;
+      message_.request = request;
+      [handler userContentController:userContentController_ didReceiveScriptMessage:message_];
     });
   };
 }
