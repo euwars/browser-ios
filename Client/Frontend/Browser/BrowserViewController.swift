@@ -40,7 +40,7 @@ class BrowserViewController: UIViewController {
     var urlBar: URLBarView!
     var readerModeBar: ReaderModeBarView?
     var readerModeCache: ReaderModeCache
-    private var statusBarOverlay: UIView!
+    var statusBarOverlay: UIView!
     private(set) var toolbar: BrowserToolbar?
     private var searchController: SearchViewController?
     private let uriFixup = URIFixup()
@@ -383,6 +383,23 @@ class BrowserViewController: UIViewController {
             make.height.equalTo(0)
             make.top.equalTo(webViewContainer)
         }
+      #if BRAVE
+      webViewContainer.snp_makeConstraints { make in
+        make.left.right.equalTo(self.view)
+
+        if let readerModeBarBottom = readerModeBar?.snp_bottom {
+          make.top.equalTo(readerModeBarBottom)
+        } else {
+          make.top.equalTo(self.header.snp_bottom)
+        }
+
+        if let toolbar = self.toolbar {
+          make.bottom.equalTo(toolbar.snp_top)
+        } else {
+          make.bottom.equalTo(self.view)
+        }
+      }
+      #endif
     }
 
     override func viewDidLayoutSubviews() {
@@ -550,21 +567,7 @@ class BrowserViewController: UIViewController {
             make.leading.trailing.equalTo(self.view)
         }
 
-        webViewContainer.snp_remakeConstraints { make in
-          make.left.right.equalTo(self.view)
 
-            if let readerModeBarBottom = readerModeBar?.snp_bottom {
-                make.top.equalTo(readerModeBarBottom)
-            } else {
-                make.top.equalTo(self.header.snp_bottom)
-            }
-
-            if let toolbar = self.toolbar {
-                make.bottom.equalTo(toolbar.snp_top)
-            } else {
-                make.bottom.equalTo(self.view)
-            }
-        }
 
         // Setup the bottom toolbar
         toolbar?.snp_remakeConstraints { make in
