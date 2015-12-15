@@ -320,7 +320,9 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
 
     if (!webView.loading) {
       _parent.configuration.userContentController.injectJsIntoPage()
+      #if !TEST
       _parent.replaceImagesUsingTheVault(webView)
+      #endif
     }
 
     _parent.kvoBroadcast()
