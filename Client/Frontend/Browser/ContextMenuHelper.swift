@@ -13,7 +13,6 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
     private weak var browser: Browser?
     weak var delegate: ContextMenuHelperDelegate?
     private let gestureRecognizer = UILongPressGestureRecognizer()
-    private var selectionGestureRecognizer = WeakList<UIGestureRecognizer>()
 
     struct Elements {
         let link: NSURL?
@@ -61,11 +60,21 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
         // when we show a context menu. To prevent this, cancel the text selection delegate if we know the
         // user is long-pressing a link.
         if let handled = data["handled"] as? Bool where handled {
-            // Setting `enabled = false` cancels the current gesture for this recognizer.
-          for item in selectionGestureRecognizer {
-            item.enabled = false
-            item.enabled = true
+          func blockOtherGestures(views: [UIView]) {
+            for view in views {
+              if let gestures = view.gestureRecognizers as [UIGestureRecognizer]! {
+                for gesture in gestures {
+                  if gesture is UILongPressGestureRecognizer && gesture != gestureRecognizer {
+                    // toggling gets the gesture to ignore this long press
+                    gesture.enabled = false
+                    gesture.enabled = true
+                  }
+                }
+              }
+            }
           }
+
+          blockOtherGestures((browser?.webView?.scrollView.subviews)!)
         }
 
         var linkURL: NSURL?
@@ -87,14 +96,8 @@ class ContextMenuHelper: NSObject, BrowserHelper, UIGestureRecognizerDelegate {
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
-#if BRAVE
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailByGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-      if otherGestureRecognizer is UILongPressGestureRecognizer {
-        selectionGestureRecognizer.insert(otherGestureRecognizer)
-      }
-      return false
-    }
-#else
+
+#if !BRAVE
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailByGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         // Hack to detect the built-in text selection gesture recognizer.
         if let otherDelegate = otherGestureRecognizer.delegate where String(otherDelegate).contains("_UIKeyboardBasedNonEditableTextSelectionGestureController") {

@@ -49,14 +49,73 @@
 
 @implementation LegacyJSContext
 
+typedef void(^JSCallbackBlock)(NSDictionary*);
+
 LegacyScriptMessage *message_ = 0;
 WKUserContentController *userContentController_ = 0;
+
+// Used to lookup the callback needed for a given handler name
+NSMutableDictionary<NSString *, JSCallbackBlock> *callbackBlocks_ = 0;
+NSMapTable<NSNumber *, UIWebView *> *handlerToWebview_ = 0;
+
+// Handy method for getting unique values from object address to use as keys in a dict/hash
+NSNumber* objToKey(id object) {
+  return [NSNumber numberWithLongLong:(uintptr_t)object];
+}
+
+JSCallbackBlock blockFactory(NSString *handlerName, id<WKScriptMessageHandler> handler, UIWebView *webView)
+{
+  if (!handlerToWebview_) {
+    handlerToWebview_ = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsStrongMemory valueOptions:NSPointerFunctionsWeakMemory];
+  }
+
+  [handlerToWebview_ setObject:webView forKey:objToKey(handler)];
+
+  NSString *key = [NSString stringWithFormat:@"%@_%@_%@", handlerName, objToKey(handler), objToKey(webView)];
+
+  if (!callbackBlocks_) {
+    callbackBlocks_ = [NSMutableDictionary dictionary];
+  }
+
+  JSCallbackBlock result = [callbackBlocks_ objectForKey:key];
+  if (result) {
+    return result;
+  }
+
+  result =  ^(NSDictionary* message) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+#ifdef DEBUG
+      //NSLog(@"%@ %@", handlerName, message);
+#endif
+      if (!message_) {
+        message_ = [LegacyScriptMessage new];
+        userContentController_ = [WKUserContentController new];
+      }
+
+      message_.writeableBody = message;
+      message_.writableName = handlerName;
+      if (handlerToWebview_) {
+        UIWebView *webView = [handlerToWebview_ objectForKey:objToKey(handler)];
+        if (webView) {
+          message_.request = webView.request;
+        }
+      }
+
+      [handler userContentController:userContentController_ didReceiveScriptMessage:message_];
+    });
+  };
+
+  [callbackBlocks_ setObject:result forKey:key];
+
+  return result;
+}
 
 - (void)installHandlerForContext:(id)_context
                      handlerName:(NSString *)handlerName
                          handler:(id<WKScriptMessageHandler>)handler
                          webView:(UIWebView *)webView
 {
+
   JSContext* context = _context;
   NSString* script = [NSString stringWithFormat:@""
                       "if (!window.hasOwnProperty('webkit')) {"
@@ -69,24 +128,8 @@ WKUserContentController *userContentController_ = 0;
 
   [context evaluateScript:script];
 
-  __block NSURLRequest* request = webView.request.copy;
   context[@"Window"][@"prototype"][@"webkit"][@"messageHandlers"][handlerName][@"postMessage"] =
-  ^(NSDictionary* message) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-#ifdef DEBUG
-      //NSLog(@"%@ %@", handlerName, message);
-#endif
-      if (!message_) {
-        message_ = [LegacyScriptMessage new];
-        userContentController_ = [WKUserContentController new];
-      }
-
-      message_.writeableBody = message;
-      message_.writableName = handlerName;
-      message_.request = request;
-      [handler userContentController:userContentController_ didReceiveScriptMessage:message_];
-    });
-  };
+    blockFactory(handlerName, handler, webView);
 }
 
 - (void)installHandlerForWebView:(UIWebView *)webView
