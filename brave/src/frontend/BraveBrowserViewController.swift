@@ -26,6 +26,7 @@ class BraveBrowserViewController : BrowserViewController {
     ToolbarTextField.appearance().textColor = BraveUX.LocationBarTextColor
     ToolbarTextField.appearance().highlightColor = BraveUX.AutocompleteTextFieldHighlightColor
     ToolbarTextField.appearance().clearButtonTintColor = nil
+    ToolbarTextField.appearance().backgroundColor = BraveUX.LocationBarBackgroundColor_NonPrivateMode
 
     URLBarView.appearance().locationBorderColor = BraveUX.TextFieldBorderColor_NoFocus
     URLBarView.appearance().locationActiveBorderColor = BraveUX.TextFieldBorderColor_HasFocus

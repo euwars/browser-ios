@@ -67,7 +67,7 @@ class BraveURLBarView : URLBarView {
     super.updateConstraints()
 
     // I have to set this late (as in here) as it gets overridden if set earlier
-    self.locationTextField?.backgroundColor = BraveUX.LocationBarBackgroundColor_NonPrivateMode
+    self.locationTextField?.backgroundColor = BraveUX.LocationTextEntryBackgroundColor
 
     if !inOverlayMode {
       self.locationContainer.snp_remakeConstraints { make in

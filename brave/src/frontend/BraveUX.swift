@@ -14,8 +14,9 @@ struct BraveUX {
 
   static let BackForwardDisabledButtonAlpha = CGFloat(0.1)
 
-  static let LocationBarBackgroundColor_NonPrivateMode = UIColor(white: 77/255.0, alpha: 1)
+  static let LocationBarBackgroundColor_NonPrivateMode = UIColor(white: 77/255.0, alpha: 0.3)
   static let LocationBarTextColor = UIColor(white: 230/255.0, alpha: 1)
+  static let LocationTextEntryBackgroundColor = UIColor(white: 50/255.0, alpha: 1.0)
 
   // Interesting: compontents of the url can be colored differently: http://www.foo.com
   // Base: http://www and Host: foo.com
@@ -31,8 +32,6 @@ struct BraveUX {
   static let ActionButtonTintColor = LocationBarTextColor
 
   static let AutocompleteTextFieldHighlightColor = UIColor.brownColor()
-
-  static let BottomToolbarBackgroundColor = LocationBarBackgroundColor_NonPrivateMode
 
   // Yes it could be detected, just make life easier and set this number for now
   static let BottomToolbarNumberButtonsToRightOfBackForward = 3
