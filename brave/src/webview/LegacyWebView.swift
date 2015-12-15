@@ -214,6 +214,15 @@ class LegacyWebView: UIWebView {
     }
     return super.canPerformAction(action, withSender: sender)
   }
+
+  func injectCSS(css: String) {
+    var js = "var script = document.createElement('style');"
+    js += "script.type = 'text/css';"
+    js += "script.innerHTML = '\(css)';"
+    js += "document.head.appendChild(script);"
+    LegacyUserContentController.injectJsIntoAllFrames(self, script: js)
+  }
+
 }
 
 class WebViewDelegate: NSObject, UIWebViewDelegate {
@@ -311,8 +320,6 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
 
     if (!webView.loading) {
       _parent.configuration.userContentController.injectJsIntoPage()
-      // Stop built-in context menu
-      LegacyUserContentController.injectJsIntoAllFrames(_parent, script: "document.body.style.webkitTouchCallout='none'")
       _parent.replaceImagesUsingTheVault(webView)
     }
 
@@ -322,7 +329,6 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     if readyState == "complete" {
       NSNotificationCenter.defaultCenter()
         .postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
-
     }
   }
 

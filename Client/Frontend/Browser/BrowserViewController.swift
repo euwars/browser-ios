@@ -1282,6 +1282,11 @@ extension BrowserViewController: BrowserDelegate {
         let sessionRestoreHelper = SessionRestoreHelper(browser: browser)
         sessionRestoreHelper.delegate = self
         browser.addHelper(sessionRestoreHelper, name: SessionRestoreHelper.name())
+      #if BRAVE
+        let pageUnload = BravePageUnloadHelper(browser: browser)
+        pageUnload.delegate = self
+        browser.addHelper(pageUnload, name: BravePageUnloadHelper.name())
+      #endif
     }
 
     func browser(browser: Browser, willDeleteWebView webView: LegacyWebView) {
