@@ -747,7 +747,7 @@ class SettingsTableViewController: UITableViewController {
             value in
             BraveUX.IsOverrideScrollingSpeedAndMakeSlower = value
           }),
-          BoolSetting(prefs: prefs, prefKey: "•simulateslowdevice•", defaultValue: BraveUX.IsHighLoadAnimationAllowed, titleText: "Debug: Set scrolling mode for older device type", statusText: "Changes toolbar hide/show behaviour.", settingDidChange: {
+          BoolSetting(prefs: prefs, prefKey: "•simulateslowdevice•", defaultValue: !BraveUX.IsHighLoadAnimationAllowed, titleText: "Debug: Set scrolling mode for older device type", statusText: "Changes toolbar hide/show behaviour.", settingDidChange: {
             value in
             BraveUX.IsHighLoadAnimationAllowed = !value
           })
