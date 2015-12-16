@@ -40,9 +40,11 @@ Obj-C standard should follow https://google.github.io/styleguide/objcguide.xml. 
 
 ## Provisioning Profiles
 
-These are in brave/provisioning-profiles. Do not use 'Xcode managed profiles', there is no advantage to this, and debugging problems with that system is a dead end due to lack of transparency in that system. 
-brave/provisioning-profiles has some handy scripts:
-* setup-profile.sh: copies the profiles to the correct directory in ~Library so that Xcode will find them. Also, *deletes* all other profiles to prevent conflicts.
-* checkdevices.sh: verifies the UDIDS in devices.txt are in all the profiles. In terms of workflow, do the following in the Apple Dev portal: 1) add test user devices, 2) add the devices to the Ad Hoc provisioning profile and download the 4 Ad Hoc profiles (broswer and 3 extension profiles), 3) copy the device list off the portal and update devices.txt. Finally, run checkdevices.sh.
+Do not use 'Xcode managed profiles', there is no advantage to this, and debugging problems with that system is a dead end due to lack of transparency in that system. 
 
+```brave/build-system/profiles``` has some handy scripts to download the adhoc or developer profiles and install them.
+
+## Release Builds
+
+```brave/build-system/build-archive.sh``` does everything. When that completes, the Fabric app detects a new archive and asks to distribute to testers.
 
