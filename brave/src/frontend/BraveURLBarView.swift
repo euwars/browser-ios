@@ -68,6 +68,8 @@ class BraveURLBarView : URLBarView {
 
     // I have to set this late (as in here) as it gets overridden if set earlier
     self.locationTextField?.backgroundColor = BraveUX.LocationTextEntryBackgroundColor
+    // TODO : remove this entirely
+    self.progressBar.alpha = 0.0
 
     if !inOverlayMode {
       self.locationContainer.snp_remakeConstraints { make in
@@ -132,10 +134,12 @@ class BraveURLBarView : URLBarView {
       UIView.animateWithDuration(0.5, animations: {
         setWidth(self.locationView.frame.width)
         }, completion: { _ in
-          self.progressIsCompleting = false
           UIView.animateWithDuration(0.5, animations: {
             self.locationView.progressView.alpha = 0.0
-            }, completion: { _ in setWidth(0) })
+            }, completion: { _ in
+              self.progressIsCompleting = false
+              setWidth(0)
+          })
       })
     } else {
       self.locationView.progressView.alpha = 1.0
