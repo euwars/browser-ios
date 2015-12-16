@@ -37,7 +37,7 @@ struct BraveUX {
   static let BottomToolbarNumberButtonsToRightOfBackForward = 3
   static let BackForwardButtonLeftOffset = CGFloat(10)
 
-  static let ProgressBarColor = UIColor.orangeColor().colorWithAlphaComponent(0.3)
+  static let ProgressBarColor = UIColor(colorLiteralRed: 0, green: 0, blue: 180/255.0, alpha: 1.0)
 
   // Internal use
   static let HeaderBackdropBackgroundColor = UIColor.blackColor()

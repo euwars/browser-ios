@@ -117,7 +117,7 @@ class BrowserLocationView: UIView {
         return readerModeButton
     }()
 
-    var progressView: UIView = UIView(frame: CGRectMake(0,0,0,40))
+    var progressView: UIView = UIView(frame: CGRectMake(0, 0, 0, CGFloat(URLBarViewUX.LocationHeight - 1)))
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -140,6 +140,8 @@ class BrowserLocationView: UIView {
         }
 
         progressView.backgroundColor = BraveUX.ProgressBarColor
+        progressView.layer.cornerRadius = CGFloat(BraveUX.TextFieldCornerRadius)
+        progressView.layer.masksToBounds = true
         self.addSubview(progressView)
         self.sendSubviewToBack(progressView)
     }

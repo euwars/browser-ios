@@ -61,6 +61,13 @@ class BraveURLBarView : URLBarView {
     if inOverlayMode {
       self.bookmarkButton.hidden = true
     }
+
+    progressBar.hidden = true
+  }
+
+  override func prepareOverlayAnimation() {
+    super.prepareOverlayAnimation()
+    progressBar.hidden = true
   }
 
   override func updateConstraints() {
@@ -69,7 +76,8 @@ class BraveURLBarView : URLBarView {
     // I have to set this late (as in here) as it gets overridden if set earlier
     self.locationTextField?.backgroundColor = BraveUX.LocationTextEntryBackgroundColor
     // TODO : remove this entirely
-    self.progressBar.alpha = 0.0
+    progressBar.hidden = true
+    progressBar.alpha = 0.0
 
     if !inOverlayMode {
       self.locationContainer.snp_remakeConstraints { make in
@@ -148,7 +156,7 @@ class BraveURLBarView : URLBarView {
 
       if w > locationView.progressView.frame.size.width {
         UIView.animateWithDuration(0.5, animations: {
-          self.locationView.progressView.frame = CGRectMake(0, 0, w, 40)
+          setWidth(w)
           }, completion: { _ in
 
         })
