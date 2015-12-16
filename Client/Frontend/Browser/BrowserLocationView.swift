@@ -117,6 +117,8 @@ class BrowserLocationView: UIView {
         return readerModeButton
     }()
 
+    var progressView: UIView = UIView(frame: CGRectMake(0,0,0,40))
+
     override init(frame: CGRect) {
         super.init(frame: frame)
 
@@ -136,6 +138,10 @@ class BrowserLocationView: UIView {
             make.trailing.centerY.equalTo(self)
             make.width.equalTo(self.readerModeButton.intrinsicContentSize().width + CGFloat(BrowserLocationViewUX.LocationContentInset * 2))
         }
+
+        progressView.backgroundColor = BraveUX.ProgressBarColor
+        self.addSubview(progressView)
+        self.sendSubviewToBack(progressView)
     }
 
     override var accessibilityElements: [AnyObject]! {

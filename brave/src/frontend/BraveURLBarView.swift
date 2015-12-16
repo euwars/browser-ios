@@ -112,4 +112,44 @@ class BraveURLBarView : URLBarView {
   override func setupConstraints() {
     super.setupConstraints()
   }
+
+  var progressIsCompleting = false
+  override func updateProgressBar(progress: Float) {
+    let minProgress = locationView.frame.width / 3.0
+
+    func setWidth(width: CGFloat) {
+      var frame = locationView.progressView.frame
+      frame.size.width = width
+      locationView.progressView.frame = frame
+    }
+
+    if progress == 1.0 {
+      if progressIsCompleting {
+        return
+      }
+      progressIsCompleting = true
+
+      UIView.animateWithDuration(0.5, animations: {
+        setWidth(self.locationView.frame.width)
+        }, completion: { _ in
+          self.progressIsCompleting = false
+          UIView.animateWithDuration(0.5, animations: {
+            self.locationView.progressView.alpha = 0.0
+            }, completion: { _ in setWidth(0) })
+      })
+    } else {
+      self.locationView.progressView.alpha = 1.0
+      progressIsCompleting = false
+      let w = minProgress + CGFloat(progress) * (self.locationView.frame.width - minProgress)
+
+      if w > locationView.progressView.frame.size.width {
+        UIView.animateWithDuration(0.5, animations: {
+          self.locationView.progressView.frame = CGRectMake(0, 0, w, 40)
+          }, completion: { _ in
+
+        })
+      }
+    }
+  }
+
 }
