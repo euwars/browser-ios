@@ -8,6 +8,12 @@ private let _singleton = BraveApp()
 let kAppBootingIncompleteFlag = "kAppBootingIncompleteFlag"
 let kDesktopUserAgent = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; it-it) AppleWebKit/533.16 (KHTML, like Gecko) Version/5.0 Safari/533.16"
 
+#if !TEST
+func getApp() -> AppDelegate {
+  return UIApplication.sharedApplication().delegate as! AppDelegate
+}
+#endif
+
 // Any app-level hooks we need from Firefox, just add a call to here
 class BraveApp {
   static var isSafeToRestoreTabs = true
@@ -16,6 +22,9 @@ class BraveApp {
 
   class var singleton: BraveApp {
     return _singleton
+  }
+
+  private init() {
   }
 
   class func setupCacheDefaults() {
