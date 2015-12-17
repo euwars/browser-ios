@@ -37,12 +37,21 @@ Swift coding standard is generally compiler inforced, but indentation is not. I 
 
 Obj-C standard should follow https://google.github.io/styleguide/objcguide.xml. I am not a fan of this cuddling: ```NSObject *object```, preferring ```NSObject* object```, but have now realized the futility of this since we are open-sourcing, and nearly all open-source projects use ```NSObject *object`` cuddling. Start using this; at some point I'll switch the existing code to that standard.
 
-
 ## Provisioning Profiles
 
 Do not use 'Xcode managed profiles', there is no advantage to this, and debugging problems with that system is a dead end due to lack of transparency in that system. 
 
 ```brave/build-system/profiles``` has some handy scripts to download the adhoc or developer profiles and install them.
+
+## JS Tips
+
+For anyone working with JS in iOS native, I recommend running and debugging your JS in an attached JS console. (Not using an edit/compile/debug cycle in Xcode). When you run from Xcode any iOS web view in the simulator (or attached device), you can then attach from Safari desktop (the Develop menu), and you get a JS console to work in. 
+
+We have various JS interpreters available: UIWebView, JavaScriptCore, and WKWebView.
+
+The first is required if we are running JS on the web page, since we are using UIWebView. JavaScriptCore is a stand-alone JS engine that I believe is more up-to-date than UIWebView's. WKWebView will have the most modern JS engine, but requires instantiating a WKWebView for this purpose, which we would prefer to avoid as that is a heavy approach. UIWebView's JS engine is a few years old, and is quite primitive.
+
+None of these are comparable to Safari iOS's JS engine, which is highly up-to-date in its capabilities but is not available to us.
 
 ## Release Builds
 
