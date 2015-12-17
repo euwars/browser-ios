@@ -63,6 +63,7 @@ class Toolbar : UIView {
     }
 
     override func updateConstraints() {
+      #if !BRAVE
         var prev: UIView? = nil
         for view in self.subviews {
             view.snp_remakeConstraints { make in
@@ -78,6 +79,7 @@ class Toolbar : UIView {
                 make.width.equalTo(self).dividedBy(self.subviews.count)
             }
         }
+        #endif
         super.updateConstraints()
     }
 }
