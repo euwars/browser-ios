@@ -27,6 +27,11 @@ class BraveApp {
   private init() {
   }
 
+  class func isIPhoneLandscape() -> Bool {
+    return UIDevice.currentDevice().userInterfaceIdiom == .Phone &&
+          UIInterfaceOrientationIsLandscape(UIApplication.sharedApplication().statusBarOrientation)
+  }
+
   class func setupCacheDefaults() {
     NSURLCache.sharedURLCache().memoryCapacity = 6 * 1024 * 1024; // 6 MB
     NSURLCache.sharedURLCache().diskCapacity = 40 * 1024 * 1024;
