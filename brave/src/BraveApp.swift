@@ -43,7 +43,9 @@ class BraveApp {
     BraveApp.setupCacheDefaults()
     NSURLProtocol.registerClass(URLProtocol);
 
+#if !TEST
     BraveUX.IsHighLoadAnimationAllowed = DeviceInfo.isBlurSupported()
+#endif
 
     NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
       selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: nil)
@@ -62,11 +64,11 @@ class BraveApp {
 #if DEBUG
     NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
       selector: "prefsChanged_verifySuiteNameIsOk:", name: NSUserDefaultsDidChangeNotification, object: nil)
-
+  #if !TEST
     if BraveUX.DebugShowBorders {
       UIView.bordersOn()
     }
-
+  #endif
     // desktop UA for testing
     //      let defaults = NSUserDefaults(suiteName: AppInfo.sharedContainerIdentifier())!
     //      let desktop = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_5_8; it-it) AppleWebKit/533.16 (KHTML, like Gecko) Version/5.0 Safari/533.16"
