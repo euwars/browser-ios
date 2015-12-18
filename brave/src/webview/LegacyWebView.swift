@@ -241,6 +241,10 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     navigationType: UIWebViewNavigationType ) -> Bool {
       guard let _parent = parent else { return false }
 
+      if AboutUtils.isAboutHomeURL(request.URL) {
+        return false
+      }
+
       if let contextMenu = _parent.window?.rootViewController?.presentedViewController
         where contextMenu.view.tag == LegacyWebView.kContextMenuBlockNavigation {
         // When showing a context menu, the webview will often still navigate (ex. news.google.com)
