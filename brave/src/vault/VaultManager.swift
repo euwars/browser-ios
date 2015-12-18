@@ -75,7 +75,7 @@ class VaultManager {
         if let data = data,
           jsonStr = NSString(data: data, encoding: NSUTF8StringEncoding) {
             #if DEBUG
-              print("Parsed JSON: '\(jsonStr)'")
+              //print("Parsed JSON: '\(jsonStr)'")
               NSNotificationCenter.defaultCenter().postNotificationName(notificationVaultSimpleResponse,
                 object: nil, userInfo: ["response": jsonStr])
             #endif
