@@ -63,7 +63,9 @@ class BraveBrowserToolbar : BrowserToolbar {
     tabsContainer.addSubview(tabsButton)
     addSubview(tabsContainer)
     addSubview(backForwardUnderlay)
-
+    
+    backForwardUnderlay.alpha = BraveUX.BackForwardEnabledButtonAlpha
+    
     bringSubviewToFront(backButton)
     bringSubviewToFront(forwardButton)
 
