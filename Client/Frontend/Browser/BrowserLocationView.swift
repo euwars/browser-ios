@@ -139,6 +139,7 @@ class BrowserLocationView: UIView {
             make.width.equalTo(self.readerModeButton.intrinsicContentSize().width + CGFloat(BrowserLocationViewUX.LocationContentInset * 2))
         }
 
+        progressView.accessibilityLabel = "progressView"
         progressView.backgroundColor = BraveUX.ProgressBarColor
         progressView.layer.cornerRadius = CGFloat(BraveUX.TextFieldCornerRadius)
         progressView.layer.masksToBounds = true
@@ -170,7 +171,7 @@ class BrowserLocationView: UIView {
             }
 
             if readerModeButton.hidden {
-                make.trailing.equalTo(self).offset(-BrowserLocationViewUX.LocationContentInset)
+                make.trailing.greaterThanOrEqualTo(self).offset(-BrowserLocationViewUX.LocationContentInset)
             } else {
                 make.trailing.equalTo(self.readerModeButton.snp_leading)
             }
