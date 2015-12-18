@@ -64,13 +64,14 @@ class LegacyWebView: UIWebView {
     let selectorName = String(format: "_%@WebThread:", "setDrawIn") // avoid Apple Store static analyzer
     performSelector(NSSelectorFromString(selectorName), withObject:Bool(true))
 
+#if !TEST
     if (BraveUX.IsHighLoadAnimationAllowed && !BraveUX.IsOverrideScrollingSpeedAndMakeSlower) {
       let rate = UIScrollViewDecelerationRateFast + (UIScrollViewDecelerationRateNormal - UIScrollViewDecelerationRateFast) * 0.5;
       scrollView.setValue(NSValue(CGSize: CGSizeMake(rate, rate)), forKey: "_decelerationFactor")
     } else {
       scrollView.decelerationRate = UIScrollViewDecelerationRateFast
     }
-
+#endif
     setupSwipeGesture()
   }
 
