@@ -103,7 +103,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         browserViewController.restorationClass = AppDelegate.self
         browserViewController.automaticallyAdjustsScrollViewInsets = false
 
-        rootViewController = UINavigationController(rootViewController: browserViewController)
+        let topmost = BraveTopViewController(browser: browserViewController as! BraveBrowserViewController)
+
+        rootViewController = UINavigationController(rootViewController: topmost)
         rootViewController.automaticallyAdjustsScrollViewInsets = false
         rootViewController.delegate = self
         rootViewController.navigationBarHidden = true

@@ -56,7 +56,7 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
             // Get all the bookmarks split by folders
             if let bookmarkFolder = bookmarkFolder {
                 profile.bookmarks.modelForFolder(bookmarkFolder).upon(onModelFetched)
-            } else {
+            } else if profile != nil {
                 profile.bookmarks.modelForFolder(BookmarkRoots.MobileFolderGUID).upon(onModelFetched)
             }
             return

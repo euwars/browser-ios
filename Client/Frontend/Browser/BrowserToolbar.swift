@@ -150,11 +150,12 @@ public class BrowserToolbarHelper: NSObject {
     }
 
     func SELdidClickStopReload() {
-        if loading {
-            toolbar.browserToolbarDelegate?.browserToolbarDidPressStop(toolbar, button: toolbar.stopReloadButton)
-        } else {
-            toolbar.browserToolbarDelegate?.browserToolbarDidPressReload(toolbar, button: toolbar.stopReloadButton)
-        }
+      NSNotificationCenter.defaultCenter().postNotificationName("foofoo", object: nil)
+//        if loading {
+//            toolbar.browserToolbarDelegate?.browserToolbarDidPressStop(toolbar, button: toolbar.stopReloadButton)
+//        } else {
+//            toolbar.browserToolbarDelegate?.browserToolbarDidPressReload(toolbar, button: toolbar.stopReloadButton)
+//        }
     }
 
     func SELdidLongPressStopReload(recognizer: UILongPressGestureRecognizer) {
@@ -192,6 +193,9 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
         actionButtons = [backButton, forwardButton, stopReloadButton, shareButton, bookmarkButton]
 
         super.init(frame: frame)
+
+      layer.borderWidth = 5
+      layer.borderColor  = UIColor.brownColor().CGColor
 
         self.helper = BrowserToolbarHelper(toolbar: self)
 

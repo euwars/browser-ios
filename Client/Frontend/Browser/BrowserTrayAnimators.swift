@@ -6,10 +6,10 @@ import UIKit
 
 class TrayToBrowserAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
-        if let bvc = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as? BrowserViewController,
-           let tabTray = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as? TabTrayController {
-            transitionFromTray(tabTray, toBrowser: bvc, usingContext: transitionContext)
-        }
+      guard let vc = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) else { return }
+      guard let bvc = (vc as? BraveTopViewController)?.browser else { return }
+      guard let tabTray = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as? TabTrayController else { return }
+      transitionFromTray(tabTray, toBrowser: bvc, usingContext: transitionContext)
     }
 
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
@@ -54,7 +54,7 @@ private extension TrayToBrowserAnimator {
         let cell = createTransitionCellFromBrowser(bvc.tabManager.selectedTab, withFrame: startingFrame)
         cell.backgroundHolder.layer.cornerRadius = 0
 
-        container.insertSubview(bvc.view, aboveSubview: tabCollectionViewSnapshot)
+        container.insertSubview(getApp().rootViewController.topViewController!.view, aboveSubview: tabCollectionViewSnapshot)
         container.insertSubview(cell, aboveSubview: bvc.view)
 
         // Flush any pending layout/animation code in preperation of the animation call
@@ -112,10 +112,10 @@ private extension TrayToBrowserAnimator {
 
 class BrowserToTrayAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
-        if let bvc = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) as? BrowserViewController,
-           let tabTray = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as? TabTrayController {
-            transitionFromBrowser(bvc, toTabTray: tabTray, usingContext: transitionContext)
-        }
+      guard let vc = transitionContext.viewControllerForKey(UITransitionContextFromViewControllerKey) else { return }
+      guard let bvc = (vc as? BraveTopViewController)?.browser else { return }
+      guard let tabTray = transitionContext.viewControllerForKey(UITransitionContextToViewControllerKey) as? TabTrayController else { return }
+      transitionFromBrowser(bvc, toTabTray: tabTray, usingContext: transitionContext)
     }
 
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {

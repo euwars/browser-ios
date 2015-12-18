@@ -63,7 +63,7 @@ class BraveBrowserToolbar : BrowserToolbar {
     tabsContainer.addSubview(tabsButton)
     addSubview(tabsContainer)
     addSubview(backForwardUnderlay)
-
+    
     bringSubviewToFront(backButton)
     bringSubviewToFront(forwardButton)
 
@@ -107,9 +107,10 @@ class BraveBrowserToolbar : BrowserToolbar {
   }
 
   override func updateConstraints() {
-    hackToSetButtonColor()
     backgroundColor = UIColor.clearColor()
-
+    delay(0) {
+      self.hackToSetButtonColor()
+    }
     super.updateConstraints()
 
     var backButtonWidth = backButton.imageView?.image?.size.width ?? 0
@@ -122,9 +123,8 @@ class BraveBrowserToolbar : BrowserToolbar {
 
     func commonButtonsToRightOfBackForward(make: ConstraintMaker, bottomInset: Int = 0) {
       common(make, bottomInset: bottomInset)
-//      make.width.equalTo(self)
-//        .inset(BraveUX.BackForwardButtonWidth)
-//        .dividedBy(numberButtonsToRightOfBackForward)
+        //         make.width.equalTo(self.snp_width).dividedBy(Double(BraveUX.BottomToolbarNumberButtonsToRightOfBackForward) + 0.5)
+
       let bounds = UIScreen.mainScreen().bounds
       let w = min(bounds.width, bounds.height)
 
