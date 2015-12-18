@@ -13,6 +13,7 @@ struct BraveUX {
   static let DebugShowBorders = false
 
   static let BackForwardDisabledButtonAlpha = CGFloat(0.3)
+  static let BackForwardEnabledButtonAlpha = CGFloat(1.0)
 
   static let LocationBarBackgroundColor_NonPrivateMode = UIColor(white: 77/255.0, alpha: 0.3)
   static let LocationBarTextColor = UIColor(white: 230/255.0, alpha: 1)
