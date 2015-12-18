@@ -27,11 +27,11 @@ private let KVOContentSize = "contentSize"
 
 private let ActionSheetTitleMaxLength = 120
 
-private struct BrowserViewControllerUX {
-    private static let BackgroundColor = UIConstants.AppBackgroundColor
-    private static let ShowHeaderTapAreaHeight: CGFloat = 32
-    private static let BookmarkStarAnimationDuration: Double = 0.5
-    private static let BookmarkStarAnimationOffset: CGFloat = 80
+struct BrowserViewControllerUX {
+    static let BackgroundColor = UIConstants.AppBackgroundColor
+    static let ShowHeaderTapAreaHeight: CGFloat = 32
+    static let BookmarkStarAnimationDuration: Double = 0.5
+    static let BookmarkStarAnimationOffset: CGFloat = 80
 }
 
 class BrowserViewController: UIViewController {
@@ -43,11 +43,11 @@ class BrowserViewController: UIViewController {
     var statusBarOverlay: UIView!
     private(set) var toolbar: BrowserToolbar?
     private var searchController: SearchViewController?
-    private let uriFixup = URIFixup()
+    let uriFixup = URIFixup()
     private var screenshotHelper: ScreenshotHelper!
-    private var homePanelIsInline = false
+    var homePanelIsInline = false
     private var searchLoader: SearchLoader!
-    private let snackBars = UIView()
+    let snackBars = UIView()
     private let webViewContainerToolbar = UIView()
 
     // popover rotation handling
@@ -72,7 +72,7 @@ class BrowserViewController: UIViewController {
     var footer: UIView!
     var footerBackdrop: UIView!
     var footerBackground: BlurWrapper?
-    private var topTouchArea: UIButton!
+    var topTouchArea: UIButton!
 
     // Backdrop used for displaying greyed background for private tabs
     var webViewContainerBackdrop: UIView!
@@ -152,7 +152,7 @@ class BrowserViewController: UIViewController {
         }
     }
 
-    private func updateToolbarStateForTraitCollection(newCollection: UITraitCollection) {
+    func updateToolbarStateForTraitCollection(newCollection: UITraitCollection) {
         let showToolbar = shouldShowFooterForTraitCollection(newCollection)
 
         urlBar.setShowToolbar(!showToolbar)
@@ -301,9 +301,7 @@ class BrowserViewController: UIViewController {
         urlBar.browserToolbarDelegate = self
         header = BlurWrapper(view: urlBar)
         view.addSubview(header)
-
-        headerBackdrop.backgroundColor = BraveUX.HeaderBackdropBackgroundColor
-#endif
+ #endif
 
         // UIAccessibilityCustomAction subclass holding an AccessibleAction instance does not work, thus unable to generate AccessibleActions and UIAccessibilityCustomActions "on-demand" and need to make them "persistent" e.g. by being stored in BVC
         pasteGoAction = AccessibleAction(name: NSLocalizedString("Paste & Go", comment: "Paste the URL into the location bar and visit"), handler: { () -> Bool in
@@ -343,15 +341,17 @@ class BrowserViewController: UIViewController {
         scrollController.footer = footer
         scrollController.snackBars = snackBars
 
+#if !BRAVE
         log.debug("BVC updating toolbar state…")
         self.updateToolbarStateForTraitCollection(self.traitCollection)
 
         log.debug("BVC setting up constraints…")
         setupConstraints()
         log.debug("BVC done.")
+#endif
     }
 
-    private func setupConstraints() {
+    func setupConstraints() {
         urlBar.snp_makeConstraints { make in
             make.edges.equalTo(self.header)
         }
@@ -383,32 +383,17 @@ class BrowserViewController: UIViewController {
             make.height.equalTo(0)
             make.top.equalTo(webViewContainer)
         }
-      #if BRAVE
-      webViewContainer.snp_makeConstraints { make in
-        make.left.right.equalTo(self.view)
-
-        if let readerModeBarBottom = readerModeBar?.snp_bottom {
-          make.top.equalTo(readerModeBarBottom)
-        } else {
-          make.top.equalTo(self.header.snp_bottom)
-        }
-
-        if let toolbar = self.toolbar {
-          make.bottom.equalTo(toolbar.snp_top)
-        } else {
-          make.bottom.equalTo(self.view)
-        }
-      }
-      #endif
     }
 
     override func viewDidLayoutSubviews() {
         log.debug("BVC viewDidLayoutSubviews…")
         super.viewDidLayoutSubviews()
+      #if !BRAVE
         statusBarOverlay.snp_remakeConstraints { make in
             make.top.left.right.equalTo(self.view)
             make.height.equalTo(self.topLayoutGuide.length)
         }
+      #endif
         log.debug("BVC done.")
     }
 
@@ -451,22 +436,15 @@ class BrowserViewController: UIViewController {
         super.viewWillAppear(animated)
         log.debug("BVC super.viewWillAppear done.")
 
+#if !BRAVE
         // On iPhone, if we are about to show the On-Boarding, blank out the browser so that it does
         // not flash before we present. This change of alpha also participates in the animation when
         // the intro view is dismissed.
-#if !BRAVE //todo turn this back on when Intro screen is hooked up again?
+ //todo brave turn this back on when Intro screen is hooked up again?
         if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
-#endif
-      
-#if BRAVE
-        if BraveApp.shouldRestoreTabs() {
-          tabManager.restoreTabs()
-        } else {
-          tabManager.addTabAndSelect();
-       }
-#else
+
         if activeCrashReporter?.previouslyCrashed ?? false {
             log.debug("Previously crashed.")
 
@@ -483,8 +461,9 @@ class BrowserViewController: UIViewController {
         } else {
            tabManager.restoreTabs()
         }
-#endif
+
         updateTabCountUsingTabManager(tabManager, animated: false)
+#endif
     }
 
     private func showCrashOptInAlert() {
@@ -567,13 +546,29 @@ class BrowserViewController: UIViewController {
             make.leading.trailing.equalTo(self.view)
         }
 
+#if !BRAVE
+        webViewContainer.snp_remakeConstraints { make in
+            make.left.right.equalTo(self.view)
 
+            if let readerModeBarBottom = readerModeBar?.snp_bottom {
+                make.top.equalTo(readerModeBarBottom)
+            } else {
+                make.top.equalTo(self.header.snp_bottom)
+            }
+
+            if let toolbar = self.toolbar {
+                make.bottom.equalTo(toolbar.snp_top)
+            } else {
+                make.bottom.equalTo(self.view)
+            }
+        }
 
         // Setup the bottom toolbar
         toolbar?.snp_remakeConstraints { make in
             make.edges.equalTo(self.footerBackground!)
             make.height.equalTo(UIConstants.ToolbarHeight)
         }
+#endif
 
         footer.snp_remakeConstraints { make in
             scrollController.footerBottomConstraint = make.bottom.equalTo(self.view.snp_bottom).constraint
@@ -1317,7 +1312,7 @@ extension BrowserViewController: BrowserDelegate {
         return nil
     }
 
-    private func adjustFooterSize(top: UIView? = nil) {
+    func adjustFooterSize(top: UIView? = nil) {
         snackBars.snp_remakeConstraints { make in
             let bars = self.snackBars.subviews
             // if the keyboard is showing then ensure that the snackbars are positioned above it, otherwise position them above the toolbar/view bottom
@@ -1596,7 +1591,7 @@ extension BrowserViewController: TabManagerDelegate {
         return false
     }
 
-    private func updateTabCountUsingTabManager(tabManager: TabManager, animated: Bool = true) {
+    func updateTabCountUsingTabManager(tabManager: TabManager, animated: Bool = true) {
         if let selectedTab = tabManager.selectedTab {
             let count = selectedTab.isPrivate ? tabManager.privateTabs.count : tabManager.normalTabs.count
             urlBar.updateTabCount(max(count, 1), animated: animated)
