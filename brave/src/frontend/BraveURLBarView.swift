@@ -100,8 +100,9 @@ class BraveURLBarView : URLBarView {
           make.centerY.equalTo(self)
           make.size.equalTo(backButton)
         } else {
-          make.left.centerY.equalTo(self)
-          make.size.equalTo(UIConstants.ToolbarHeight)
+          make.left.equalTo(self)
+          make.centerY.equalTo(self)
+          make.size.lessThanOrEqualTo(UIConstants.ToolbarHeight)
         }
       }
 
@@ -109,18 +110,48 @@ class BraveURLBarView : URLBarView {
         if self.toolbarIsShowing {
           make.right.equalTo(self.tabsButton.snp_left)
           make.centerY.equalTo(self)
-          make.size.equalTo(backButton)
+          make.size.equalTo(UIConstants.ToolbarHeight)
         } else {
           make.right.equalTo(self)
           make.centerY.equalTo(self)
-          make.size.equalTo(backButton)
+          make.size.lessThanOrEqualTo(UIConstants.ToolbarHeight)
         }
       }
     }
   }
 
   override func setupConstraints() {
-    super.setupConstraints()
+      locationView.snp_makeConstraints { make in
+        make.edges.equalTo(self.locationContainer)
+      }
+
+      cancelButton.snp_makeConstraints { make in
+        make.centerY.equalTo(self.locationContainer)
+        make.trailing.equalTo(self)
+      }
+
+      tabsButton.snp_makeConstraints { make in
+        make.centerY.equalTo(self.locationContainer)
+        make.trailing.equalTo(self)
+        make.size.equalTo(UIConstants.ToolbarHeight)
+      }
+
+      backButton.snp_makeConstraints { make in
+        make.left.centerY.equalTo(self)
+        make.size.equalTo(UIConstants.ToolbarHeight)
+      }
+
+      forwardButton.snp_makeConstraints { make in
+        make.left.equalTo(self.backButton.snp_right)
+        make.centerY.equalTo(self)
+        make.size.equalTo(backButton)
+      }
+
+      shareButton.snp_makeConstraints { make in
+        make.right.equalTo(self.bookmarkButton.snp_left)
+        make.centerY.equalTo(self)
+        make.size.equalTo(backButton)
+      }
   }
 
   var progressIsCompleting = false
