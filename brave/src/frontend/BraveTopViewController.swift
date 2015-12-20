@@ -35,10 +35,21 @@ class BraveTopViewController : UIViewController {
       make.width.equalTo(0)
     }
 
-    browser.view.snp_makeConstraints {
+    setupBrowserConstraints(useTopLayoutGuide: true)
+
+    NSNotificationCenter.defaultCenter().removeObserver(self, name: "foofoo", object: nil)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: "foo:", name: "foofoo", object: nil)
+  }
+
+  private func setupBrowserConstraints(useTopLayoutGuide useTopLayoutGuide: Bool) {
+    browser.view.snp_remakeConstraints {
       make in
       make.bottom.equalTo(view)
-      make.top.equalTo(view).inset(topLayoutGuide.length)
+      if useTopLayoutGuide {
+        make.top.equalTo(view).inset(topLayoutGuide.length)
+      } else {
+        make.top.equalTo(view).inset(20)
+      }
       make.left.equalTo(mainSidePanel.view.snp_right)
       if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
         make.width.equalTo(view.snp_width)
@@ -46,9 +57,14 @@ class BraveTopViewController : UIViewController {
         make.right.equalTo(view)
       }
     }
+  }
 
-    NSNotificationCenter.defaultCenter().removeObserver(self, name: "foofoo", object: nil)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "foo:", name: "foofoo", object: nil)
+  override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+
+//    coordinator.animateAlongsideTransition({ (cont) -> Void in
+//      self.setupBrowserConstraints(useTopLayoutGuide: true)
+//      }, completion: nil)
   }
 
   override func preferredStatusBarStyle() -> UIStatusBarStyle {
@@ -69,27 +85,21 @@ class BraveTopViewController : UIViewController {
 
   var showing = false
   func foo(_:NSNotification) {
-    UIView.animateWithDuration(0.3) {
-      if self.showing {
-        self.mainSidePanel.view.snp_remakeConstraints {
-          make in
-          make.bottom.left.top.equalTo(self.view)
-          make.width.equalTo(0)
-        }
-      } else {
-        self.mainSidePanel.view.snp_remakeConstraints {
-          make in
-          make.bottom.left.top.equalTo(self.view)
-          make.width.equalTo(300)
-        }
-      }
-      self.view.layoutIfNeeded()
+    showing = !showing
+    let width = showing ? 300 : 0
+    let animation = {
+          self.mainSidePanel.view.snp_remakeConstraints {
+            make in
+            make.bottom.left.top.equalTo(self.view)
+            make.width.equalTo(width)
+          }
+          self.view.layoutIfNeeded()
+          self.setNeedsStatusBarAppearanceUpdate()
     }
 
-    showing = !showing
-    setNeedsStatusBarAppearanceUpdate()
+    UIView.animateWithDuration(0.3, animations: animation)
   }
-
+  
   //  override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
   //    coordinator.animateAlongsideTransition({ (cont) -> Void in
   //      }, completion: nil)
