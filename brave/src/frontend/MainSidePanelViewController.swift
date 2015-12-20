@@ -1,14 +1,15 @@
-import Foundation
+import Storage
 
 class MainSidePanelViewController : UIViewController {
 
-  var bookmarks: BookmarksPanel = BookmarksPanel()
+  let bookmarks: BookmarksPanel = BookmarksPanel()
+  let history = HistoryPanel()
 
   let width = 300
   let headerHeight = 40
 
-  var bookmarksButton: UIButton?
-  var historyButton: UIButton?
+  var bookmarksButton: UIButton = UIButton()
+  var historyButton: UIButton = UIButton()
 
   override func viewDidLoad() {
       view.backgroundColor = UIColor.blackColor()
@@ -19,26 +20,56 @@ class MainSidePanelViewController : UIViewController {
 //    blurEffectView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
 //    view.addSubview(blurEffectView)
 
-    bookmarksButton = UIButton()
-    bookmarksButton?.setTitle("Bookmarks", forState: UIControlState.Normal)
-    view.addSubview(bookmarksButton!)
+    bookmarksButton.setTitle("Bookmarks", forState: UIControlState.Normal)
+    view.addSubview(bookmarksButton)
 
-    bookmarksButton?.snp_makeConstraints {
+    bookmarksButton.snp_makeConstraints {
       make in
       make.top.equalTo(view).offset(spaceForStatusBar())
       make.centerX.equalTo(view).dividedBy(2.0)
     }
+    bookmarksButton.addTarget(self, action: "showBookmarks", forControlEvents: .TouchUpInside)
 
-    historyButton = UIButton()
-    historyButton?.setTitle("History", forState: UIControlState.Normal)
-    view.addSubview(historyButton!)
+    historyButton.setTitle("History", forState: UIControlState.Normal)
+    view.addSubview(historyButton)
+    historyButton.addTarget(self, action: "showHistory", forControlEvents: .TouchUpInside)
 
-    historyButton?.snp_makeConstraints {
+    historyButton.snp_makeConstraints {
       make in
       make.top.equalTo(view).offset(spaceForStatusBar())
       make.centerX.equalTo(view).multipliedBy(1.5)
 
 //      make.left.equalTo(bookmarksButton!.snp_right).offset(12)
+    }
+
+    view.clipsToBounds = false;
+    view.layer.shadowColor = UIColor.blackColor().CGColor
+    view.layer.shadowOffset = CGSizeMake(0,5);
+    view.layer.shadowOpacity = 0.5;
+
+    bookmarks.profile = getApp().profile
+    history.profile = getApp().profile
+
+    showBookmarks()
+  }
+
+  func showBookmarks() {
+    history.view.removeFromSuperview()
+
+    view.addSubview(bookmarks.view)
+    bookmarks.view.snp_makeConstraints { make in
+      make.left.right.bottom.equalTo(view)
+      make.top.equalTo(view).offset(headerHeight + spaceForStatusBar())
+    }
+  }
+
+  func showHistory() {
+    bookmarks.view.removeFromSuperview()
+
+    view.addSubview(history.view)
+    history.view.snp_makeConstraints { make in
+      make.left.right.bottom.equalTo(view)
+      make.top.equalTo(view).offset(headerHeight + spaceForStatusBar())
     }
   }
 
@@ -47,17 +78,17 @@ class MainSidePanelViewController : UIViewController {
     return spacer
   }
 
-  override func viewDidAppear(animated: Bool) {
-    guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return }
-    bookmarks.profile = app.profile
-    view.addSubview(bookmarks.view)
-    bookmarks.view.snp_makeConstraints { make in
-      make.left.right.bottom.equalTo(view)
-      make.top.equalTo(view).offset(headerHeight + spaceForStatusBar())
+  func showAndSetDelegate(showing: Bool, delegate: HomePanelDelegate?) {
+    if (showing) {
+      bookmarks.homePanelDelegate = delegate
+      bookmarks.reloadData()
+      history.homePanelDelegate = delegate
+      history.reloadData()
+    } else {
+      bookmarks.homePanelDelegate = nil
+      history.homePanelDelegate = nil
     }
   }
-
-  override func viewDidDisappear(animated: Bool) {
-    bookmarks.view.removeFromSuperview()
-  }
 }
+
+

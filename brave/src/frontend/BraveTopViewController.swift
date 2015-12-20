@@ -1,4 +1,5 @@
 import Shared
+import Storage
 
 class BraveTopViewController : UIViewController {
   var browser:BraveBrowserViewController
@@ -85,7 +86,12 @@ class BraveTopViewController : UIViewController {
 
   var showing = false
   func foo(_:NSNotification) {
+    toggleLeftPanel()
+  }
+
+  func toggleLeftPanel() {
     showing = !showing
+    mainSidePanel.showAndSetDelegate(showing, delegate:self)
     let width = showing ? 300 : 0
     let animation = {
           self.mainSidePanel.view.snp_remakeConstraints {
@@ -98,8 +104,9 @@ class BraveTopViewController : UIViewController {
     }
 
     UIView.animateWithDuration(0.3, animations: animation)
+
   }
-  
+
   //  override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
   //    coordinator.animateAlongsideTransition({ (cont) -> Void in
   //      }, completion: nil)
@@ -111,4 +118,14 @@ class BraveTopViewController : UIViewController {
   //    var w:UIWebView = browser.webView
   //    
   //  }
+}
+
+extension BraveTopViewController : HomePanelDelegate {
+  func homePanelDidRequestToSignIn(homePanel: HomePanel) {}
+  func homePanelDidRequestToCreateAccount(homePanel: HomePanel) {}
+  func homePanel(homePanel: HomePanel, didSelectURL url: NSURL, visitType: VisitType) {
+    print("selected \(url)")
+    browser.tabManager.selectedTab?.loadRequest(NSURLRequest(URL: url))
+    toggleLeftPanel()
+  }
 }
