@@ -86,7 +86,16 @@ class BrowserScrollingController: NSObject {
 
     override init() {
         super.init()
+
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "pageUnload", name: kNotificationPageUnload, object: nil)
     }
+
+  func pageUnload() {
+    print("scroll controller pageUnload")
+    delay(0.1) {
+      self.showToolbars(animated: true)
+    }
+  }
 
     func showToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
       if toolbarState == .Visible || toolbarsShowing {
