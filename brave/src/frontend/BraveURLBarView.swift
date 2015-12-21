@@ -121,33 +121,35 @@ class BraveURLBarView : URLBarView {
   }
 
   override func setupConstraints() {
-      locationView.snp_makeConstraints { make in
+      super.setupConstraints()
+
+      locationView.snp_remakeConstraints { make in
         make.edges.equalTo(self.locationContainer)
       }
 
-      cancelButton.snp_makeConstraints { make in
+      cancelButton.snp_remakeConstraints { make in
         make.centerY.equalTo(self.locationContainer)
         make.trailing.equalTo(self)
       }
 
-      tabsButton.snp_makeConstraints { make in
+      tabsButton.snp_remakeConstraints { make in
         make.centerY.equalTo(self.locationContainer)
         make.trailing.equalTo(self)
         make.size.equalTo(UIConstants.ToolbarHeight)
       }
 
-      backButton.snp_makeConstraints { make in
+      backButton.snp_remakeConstraints { make in
         make.left.centerY.equalTo(self)
         make.size.equalTo(UIConstants.ToolbarHeight)
       }
 
-      forwardButton.snp_makeConstraints { make in
+      forwardButton.snp_remakeConstraints { make in
         make.left.equalTo(self.backButton.snp_right)
         make.centerY.equalTo(self)
         make.size.equalTo(backButton)
       }
 
-      shareButton.snp_makeConstraints { make in
+      shareButton.snp_remakeConstraints { make in
         make.right.equalTo(self.bookmarkButton.snp_left)
         make.centerY.equalTo(self)
         make.size.equalTo(backButton)

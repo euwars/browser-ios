@@ -277,30 +277,30 @@ class URLBarView: UIView {
 
     override func updateConstraints() {
         super.updateConstraints()
-//        if inOverlayMode {
-//            // In overlay mode, we always show the location view full width
-//            self.locationContainer.snp_remakeConstraints { make in
-//                make.leading.equalTo(self).offset(URLBarViewUX.LocationLeftPadding)
-//                make.trailing.equalTo(self.cancelButton.snp_leading)
-//                make.height.equalTo(URLBarViewUX.LocationHeight)
-//                make.centerY.equalTo(self)
-//            }
-//        } else {
-//            self.locationContainer.snp_remakeConstraints { make in
-//                if self.toolbarIsShowing {
-//                    // If we are showing a toolbar, show the text field next to the forward button
-//                    make.leading.equalTo(self.stopReloadButton.snp_trailing)
-//                    make.trailing.equalTo(self.shareButton.snp_leading)
-//                } else {
-//                    // Otherwise, left align the location view
-//                    make.leading.equalTo(self).offset(URLBarViewUX.LocationLeftPadding)
-//                    make.trailing.equalTo(self.tabsButton.snp_leading).offset(-14)
-//                }
-//
-//                make.height.equalTo(URLBarViewUX.LocationHeight)
-//                make.centerY.equalTo(self)
-//            }
-//        }
+        if inOverlayMode {
+            // In overlay mode, we always show the location view full width
+            self.locationContainer.snp_remakeConstraints { make in
+                make.leading.equalTo(self).offset(URLBarViewUX.LocationLeftPadding)
+                make.trailing.equalTo(self.cancelButton.snp_leading)
+                make.height.equalTo(URLBarViewUX.LocationHeight)
+                make.centerY.equalTo(self)
+            }
+        } else {
+            self.locationContainer.snp_remakeConstraints { make in
+                if self.toolbarIsShowing {
+                    // If we are showing a toolbar, show the text field next to the forward button
+                    make.leading.equalTo(self.leftSlideOutButton.snp_trailing)
+                    make.trailing.equalTo(self.shareButton.snp_leading)
+                } else {
+                    // Otherwise, left align the location view
+                    make.leading.equalTo(self).offset(URLBarViewUX.LocationLeftPadding)
+                    make.trailing.equalTo(self.tabsButton.snp_leading).offset(-14)
+                }
+
+                make.height.equalTo(URLBarViewUX.LocationHeight)
+                make.centerY.equalTo(self)
+            }
+        }
 
     }
 
