@@ -13,7 +13,7 @@ public class DefaultSuggestedSites {
             imageUrl: "asset://suggestedsites_google",
             faviconUrl: "asset://braveLogo",
             trackingId: 632,
-            title: NSLocalizedString("Search Google", comment: "Tile title for Brave")
+            title: NSLocalizedString("Search Google", comment: "Tile title for Google")
         ),
         SuggestedSiteData(
             url: "https://www.yahoo.com",
@@ -21,7 +21,7 @@ public class DefaultSuggestedSites {
             imageUrl: "asset://suggestedsites_yahoo",
             faviconUrl: "asset://braveLogo",
             trackingId: 632,
-            title: NSLocalizedString("Search Yahoo", comment: "Tile title for Brave")
+            title: NSLocalizedString("Search Yahoo", comment: "Tile title for Yahoo")
         ),
         SuggestedSiteData(
             url: "https://www.bing.com",
@@ -29,7 +29,7 @@ public class DefaultSuggestedSites {
             imageUrl: "asset://suggestedsites_bing",
             faviconUrl: "asset://braveLogo",
             trackingId: 632,
-            title: NSLocalizedString("Search Bing", comment: "Tile title for Brave")
+            title: NSLocalizedString("Search Bing", comment: "Tile title for Bing")
         ),
         SuggestedSiteData(
             url: "https://www.duckduckgo.com",
@@ -37,7 +37,7 @@ public class DefaultSuggestedSites {
             imageUrl: "asset://suggestedsites_DDG",
             faviconUrl: "asset://braveLogo",
             trackingId: 632,
-            title: NSLocalizedString("Seach DuckDuckGo", comment: "Tile title for Brave")
+            title: NSLocalizedString("Seach DuckDuckGo", comment: "Tile title for DDG")
         ),
         SuggestedSiteData(
             url: "https://www.wikipedia.com",
@@ -45,7 +45,7 @@ public class DefaultSuggestedSites {
             imageUrl: "asset://suggestedsites_wiki",
             faviconUrl: "asset://braveLogo",
             trackingId: 632,
-            title: NSLocalizedString("Search Wikipedia", comment: "Tile title for Brave")
+            title: NSLocalizedString("Search Wikipedia", comment: "Tile title for wikipedia")
         ),
         SuggestedSiteData(
             url: "https://www.brave.com",
