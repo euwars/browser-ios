@@ -53,8 +53,8 @@ class SiteTableViewHeader : UITableViewHeaderFooterView {
         }
 
         titleLabel.snp_makeConstraints { make in
-            make.left.equalTo(contentView).offset(SiteTableViewControllerUX.HeaderTextMargin)
-            make.right.equalTo(contentView).offset(-SiteTableViewControllerUX.HeaderTextMargin)
+            make.left.equalTo(contentView).offset(SiteTableViewControllerUX.HeaderTextMargin).priority(999)
+            make.right.equalTo(contentView).offset(-SiteTableViewControllerUX.HeaderTextMargin).priority(999)
             make.centerY.equalTo(contentView)
         }
     }

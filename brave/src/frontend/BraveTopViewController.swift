@@ -3,6 +3,19 @@ import Storage
 
 let kNotificationLeftSlideOutClicked = "kNotificationLeftSlideOutClicked"
 
+
+func drawInnerShadowOnView(view: UIView, length: CGFloat) -> CALayer
+{
+  let layer = CAGradientLayer()
+  layer.startPoint    = CGPointMake(1.0, 0.5);
+  layer.endPoint      = CGPointMake(0.5, 0.5);
+  layer.colors        = [UIColor(white: 0.1, alpha: 1.0).CGColor, UIColor(white: 0.1, alpha: 0.5).CGColor, UIColor.clearColor().CGColor]
+  layer.locations     = [0.05, 0.2, 1.0]
+  view.layer.addSublayer(layer)
+  
+  return layer
+}
+
 class BraveTopViewController : UIViewController {
   var browser:BraveBrowserViewController
   var mainSidePanel:MainSidePanelViewController
@@ -57,7 +70,7 @@ class BraveTopViewController : UIViewController {
       make in
       make.bottom.equalTo(view)
       if useTopLayoutGuide {
-        make.top.equalTo(view).inset(topLayoutGuide.length)
+        make.top.equalTo(snp_topLayoutGuideTop)
       } else {
         make.top.equalTo(view).inset(20)
       }
@@ -93,6 +106,7 @@ class BraveTopViewController : UIViewController {
   func toggleLeftPanel() {
     leftSlideOutShowing = !leftSlideOutShowing
     mainSidePanel.showAndSetDelegate(leftSlideOutShowing, delegate:self)
+    mainSidePanel.view.layoutIfNeeded()
 
     if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
       if leftSlideOutShowing {
@@ -116,7 +130,7 @@ class BraveTopViewController : UIViewController {
           self.view.layoutIfNeeded()
           self.setNeedsStatusBarAppearanceUpdate()
     }
-    UIView.animateWithDuration(0.3, animations: animation)
+    UIView.animateWithDuration(0.3, animations: animation, completion: {finished in self.mainSidePanel.finishedShow() })
   }
 }
 

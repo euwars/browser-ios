@@ -86,7 +86,7 @@ class BraveBrowserViewController : BrowserViewController {
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
 
-    let h = BraveApp.isIPhoneLandscape() ? 0 : 20
+    let h = BraveApp.isIPhonePortrait() ? 20 : 0
     statusBarOverlay.snp_remakeConstraints { make in
       make.top.left.right.equalTo(self.view)
       make.height.equalTo(h)
