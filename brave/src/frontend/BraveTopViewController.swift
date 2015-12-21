@@ -1,9 +1,12 @@
 import Shared
 import Storage
 
+let kNotificationLeftSlideOutClicked = "kNotificationLeftSlideOutClicked"
+
 class BraveTopViewController : UIViewController {
   var browser:BraveBrowserViewController
   var mainSidePanel:MainSidePanelViewController
+  var leftSlideOutShowing = false
 
   init(browser:BraveBrowserViewController) {
     self.browser = browser
@@ -38,8 +41,7 @@ class BraveTopViewController : UIViewController {
 
     setupBrowserConstraints(useTopLayoutGuide: true)
 
-    NSNotificationCenter.defaultCenter().removeObserver(self, name: "foofoo", object: nil)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "foo:", name: "foofoo", object: nil)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: "leftSlideOutClicked:", name: kNotificationLeftSlideOutClicked, object: nil)
   }
 
   private func setupBrowserConstraints(useTopLayoutGuide useTopLayoutGuide: Bool) {
@@ -60,14 +62,6 @@ class BraveTopViewController : UIViewController {
     }
   }
 
-  override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-    super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-
-//    coordinator.animateAlongsideTransition({ (cont) -> Void in
-//      self.setupBrowserConstraints(useTopLayoutGuide: true)
-//      }, completion: nil)
-  }
-
   override func preferredStatusBarStyle() -> UIStatusBarStyle {
     return UIStatusBarStyle.LightContent
   }
@@ -81,18 +75,17 @@ class BraveTopViewController : UIViewController {
       return true
     }
 
-    return showing
+    return leftSlideOutShowing
   }
 
-  var showing = false
-  func foo(_:NSNotification) {
+  func leftSlideOutClicked(_:NSNotification) {
     toggleLeftPanel()
   }
 
   func toggleLeftPanel() {
-    showing = !showing
-    mainSidePanel.showAndSetDelegate(showing, delegate:self)
-    let width = showing ? 300 : 0
+    leftSlideOutShowing = !leftSlideOutShowing
+    mainSidePanel.showAndSetDelegate(leftSlideOutShowing, delegate:self)
+    let width = leftSlideOutShowing ? 300 : 0
     let animation = {
           self.mainSidePanel.view.snp_remakeConstraints {
             make in
@@ -104,20 +97,7 @@ class BraveTopViewController : UIViewController {
     }
 
     UIView.animateWithDuration(0.3, animations: animation)
-
   }
-
-  //  override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-  //    coordinator.animateAlongsideTransition({ (cont) -> Void in
-  //      }, completion: nil)
-  //    super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-  //  }
-
-  //  override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
-  //    super.didRotateFromInterfaceOrientation(fromInterfaceOrientation)
-  //    var w:UIWebView = browser.webView
-  //    
-  //  }
 }
 
 extension BraveTopViewController : HomePanelDelegate {

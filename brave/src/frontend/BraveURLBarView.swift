@@ -37,9 +37,9 @@ class BraveURLBarView : URLBarView {
         return [locationTextField, cancelButton]
       } else {
         if toolbarIsShowing {
-          return [backButton, forwardButton, stopReloadButton, locationView, shareButton, bookmarkButton, tabsButton, progressBar]
+          return [backButton, forwardButton, leftSlideOutButton, locationView, shareButton, bookmarkButton, tabsButton, progressBar]
         } else {
-          return [stopReloadButton, locationView, bookmarkButton, progressBar]
+          return [leftSlideOutButton, locationView, bookmarkButton, progressBar]
         }
       }
     }
@@ -51,7 +51,7 @@ class BraveURLBarView : URLBarView {
   override func updateViewsForOverlayModeAndToolbarChanges() {
     super.updateViewsForOverlayModeAndToolbarChanges()
     if !self.toolbarIsShowing {
-      self.stopReloadButton.hidden = false
+      self.leftSlideOutButton.hidden = false
       self.tabsButton.hidden = true
       self.bookmarkButton.hidden = false
     } else {
@@ -83,10 +83,10 @@ class BraveURLBarView : URLBarView {
       self.locationContainer.snp_remakeConstraints { make in
         if self.toolbarIsShowing {
           // Firefox is not referring to the bottom toolbar, it is asking is this class showing more tool buttons
-          make.leading.equalTo(self.stopReloadButton.snp_trailing)
+          make.leading.equalTo(self.leftSlideOutButton.snp_trailing)
           make.trailing.equalTo(self.shareButton.snp_leading)
         } else {
-          make.leading.equalTo(self.stopReloadButton.snp_trailing)
+          make.leading.equalTo(self.leftSlideOutButton.snp_trailing)
           make.trailing.equalTo(self.bookmarkButton.snp_leading)  //.offset(-14)
         }
 
@@ -94,7 +94,7 @@ class BraveURLBarView : URLBarView {
         make.centerY.equalTo(self)
       }
 
-      stopReloadButton.snp_remakeConstraints { make in
+      leftSlideOutButton.snp_remakeConstraints { make in
         if self.toolbarIsShowing {
           make.left.equalTo(self.forwardButton.snp_right)
           make.centerY.equalTo(self)

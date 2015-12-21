@@ -58,7 +58,8 @@ class BraveBrowserToolbar : BrowserToolbar {
     BraveBrowserToolbar.currentInstance = self
 
     bookmarkButton.hidden = true
-    stopReloadButton.hidden = true
+    //stopReloadButton.hidden = true
+    leftSlideOutButton.hidden = true
 
     tabsContainer.addSubview(tabsButton)
     addSubview(tabsContainer)

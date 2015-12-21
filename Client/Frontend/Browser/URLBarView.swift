@@ -156,10 +156,10 @@ class URLBarView: UIView {
 
     lazy var backButton: UIButton = { return UIButton() }()
 
-    lazy var stopReloadButton: UIButton = { return UIButton() }()
+    lazy var leftSlideOutButton: UIButton = { return UIButton() }()
 
     lazy var actionButtons: [UIButton] = {
-        return [self.shareButton, self.bookmarkButton, self.forwardButton, self.backButton, self.stopReloadButton]
+        return [self.shareButton, self.bookmarkButton, self.forwardButton, self.backButton, self.leftSlideOutButton]
     }()
 
     // Used to temporarily store the cloned button so we can respond to layout changes during animation
@@ -201,7 +201,7 @@ class URLBarView: UIView {
         addSubview(bookmarkButton)
         addSubview(forwardButton)
         addSubview(backButton)
-        addSubview(stopReloadButton)
+        addSubview(leftSlideOutButton)
 
         locationContainer.addSubview(locationView)
         addSubview(locationContainer)
@@ -256,7 +256,7 @@ class URLBarView: UIView {
             make.size.equalTo(backButton)
         }
 
-        stopReloadButton.snp_makeConstraints { make in
+        leftSlideOutButton.snp_makeConstraints { make in
             make.left.equalTo(self.forwardButton.snp_right)
             make.centerY.equalTo(self)
             make.size.equalTo(backButton)
@@ -504,7 +504,7 @@ class URLBarView: UIView {
         self.bookmarkButton.hidden = !self.toolbarIsShowing
         self.forwardButton.hidden = !self.toolbarIsShowing
         self.backButton.hidden = !self.toolbarIsShowing
-        self.stopReloadButton.hidden = !self.toolbarIsShowing
+        self.leftSlideOutButton.hidden = !self.toolbarIsShowing
     }
 
     func transitionToOverlay(didCancel: Bool = false) {
@@ -514,7 +514,7 @@ class URLBarView: UIView {
         self.bookmarkButton.alpha = inOverlayMode ? 0 : 1
         self.forwardButton.alpha = inOverlayMode ? 0 : 1
         self.backButton.alpha = inOverlayMode ? 0 : 1
-        self.stopReloadButton.alpha = inOverlayMode ? 0 : 1
+        self.leftSlideOutButton.alpha = inOverlayMode ? 0 : 1
 
         let borderColor = inOverlayMode ? locationActiveBorderColor : locationBorderColor
         locationContainer.layer.borderColor = borderColor.CGColor
@@ -551,7 +551,7 @@ class URLBarView: UIView {
         self.bookmarkButton.hidden = !self.toolbarIsShowing || inOverlayMode
         self.forwardButton.hidden = !self.toolbarIsShowing || inOverlayMode
         self.backButton.hidden = !self.toolbarIsShowing || inOverlayMode
-        self.stopReloadButton.hidden = !self.toolbarIsShowing || inOverlayMode
+        self.leftSlideOutButton.hidden = !self.toolbarIsShowing || inOverlayMode
     }
 
     func animateToOverlayState(overlayMode overlay: Bool, didCancel cancel: Bool = false) {
@@ -601,6 +601,7 @@ extension URLBarView: BrowserToolbarProtocol {
 
     func updateReloadStatus(isLoading: Bool) {
         helper?.updateReloadStatus(isLoading)
+#if STOP_RELOAD_ON
         if isLoading {
             stopReloadButton.setImage(helper?.ImageStop, forState: .Normal)
             stopReloadButton.setImage(helper?.ImageStopPressed, forState: .Highlighted)
@@ -608,11 +609,14 @@ extension URLBarView: BrowserToolbarProtocol {
             stopReloadButton.setImage(helper?.ImageReload, forState: .Normal)
             stopReloadButton.setImage(helper?.ImageReloadPressed, forState: .Highlighted)
         }
+#endif
     }
 
     func updatePageStatus(isWebPage isWebPage: Bool) {
         bookmarkButton.enabled = isWebPage
+#if STOP_RELOAD_ON
         stopReloadButton.enabled = isWebPage
+#endif
         shareButton.enabled = isWebPage
     }
 
@@ -623,7 +627,7 @@ extension URLBarView: BrowserToolbarProtocol {
                 return [locationTextField, cancelButton]
             } else {
                 if toolbarIsShowing {
-                    return [backButton, forwardButton, stopReloadButton, locationView, shareButton, bookmarkButton, tabsButton, progressBar]
+                    return [backButton, forwardButton, leftSlideOutButton, locationView, shareButton, bookmarkButton, tabsButton, progressBar]
                 } else {
                     return [locationView, tabsButton, progressBar]
                 }
