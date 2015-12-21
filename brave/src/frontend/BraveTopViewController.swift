@@ -106,7 +106,7 @@ class BraveTopViewController : UIViewController {
       }
     }
     
-    let width = leftSlideOutShowing ? 300 : 0
+    let width = leftSlideOutShowing ? BraveUX.WidthOfSlideOut : 0
     let animation = {
           self.mainSidePanel.view.snp_remakeConstraints {
             make in

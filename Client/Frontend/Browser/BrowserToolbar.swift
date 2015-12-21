@@ -194,9 +194,6 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
         super.init(frame: frame)
 
-      layer.borderWidth = 5
-      layer.borderColor  = UIColor.brownColor().CGColor
-
         self.helper = BrowserToolbarHelper(toolbar: self)
 
         addButtons(backButton, forwardButton, leftSlideOutButton, shareButton, bookmarkButton)

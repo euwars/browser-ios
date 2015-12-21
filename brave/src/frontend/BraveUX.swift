@@ -5,6 +5,8 @@ struct BraveUX {
 
   static var IsHighLoadAnimationAllowed = false
 
+  static let WidthOfSlideOut = 260
+
   // debug settings
   static var IsToolbarHidingOff = false
   static var IsOverrideScrollingSpeedAndMakeSlower = false // overrides IsHighLoadAnimationAllowed effect
