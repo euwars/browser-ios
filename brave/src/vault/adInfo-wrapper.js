@@ -2,19 +2,28 @@
 
 function _brave_replaceDivWithNewContent(replacerObject) {
   var divId = replacerObject.divId;
-  var frameSrc = replacerObject.newContent;
   var width = replacerObject.width;
   var height = replacerObject.height;
-
+  var replacementUrl = replacerObject.replacementUrl;
+  
   var selector = '[id="' + divId + '"]';
   var node = document.querySelector(selector);
   if (node) {
+    // generate a random segment
+    // @todo - replace with renko targeting
+    var segments = ['IAB2', 'IAB17', 'IAB14', 'IAB21', 'IAB20']
+    var segment = segments[Math.floor(Math.random() * 4)]
+    var time_in_segment = new Date().getSeconds()
+    var segment_expiration_time = 0 // no expiration
+    
+    // ref param for referrer when possible
+    var srcUrl = replacementUrl + '?width=' + width + '&height=' + height + '&seg=' + segment + ':' + time_in_segment + ':' + segment_expiration_time
+    var frameSrc = '<html><body style="width: ' + width + 'px; height: ' + height + '; padding: 0; margin: 0;"><script src="' + srcUrl + '"></script></body></html>'
+    
     console.log('------tag name: ' + node.tagName);
     if (node.tagName === 'IFRAME') {
       node.srcdoc = frameSrc;
     } else {
-      //node.innerHTML = '<iframe src="' + srcUrl + '">';
-
       while (node.firstChild) {
         node.removeChild(node.firstChild);
       }
