@@ -121,7 +121,9 @@ class BraveApp {
   }
 
   class func getPrefs() -> NSUserDefaults? {
+#if !TEST
     assert(NSUserDefaultsPrefs.prefixWithDotForBrave.characters.count > 0)
+#endif
     return NSUserDefaults(suiteName: "group.com.brave.ios.browser")
   }
 
