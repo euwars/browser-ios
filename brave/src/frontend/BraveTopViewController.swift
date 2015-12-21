@@ -8,6 +8,8 @@ class BraveTopViewController : UIViewController {
   var mainSidePanel:MainSidePanelViewController
   var leftSlideOutShowing = false
 
+  var clickDetectionView = UIButton()
+
   init(browser:BraveBrowserViewController) {
     self.browser = browser
     mainSidePanel = MainSidePanelViewController()
@@ -42,6 +44,12 @@ class BraveTopViewController : UIViewController {
     setupBrowserConstraints(useTopLayoutGuide: true)
 
     NSNotificationCenter.defaultCenter().addObserver(self, selector: "leftSlideOutClicked:", name: kNotificationLeftSlideOutClicked, object: nil)
+
+    clickDetectionView.addTarget(self, action: "dismissSlideOut", forControlEvents: UIControlEvents.TouchUpInside)
+  }
+
+  func dismissSlideOut() {
+    toggleLeftPanel()
   }
 
   private func setupBrowserConstraints(useTopLayoutGuide useTopLayoutGuide: Bool) {
@@ -85,6 +93,19 @@ class BraveTopViewController : UIViewController {
   func toggleLeftPanel() {
     leftSlideOutShowing = !leftSlideOutShowing
     mainSidePanel.showAndSetDelegate(leftSlideOutShowing, delegate:self)
+
+    if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
+      if leftSlideOutShowing {
+        view.addSubview(clickDetectionView)
+        clickDetectionView.snp_remakeConstraints {
+          make in
+          make.edges.equalTo(browser.view)
+        }
+      } else {
+        clickDetectionView.removeFromSuperview()
+      }
+    }
+    
     let width = leftSlideOutShowing ? 300 : 0
     let animation = {
           self.mainSidePanel.view.snp_remakeConstraints {
@@ -95,7 +116,6 @@ class BraveTopViewController : UIViewController {
           self.view.layoutIfNeeded()
           self.setNeedsStatusBarAppearanceUpdate()
     }
-
     UIView.animateWithDuration(0.3, animations: animation)
   }
 }
