@@ -5,9 +5,6 @@ class MainSidePanelViewController : UIViewController {
   let bookmarks: BookmarksPanel = BookmarksPanel()
   let history = HistoryPanel()
 
-  var shadow: CALayer?
-  let shadowLength = CGFloat(6)
-
   var bookmarksButton: UIButton = UIButton()
   var historyButton: UIButton = UIButton()
 
@@ -15,17 +12,6 @@ class MainSidePanelViewController : UIViewController {
     view.backgroundColor = UIColor.grayColor()
     bookmarks.profile = getApp().profile
     history.profile = getApp().profile
-
-//
-//    let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.Light)
-//    let blurEffectView = UIVisualEffectView(effect: blurEffect)
-//    blurEffectView.frame = view.bounds
-//    blurEffectView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
-//    view.addSubview(blurEffectView)
-    //    view.clipsToBounds = false;
-    //    view.layer.shadowColor = UIColor.blackColor().CGColor
-    //    view.layer.shadowOffset = CGSizeMake(5, 5);
-    //    view.layer.shadowOpacity = 0.5;
 
     bookmarksButton.setTitle("Bookmarks", forState: UIControlState.Normal)
     view.addSubview(bookmarksButton)
@@ -40,18 +26,9 @@ class MainSidePanelViewController : UIViewController {
 
     showBookmarks()
 
-    shadow = drawInnerShadowOnView(view, length: shadowLength)
-    shadow?.hidden = true
-
     bookmarks.view.hidden = false
 
     view.layer.masksToBounds = true
-  }
-
-  override func viewDidLayoutSubviews() {
-    super.viewDidLayoutSubviews()
-    let f = view.frame
-    shadow?.frame = CGRectMake(f.size.width - shadowLength, 0, shadowLength, f.size.height)
   }
 
   func setupConstraints() {
@@ -97,7 +74,6 @@ class MainSidePanelViewController : UIViewController {
   }
 
   func showAndSetDelegate(showing: Bool, delegate: HomePanelDelegate?) {
-    shadow?.hidden = true
     if (showing) {
       bookmarks.homePanelDelegate = delegate
       bookmarks.reloadData()
@@ -111,21 +87,7 @@ class MainSidePanelViewController : UIViewController {
   }
 
   func finishedShow() {
-    shadow?.hidden = false
   }
-//
-//    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
-//      coordinator.animateAlongsideTransition({ (cont) -> Void in
-//        }, completion: nil)
-//      super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-//    }
-//
-//    override func didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation) {
-//      super.didRotateFromInterfaceOrientation(fromInterfaceOrientation)
-//      var w:UIWebView = browser.webView
-//  
-//    }
-
 }
 
 
