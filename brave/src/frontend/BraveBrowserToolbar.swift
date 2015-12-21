@@ -58,7 +58,8 @@ class BraveBrowserToolbar : BrowserToolbar {
     BraveBrowserToolbar.currentInstance = self
 
     bookmarkButton.hidden = true
-    stopReloadButton.hidden = true
+    //stopReloadButton.hidden = true
+    leftSlideOutButton.hidden = true
 
     tabsContainer.addSubview(tabsButton)
     addSubview(tabsContainer)
@@ -109,9 +110,10 @@ class BraveBrowserToolbar : BrowserToolbar {
   }
 
   override func updateConstraints() {
-    hackToSetButtonColor()
     backgroundColor = UIColor.clearColor()
-
+    delay(0) {
+      self.hackToSetButtonColor()
+    }
     super.updateConstraints()
 
     var backButtonWidth = backButton.imageView?.image?.size.width ?? 0
@@ -124,9 +126,8 @@ class BraveBrowserToolbar : BrowserToolbar {
 
     func commonButtonsToRightOfBackForward(make: ConstraintMaker, bottomInset: Int = 0) {
       common(make, bottomInset: bottomInset)
-//      make.width.equalTo(self)
-//        .inset(BraveUX.BackForwardButtonWidth)
-//        .dividedBy(numberButtonsToRightOfBackForward)
+        //         make.width.equalTo(self.snp_width).dividedBy(Double(BraveUX.BottomToolbarNumberButtonsToRightOfBackForward) + 0.5)
+
       let bounds = UIScreen.mainScreen().bounds
       let w = min(bounds.width, bounds.height)
 

@@ -4,6 +4,8 @@ import Shared
 
 func configureActiveCrashReporter(_:Bool?) {}
 
+let kNotificationPageUnload = "kNotificationPageUnload"
+
 func convertNavActionToWKType(type:UIWebViewNavigationType) -> WKNavigationType {
   return WKNavigationType(rawValue: type.rawValue)!
 }
@@ -59,6 +61,10 @@ class LegacyWebView: UIWebView {
 
   override init(frame: CGRect) {
     super.init(frame: frame)
+    commonInit()
+  }
+
+  private func commonInit() {
     delegate = self.webViewDelegate
     scalesPageToFit = true
     let selectorName = String(format: "_%@WebThread:", "setDrawIn") // avoid Apple Store static analyzer
@@ -75,6 +81,11 @@ class LegacyWebView: UIWebView {
     setupSwipeGesture()
   }
 
+  func internalProgressFinished(notification: NSNotification) {
+    //print("\(notification.userInfo?["WebProgressEstimatedProgressKey"])")
+    delegate?.webViewDidFinishLoad?(self)
+  }
+
   override var loading: Bool {
     get {
       if internalIsLoadingEndedFlag {
@@ -86,10 +97,19 @@ class LegacyWebView: UIWebView {
   }
 
   required init?(coder aDecoder: NSCoder) {
-      fatalError("init(coder:) has not been implemented")
+    super.init(coder: aDecoder)
+    commonInit()
   }
 
+  let internalProgressStartedNotification = "WebProgressStartedNotification"
+  let internalProgressChangedNotification = "WebProgressEstimateChangedNotification"
+  let internalProgressFinishedNotification = "WebProgressFinishedNotification"
+
   override func loadRequest(request: NSURLRequest) {
+    guard let internalWebView = valueForKeyPath("documentView.webView") else { return }
+    NSNotificationCenter.defaultCenter().removeObserver(self, name: internalProgressFinishedNotification, object: internalWebView)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: "internalProgressFinished:", name: internalProgressFinishedNotification, object: internalWebView)
+
     URL = request.URL
     super.loadRequest(request)
   }
@@ -157,11 +177,13 @@ class LegacyWebView: UIWebView {
   override func goBack() {
     // stop scrolling so the web view will respond faster
     scrollView.setContentOffset(scrollView.contentOffset, animated: false)
+    NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: self)
     super.goBack()
   }
 
   override func goForward() {
     scrollView.setContentOffset(scrollView.contentOffset, animated: false)
+    NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: self)
     super.goForward()
   }
 
@@ -243,7 +265,7 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
       guard let _parent = parent else { return false }
 
       if AboutUtils.isAboutHomeURL(request.URL) {
-        return false
+        _parent.progress.completeProgress()
       }
 
       if let contextMenu = _parent.window?.rootViewController?.presentedViewController
