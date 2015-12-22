@@ -13,7 +13,7 @@ protocol BrowserToolbarProtocol {
     var bookmarkButton: UIButton { get }
     var forwardButton: UIButton { get }
     var backButton: UIButton { get }
-    var leftSlideOutButton: UIButton { get }
+    var stopReloadButton: UIButton { get }
     var actionButtons: [UIButton] { get }
 
     func updateBackStatus(canGoBack: Bool)
@@ -55,18 +55,19 @@ public class BrowserToolbarHelper: NSObject {
     var loading: Bool = false {
         didSet {
             if loading {
-//                toolbar.leftSlideOutButton.setImage(ImageStop, forState: .Normal)
-//                toolbar.leftSlideOutButton.setImage(ImageStopPressed, forState: .Highlighted)
-//                toolbar.leftSlideOutButton.accessibilityLabel = NSLocalizedString("Stop", comment: "Accessibility Label for the browser toolbar Stop button")
-//            } else {
-//                toolbar.leftSlideOutButton.setImage(ImageReload, forState: .Normal)
-//                toolbar.leftSlideOutButton.setImage(ImageReloadPressed, forState: .Highlighted)
-//                toolbar.leftSlideOutButton.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the browser toolbar Reload button")
+                toolbar.stopReloadButton.setImage(ImageStop, forState: .Normal)
+                toolbar.stopReloadButton.setImage(ImageStopPressed, forState: .Highlighted)
+                toolbar.stopReloadButton.accessibilityLabel = NSLocalizedString("Stop", comment: "Accessibility Label for the browser toolbar Stop button")
+            } else {
+                toolbar.stopReloadButton.setImage(ImageReload, forState: .Normal)
+                toolbar.stopReloadButton.setImage(ImageReloadPressed, forState: .Highlighted)
+                toolbar.stopReloadButton.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the browser toolbar Reload button")
             }
         }
     }
 
     private func setTintColor(color: UIColor, forButtons buttons: [UIButton]) {
+      return
         buttons.forEach { $0.tintColor = color }
     }
 
@@ -90,12 +91,9 @@ public class BrowserToolbarHelper: NSObject {
         toolbar.forwardButton.addGestureRecognizer(longPressGestureForwardButton)
         toolbar.forwardButton.addTarget(self, action: "SELdidClickForward", forControlEvents: UIControlEvents.TouchUpInside)
 
-        toolbar.leftSlideOutButton.setImage(UIImage(named: "reload"), forState: .Normal)
-        toolbar.leftSlideOutButton.setImage(UIImage(named: "reloadPressed"), forState: .Highlighted)
-        toolbar.leftSlideOutButton.accessibilityLabel = NSLocalizedString("Reload", comment: "Accessibility Label for the browser toolbar Reload button")
-//        let longPressGestureleftSlideOutButton = UILongPressGestureRecognizer(target: self, action: "SELdidLongPressStopReload:")
-//        toolbar.leftSlideOutButton.addGestureRecognizer(longPressGestureleftSlideOutButton)
-        toolbar.leftSlideOutButton.addTarget(self, action: "SELdidClickLeftSlideOut", forControlEvents: UIControlEvents.TouchUpInside)
+        // setup stop/reload
+        loading = false
+      toolbar.stopReloadButton.addTarget(self, action: "SELdidClickStopReload", forControlEvents: UIControlEvents.TouchUpInside)
 
         toolbar.shareButton.setImage(UIImage(named: "send"), forState: .Normal)
 #if !BRAVE // we use the default press state for now. 
@@ -149,19 +147,18 @@ public class BrowserToolbarHelper: NSObject {
         }
     }
 
-    func SELdidClickLeftSlideOut() {
-      NSNotificationCenter.defaultCenter().postNotificationName(kNotificationLeftSlideOutClicked, object: nil)
-//        if loading {
-//            toolbar.browserToolbarDelegate?.browserToolbarDidPressStop(toolbar, button: toolbar.leftSlideOutButton)
-//        } else {
-//            toolbar.browserToolbarDelegate?.browserToolbarDidPressReload(toolbar, button: toolbar.leftSlideOutButton)
-//        }
+
+
+    func SELdidClickStopReload() {
+        if loading {
+            toolbar.browserToolbarDelegate?.browserToolbarDidPressStop(toolbar, button: toolbar.stopReloadButton)
+        } else {
+            toolbar.browserToolbarDelegate?.browserToolbarDidPressReload(toolbar, button: toolbar.stopReloadButton)
+        }
     }
 
     func SELdidLongPressStopReload(recognizer: UILongPressGestureRecognizer) {
-//        if recognizer.state == UIGestureRecognizerState.Began && !loading {
-//            toolbar.browserToolbarDelegate?.browserToolbarDidLongPressReload(toolbar, button: toolbar.leftSlideOutButton)
-//        }
+
     }
 
     func updateReloadStatus(isLoading: Bool) {
@@ -177,7 +174,7 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
     let bookmarkButton: UIButton
     let forwardButton: UIButton
     let backButton: UIButton
-    let leftSlideOutButton: UIButton
+    let stopReloadButton: UIButton
     let actionButtons: [UIButton]
 
     var helper: BrowserToolbarHelper?
@@ -187,16 +184,16 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
         // And these have to be initialized in here or the compiler will get angry
         backButton = UIButton()
         forwardButton = UIButton()
-        leftSlideOutButton = UIButton()
+        stopReloadButton = UIButton()
         shareButton = UIButton()
         bookmarkButton = UIButton()
-        actionButtons = [backButton, forwardButton, leftSlideOutButton, shareButton, bookmarkButton]
+        actionButtons = [backButton, forwardButton, stopReloadButton, shareButton, bookmarkButton]
 
         super.init(frame: frame)
 
         self.helper = BrowserToolbarHelper(toolbar: self)
 
-        addButtons(backButton, forwardButton, leftSlideOutButton, shareButton, bookmarkButton)
+        addButtons(backButton, forwardButton, stopReloadButton, shareButton, bookmarkButton)
 
         accessibilityNavigationStyle = .Combined
         accessibilityLabel = NSLocalizedString("Navigation Toolbar", comment: "Accessibility label for the navigation toolbar displayed at the bottom of the screen.")
@@ -224,7 +221,7 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
     func updatePageStatus(isWebPage isWebPage: Bool) {
         bookmarkButton.enabled = isWebPage
-        leftSlideOutButton.enabled = isWebPage
+        stopReloadButton.enabled = isWebPage
         shareButton.enabled = isWebPage
     }
 
