@@ -27,6 +27,8 @@ enum KVOStrings: String {
   static let allValues = [kvoCanGoBack, kvoCanGoForward, kvoLoading, kvoURL, kvoEstimatedProgress]
 }
 
+let specialStopLoadUrl = "http://localhost.stop.load"
+
 class LegacyWebView: UIWebView {
   static let kNotificationWebViewLoadCompleteOrFailed = "kNotificationWebViewLoadCompleteOrFailed"
   static let kContextMenuBlockNavigation = 8675309
@@ -41,6 +43,9 @@ class LegacyWebView: UIWebView {
   var URL: NSURL?
   var internalIsLoadingEndedFlag: Bool = false;
   var knownFrameContexts = Set<NSObject>()
+
+  // From http://stackoverflow.com/questions/14268230/has-anybody-found-a-way-to-load-https-pages-with-an-invalid-server-certificate-u
+  var loadingUnvalidatedHTTPSPage: Bool = false
 
   // To mimic WKWebView we need this property. And, to easily overrride where Firefox code is setting it, we hack the setter,
   // so that a custom agent is set always to our kDesktopUserAgent.
@@ -108,7 +113,9 @@ class LegacyWebView: UIWebView {
     NSNotificationCenter.defaultCenter().removeObserver(self, name: internalProgressFinishedNotification, object: internalWebView)
     NSNotificationCenter.defaultCenter().addObserver(self, selector: "internalProgressFinished:", name: internalProgressFinishedNotification, object: internalWebView)
 
-    URL = request.URL
+    if let url = request.URL where !url.absoluteString.contains(specialStopLoadUrl) {
+      URL = request.URL
+    }
     super.loadRequest(request)
   }
 
@@ -138,6 +145,17 @@ class LegacyWebView: UIWebView {
 
   func reloadFromOrigin() {
     self.reload()
+  }
+
+  override func stopLoading() {
+    super.stopLoading()
+    loadRequest(NSURLRequest(URL: NSURL(string: specialStopLoadUrl)!))
+    self.progress.reset()
+    // The current displayed url is wrong, so easiest hack is:
+    if (canGoBack) { // I don't think the !canGoBack case needs handling
+      goBack()
+      goForward()
+    }
   }
 
   private func convertStringToDictionary(text: String?) -> [String:AnyObject]? {
@@ -258,12 +276,18 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     self.parent = parent
   }
 
-  func webView(webView: UIWebView,shouldStartLoadWithRequest request: NSURLRequest,
-    navigationType: UIWebViewNavigationType ) -> Bool {
+  var certificateInvalidConnection:NSURLConnection?
+
+  func webView(webView: UIWebView,shouldStartLoadWithRequest request: NSURLRequest, navigationType: UIWebViewNavigationType ) -> Bool {
       guard let _parent = parent else { return false }
 
       if AboutUtils.isAboutHomeURL(request.URL) {
         _parent.progress.completeProgress()
+      }
+
+      if let url = request.URL where url.absoluteString.contains(specialStopLoadUrl) {
+        _parent.progress.completeProgress()
+        return false
       }
 
       if let contextMenu = _parent.window?.rootViewController?.presentedViewController
@@ -273,6 +297,11 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
         return false
       }
 
+      if _parent.loadingUnvalidatedHTTPSPage {
+        certificateInvalidConnection = NSURLConnection(request: request, delegate: self)
+        certificateInvalidConnection?.start()
+        return false
+      }
 
       var result = _parent.progress.shouldStartLoadWithRequest(request, navigationType: navigationType)
       if !result {
@@ -351,6 +380,34 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     if (error?.code == NSURLErrorCancelled) {
       return
     }
+
+    if (error?.domain == NSURLErrorDomain) {
+      if (error?.code == NSURLErrorServerCertificateHasBadDate      ||
+        error?.code == NSURLErrorServerCertificateUntrusted         ||
+        error?.code == NSURLErrorServerCertificateHasUnknownRoot    ||
+        error?.code == NSURLErrorServerCertificateNotYetValid)
+      {
+        guard let parent = parent, url = parent.URL else { return }
+
+        let alert = UIAlertController(title: "Certificate Error", message: "The identity of \(url.absoluteString) can't be verified", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default) {
+          handler in
+            parent.stopLoading()
+          })
+        alert.addAction(UIAlertAction(title: "Continue", style: UIAlertActionStyle.Default) {
+          handler in
+          parent.loadingUnvalidatedHTTPSPage = true;
+          parent.loadRequest(NSURLRequest(URL: url))
+
+          })
+
+        #if !TEST
+          parent.window?.rootViewController?.presentViewController(alert, animated: true, completion: nil)
+        #endif
+        return
+      }
+    }
+
     NSNotificationCenter.defaultCenter()
       .postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
     if let nd = parent?.navigationDelegate {
@@ -361,4 +418,20 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     parent?.progress.didFailLoadWithError()
     parent?.kvoBroadcast()
   }
+}
+
+extension WebViewDelegate : NSURLConnectionDelegate, NSURLConnectionDataDelegate {
+  func connection(connection: NSURLConnection, willSendRequestForAuthenticationChallenge challenge: NSURLAuthenticationChallenge) {
+    guard let trust = challenge.protectionSpace.serverTrust else { return }
+    let cred = NSURLCredential(forTrust: trust)
+    challenge.sender?.useCredential(cred, forAuthenticationChallenge: challenge)
+  }
+
+  func connection(connection: NSURLConnection, didReceiveResponse response: NSURLResponse) {
+    guard let parent = parent, url = parent.URL else { return }
+    parent.loadingUnvalidatedHTTPSPage = false
+    parent.loadRequest(NSURLRequest(URL: url))
+    certificateInvalidConnection?.cancel()
+  }
+
 }
