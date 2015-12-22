@@ -98,7 +98,7 @@ class BraveURLBarView : URLBarView {
         if self.toolbarIsShowing {
           make.left.equalTo(self.forwardButton.snp_right)
           make.centerY.equalTo(self)
-          make.size.equalTo(backButton)
+          make.size.equalTo(UIConstants.ToolbarHeight)
         } else {
           make.left.equalTo(self)
           make.centerY.equalTo(self)
@@ -118,6 +118,8 @@ class BraveURLBarView : URLBarView {
         }
       }
     }
+    leftSlideOutButton.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10)
+    bookmarkButton.contentEdgeInsets = leftSlideOutButton.contentEdgeInsets
   }
 
   override func setupConstraints() {
