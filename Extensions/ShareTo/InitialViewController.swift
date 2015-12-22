@@ -53,10 +53,10 @@ class InitialViewController: UIViewController, ShareControllerDelegate {
         }, completion: { (Bool) -> Void in
             self.dismissShareDialog()
             
-            if destinations.containsObject(ShareDestinationReadingList) {
-                self.shareToReadingList(item)
-            }
-            
+///            if destinations.containsObject(ShareDestinationReadingList) {
+///                self.shareToReadingList(item)
+///            }
+
             if destinations.containsObject(ShareDestinationBookmarks) {
                 self.shareToBookmarks(item)
             }
