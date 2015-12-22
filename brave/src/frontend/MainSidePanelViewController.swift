@@ -43,7 +43,7 @@ class MainSidePanelViewController : UIViewController {
     historyButton.setTitle("H", forState: UIControlState.Normal)
     historyButton.addTarget(self, action: "showHistory", forControlEvents: .TouchUpInside)
 
-    addBookmarkButton.setTitle("A", forState: UIControlState.Normal)
+    addBookmarkButton.setTitle("+", forState: UIControlState.Normal)
     addBookmarkButton.addTarget(self, action: "addBookmark", forControlEvents: .TouchUpInside)
 
     view.addSubview(history.view)
@@ -156,6 +156,7 @@ class MainSidePanelViewController : UIViewController {
 
   func showAndSetDelegate(showing: Bool, delegate: HomePanelDelegate?) {
     if (showing) {
+      view.hidden = false
       bookmarks.tableView.backgroundColor = UIColor(white: 242/255.0, alpha: 1.0)
       history.tableView.backgroundColor = bookmarks.tableView.backgroundColor
       bookmarks.homePanelDelegate = delegate
@@ -169,7 +170,10 @@ class MainSidePanelViewController : UIViewController {
     }
   }
 
-  func finishedShow() {
+  func finishedAnimation(showing showing: Bool) {
+    if !showing { 
+      view.hidden = true
+    }
   }
 }
 

@@ -41,11 +41,13 @@ class BraveTopViewController : UIViewController {
       make.width.equalTo(0)
     }
 
-    browser.view.clipsToBounds = false;
-    browser.view.layer.shadowColor = UIColor.blackColor().CGColor
-    browser.view.layer.shadowOffset = CGSizeMake(-4, 0)
-    browser.view.layer.shadowOpacity = 0.7
-    browser.view.layer.shadowRadius = 8.0
+
+//    clickDetectionView.layer.shadowColor = UIColor.redColor().CGColor
+//    clickDetectionView.layer.shadowOffset = CGSizeMake(-4, 0)
+//    clickDetectionView.layer.shadowOpacity = 0.7
+//    clickDetectionView.layer.shadowRadius = 8.0
+
+    clickDetectionView.backgroundColor = UIColor(white: 100/255, alpha: 0.05)
 
     setupBrowserConstraints(useTopLayoutGuide: true)
 
@@ -99,7 +101,6 @@ class BraveTopViewController : UIViewController {
   }
 
   func toggleLeftPanel() {
-    view.bringSubviewToFront(browser.view)
     leftSlideOutShowing = !leftSlideOutShowing
     mainSidePanel.showAndSetDelegate(leftSlideOutShowing, delegate:self)
     mainSidePanel.view.layoutIfNeeded()
@@ -111,6 +112,7 @@ class BraveTopViewController : UIViewController {
           make in
           make.edges.equalTo(browser.view)
         }
+        clickDetectionView.layoutIfNeeded()
       } else {
         clickDetectionView.removeFromSuperview()
       }
@@ -126,7 +128,11 @@ class BraveTopViewController : UIViewController {
           self.view.layoutIfNeeded()
           self.setNeedsStatusBarAppearanceUpdate()
     }
-    UIView.animateWithDuration(0.3, animations: animation, completion: {finished in self.mainSidePanel.finishedShow() })
+
+    UIView.animateWithDuration(0.3, animations: animation, completion: {
+      finished in
+      self.mainSidePanel.finishedAnimation(showing: width != 0)
+    })
   }
 }
 
