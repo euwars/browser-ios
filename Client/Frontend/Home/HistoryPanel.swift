@@ -234,6 +234,9 @@ class HistoryPanel: SiteTableViewController, HomePanel {
             }
         }
 
+#if BRAVE
+        cell.backgroundColor = UIColor.clearColor()
+#endif
         return cell
     }
 

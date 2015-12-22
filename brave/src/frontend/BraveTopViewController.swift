@@ -52,6 +52,8 @@ class BraveTopViewController : UIViewController {
     NSNotificationCenter.defaultCenter().addObserver(self, selector: "leftSlideOutClicked:", name: kNotificationLeftSlideOutClicked, object: nil)
 
     clickDetectionView.addTarget(self, action: "dismissSlideOut", forControlEvents: UIControlEvents.TouchUpInside)
+
+    mainSidePanel.browser = browser
   }
 
   func dismissSlideOut() {

@@ -134,6 +134,9 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
                 cell.textLabel?.text = bookmark.title
         }
 
+#if BRAVE
+        cell.backgroundColor = UIColor.clearColor()
+#endif
         return cell
     }
 
