@@ -3,7 +3,8 @@ import Foundation
 
 struct BraveUX {
 
-  static var IsHighLoadAnimationAllowed = false
+  // I am considering using DeviceInfo.isBlurSupported() to set this, and reduce heavy animations
+  static var IsHighLoadAnimationAllowed = true
 
   static let WidthOfSlideOut = 260
 

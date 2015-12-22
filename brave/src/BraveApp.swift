@@ -48,10 +48,6 @@ class BraveApp {
     BraveApp.setupCacheDefaults()
     NSURLProtocol.registerClass(URLProtocol);
 
-#if !TEST
-    BraveUX.IsHighLoadAnimationAllowed = DeviceInfo.isBlurSupported()
-#endif
-
     NSNotificationCenter.defaultCenter().addObserver(BraveApp.singleton,
       selector: "didEnterBackground:", name: UIApplicationDidEnterBackgroundNotification, object: nil)
 
