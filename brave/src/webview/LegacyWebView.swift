@@ -67,8 +67,6 @@ class LegacyWebView: UIWebView {
   private func commonInit() {
     delegate = self.webViewDelegate
     scalesPageToFit = true
-    let selectorName = String(format: "_%@WebThread:", "setDrawIn") // avoid Apple Store static analyzer
-    performSelector(NSSelectorFromString(selectorName), withObject:Bool(true))
 
 #if !TEST
     if (BraveUX.IsHighLoadAnimationAllowed && !BraveUX.IsOverrideScrollingSpeedAndMakeSlower) {
