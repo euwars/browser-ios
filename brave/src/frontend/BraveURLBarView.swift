@@ -7,17 +7,26 @@ class HideCurveView : CurveView {
 class BraveURLBarView : URLBarView {
 
   private static weak var currentInstance: BraveURLBarView?
-
+  lazy var leftSidePanelButton = { return UIButton() }()
   override func commonInit() {
     BraveURLBarView.currentInstance = self
     locationContainer.layer.cornerRadius = CGFloat(BraveUX.TextFieldCornerRadius)
     curveShape = HideCurveView()
+
+    addSubview(leftSidePanelButton)
     super.commonInit()
+
+    leftSidePanelButton.addTarget(self, action: "SELdidClickLeftSlideOut", forControlEvents: UIControlEvents.TouchUpInside)
+    leftSidePanelButton.setTitle("☰", forState: .Normal)
   }
 
   override func updateAlphaForSubviews(alpha: CGFloat) {
     super.updateAlphaForSubviews(alpha)
     self.superview?.alpha = alpha
+  }
+
+  func SELdidClickLeftSlideOut() {
+    NSNotificationCenter.defaultCenter().postNotificationName(kNotificationLeftSlideOutClicked, object: nil)
   }
 
   override func updateTabCount(count: Int, animated: Bool = true) {
@@ -37,9 +46,9 @@ class BraveURLBarView : URLBarView {
         return [locationTextField, cancelButton]
       } else {
         if toolbarIsShowing {
-          return [backButton, forwardButton, leftSlideOutButton, locationView, shareButton, bookmarkButton, tabsButton, progressBar]
+          return [backButton, forwardButton, leftSidePanelButton, locationView, stopReloadButton, shareButton, tabsButton]
         } else {
-          return [leftSlideOutButton, locationView, bookmarkButton, progressBar]
+          return [leftSidePanelButton, locationView, stopReloadButton, progressBar]
         }
       }
     }
@@ -50,51 +59,64 @@ class BraveURLBarView : URLBarView {
 
   override func updateViewsForOverlayModeAndToolbarChanges() {
     super.updateViewsForOverlayModeAndToolbarChanges()
+    self.leftSidePanelButton.hidden = inOverlayMode
     if !self.toolbarIsShowing {
-      self.leftSlideOutButton.hidden = false
       self.tabsButton.hidden = true
-      self.bookmarkButton.hidden = false
     } else {
       self.tabsButton.hidden = false
     }
 
-    if inOverlayMode {
-      self.bookmarkButton.hidden = true
-    }
+    self.stopReloadButton.hidden = inOverlayMode
 
     progressBar.hidden = true
+    bookmarkButton.hidden = true
   }
 
   override func prepareOverlayAnimation() {
     super.prepareOverlayAnimation()
     progressBar.hidden = true
+    self.leftSidePanelButton.hidden = !self.toolbarIsShowing
+    bookmarkButton.hidden = true
+  }
+
+  override func transitionToOverlay(didCancel: Bool = false) {
+    self.leftSidePanelButton.alpha = inOverlayMode ? 0 : 1
+    super.transitionToOverlay(didCancel)
+    bookmarkButton.hidden = true
   }
 
   override func updateConstraints() {
     super.updateConstraints()
 
+    curveShape.hidden = true
+    bookmarkButton.hidden = true
+
     // I have to set this late (as in here) as it gets overridden if set earlier
     self.locationTextField?.backgroundColor = BraveUX.LocationTextEntryBackgroundColor
+    self.stopReloadButton.tintColor = BraveUX.ActionButtonTintColor
     // TODO : remove this entirely
     progressBar.hidden = true
     progressBar.alpha = 0.0
+
+    bookmarkButton.snp_removeConstraints()
+    curveShape.snp_removeConstraints()
 
     if !inOverlayMode {
       self.locationContainer.snp_remakeConstraints { make in
         if self.toolbarIsShowing {
           // Firefox is not referring to the bottom toolbar, it is asking is this class showing more tool buttons
-          make.leading.equalTo(self.leftSlideOutButton.snp_trailing)
-          make.trailing.equalTo(self.shareButton.snp_leading)
+          make.leading.equalTo(self.leftSidePanelButton.snp_trailing)
+          make.trailing.equalTo(self.stopReloadButton.snp_leading)
         } else {
-          make.leading.equalTo(self.leftSlideOutButton.snp_trailing)
-          make.trailing.equalTo(self.bookmarkButton.snp_leading)  //.offset(-14)
+          make.leading.equalTo(self.leftSidePanelButton.snp_trailing)
+          make.trailing.equalTo(self.stopReloadButton.snp_leading)  //.offset(-14)
         }
 
         make.height.equalTo(URLBarViewUX.LocationHeight)
         make.centerY.equalTo(self)
       }
 
-      leftSlideOutButton.snp_remakeConstraints { make in
+      leftSidePanelButton.snp_remakeConstraints { make in
         if self.toolbarIsShowing {
           make.left.equalTo(self.forwardButton.snp_right)
           make.centerY.equalTo(self)
@@ -106,9 +128,9 @@ class BraveURLBarView : URLBarView {
         }
       }
 
-      bookmarkButton.snp_remakeConstraints { make in
+      stopReloadButton.snp_remakeConstraints { make in
         if self.toolbarIsShowing {
-          make.right.equalTo(self.tabsButton.snp_left)
+          make.right.equalTo(self.shareButton.snp_left)
           make.centerY.equalTo(self)
           make.size.equalTo(UIConstants.ToolbarHeight)
         } else {
@@ -118,43 +140,29 @@ class BraveURLBarView : URLBarView {
         }
       }
     }
-    leftSlideOutButton.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10)
-    bookmarkButton.contentEdgeInsets = leftSlideOutButton.contentEdgeInsets
+    leftSidePanelButton.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10)
+    stopReloadButton.contentEdgeInsets = leftSidePanelButton.contentEdgeInsets
   }
 
   override func setupConstraints() {
       super.setupConstraints()
 
-      locationView.snp_remakeConstraints { make in
-        make.edges.equalTo(self.locationContainer)
-      }
-
-      cancelButton.snp_remakeConstraints { make in
-        make.centerY.equalTo(self.locationContainer)
-        make.trailing.equalTo(self)
-      }
-
-      tabsButton.snp_remakeConstraints { make in
-        make.centerY.equalTo(self.locationContainer)
-        make.trailing.equalTo(self)
-        make.size.equalTo(UIConstants.ToolbarHeight)
-      }
-
-      backButton.snp_remakeConstraints { make in
-        make.left.centerY.equalTo(self)
-        make.size.equalTo(UIConstants.ToolbarHeight)
-      }
-
-      forwardButton.snp_remakeConstraints { make in
-        make.left.equalTo(self.backButton.snp_right)
-        make.centerY.equalTo(self)
-        make.size.equalTo(backButton)
-      }
-
       shareButton.snp_remakeConstraints { make in
-        make.right.equalTo(self.bookmarkButton.snp_left)
+        make.right.equalTo(self.tabsButton.snp_left)
         make.centerY.equalTo(self)
-        make.size.equalTo(backButton)
+        make.width.equalTo(UIConstants.ToolbarHeight)
+      }
+
+      stopReloadButton.snp_remakeConstraints { make in
+        make.right.equalTo(self.shareButton.snp_left)
+        make.centerY.equalTo(self)
+        make.size.equalTo(UIConstants.ToolbarHeight)
+      }
+
+      leftSidePanelButton.snp_makeConstraints { make in
+        make.left.equalTo(self.forwardButton.snp_right)
+        make.centerY.equalTo(self)
+        make.size.equalTo(UIConstants.ToolbarHeight)
       }
   }
 

@@ -27,6 +27,8 @@ extension UIImage{
 class BraveBrowserToolbar : BrowserToolbar {
   static var tabsCount = 0
 
+ // let leftSidePanelButton: UIButton
+
   lazy var tabsButton: TabsButton = {
     let tabsButton = TabsButton()
     tabsButton.titleLabel.text = "\(tabsCount)"
@@ -53,13 +55,14 @@ class BraveBrowserToolbar : BrowserToolbar {
   let backForwardUnderlay = UIImageView(image: UIImage(named: "backForwardUnderlay"))
 
   override init(frame: CGRect) {
+    //leftSidePanelButton = UIButton()
     super.init(frame: frame)
 
     BraveBrowserToolbar.currentInstance = self
 
     bookmarkButton.hidden = true
     //stopReloadButton.hidden = true
-    leftSlideOutButton.hidden = true
+    //  Button.hidden = true
 
     tabsContainer.addSubview(tabsButton)
     addSubview(tabsContainer)

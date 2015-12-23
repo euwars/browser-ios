@@ -129,7 +129,7 @@ class BraveTopViewController : UIViewController {
           self.setNeedsStatusBarAppearanceUpdate()
     }
 
-    UIView.animateWithDuration(0.3, animations: animation, completion: {
+    UIView.animateWithDuration(0.2, animations: animation, completion: {
       finished in
       self.mainSidePanel.finishedAnimation(showing: width != 0)
     })
