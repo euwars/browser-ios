@@ -17,7 +17,7 @@ class BraveURLBarView : URLBarView {
     super.commonInit()
 
     leftSidePanelButton.addTarget(self, action: "SELdidClickLeftSlideOut", forControlEvents: UIControlEvents.TouchUpInside)
-    leftSidePanelButton.setTitle("☰", forState: .Normal)
+    leftSidePanelButton.setImage(UIImage(named: "listpanel"), forState: .Normal)
   }
 
   override func updateAlphaForSubviews(alpha: CGFloat) {
@@ -92,8 +92,9 @@ class BraveURLBarView : URLBarView {
     bookmarkButton.hidden = true
 
     // I have to set this late (as in here) as it gets overridden if set earlier
-    self.locationTextField?.backgroundColor = BraveUX.LocationTextEntryBackgroundColor
-    self.stopReloadButton.tintColor = BraveUX.ActionButtonTintColor
+    locationTextField?.backgroundColor = BraveUX.LocationTextEntryBackgroundColor
+    stopReloadButton.tintColor = BraveUX.ActionButtonTintColor
+    leftSidePanelButton.tintColor = BraveUX.ActionButtonTintColor
     // TODO : remove this entirely
     progressBar.hidden = true
     progressBar.alpha = 0.0
@@ -140,8 +141,9 @@ class BraveURLBarView : URLBarView {
         }
       }
     }
-    leftSidePanelButton.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10)
-    stopReloadButton.contentEdgeInsets = leftSidePanelButton.contentEdgeInsets
+  //  leftSidePanelButton.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10)
+    stopReloadButton.contentEdgeInsets =  UIEdgeInsetsMake(0, 10, 0, 10)
+
   }
 
   override func setupConstraints() {

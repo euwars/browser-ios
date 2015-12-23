@@ -84,9 +84,11 @@ class LegacyWebView: UIWebView {
     setupSwipeGesture()
   }
 
-  func internalProgressFinished(notification: NSNotification) {
+  func internalProgressNotification(notification: NSNotification) {
     //print("\(notification.userInfo?["WebProgressEstimatedProgressKey"])")
-    delegate?.webViewDidFinishLoad?(self)
+    if (notification.userInfo?["WebProgressEstimatedProgressKey"] as? Double ?? 0 > 0.99) {
+      delegate?.webViewDidFinishLoad?(self)
+    }
   }
 
   override var loading: Bool {
@@ -106,12 +108,12 @@ class LegacyWebView: UIWebView {
 
   let internalProgressStartedNotification = "WebProgressStartedNotification"
   let internalProgressChangedNotification = "WebProgressEstimateChangedNotification"
-  let internalProgressFinishedNotification = "WebProgressFinishedNotification"
+  let internalProgressFinishedNotification = "WebProgressFinishedNotification" // Not usable
 
   override func loadRequest(request: NSURLRequest) {
     guard let internalWebView = valueForKeyPath("documentView.webView") else { return }
-    NSNotificationCenter.defaultCenter().removeObserver(self, name: internalProgressFinishedNotification, object: internalWebView)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "internalProgressFinished:", name: internalProgressFinishedNotification, object: internalWebView)
+    NSNotificationCenter.defaultCenter().removeObserver(self, name: internalProgressChangedNotification, object: internalWebView)
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: "internalProgressNotification:", name: internalProgressChangedNotification, object: internalWebView)
 
     if let url = request.URL where !url.absoluteString.contains(specialStopLoadUrl) {
       URL = request.URL
@@ -324,7 +326,8 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
       }
 
       _parent.kvoBroadcast()
-      return result
+
+       return result
   }
 
 
@@ -343,6 +346,8 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
 
     guard let _parent = parent else { return }
     let readyState = _parent.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
+
+    //print("readyState:\(readyState)")
 
     _parent.progress.webViewDidFinishLoad(documentReadyState: readyState)
 
@@ -370,9 +375,8 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
     _parent.kvoBroadcast()
 
     // For testing
-    if readyState == "complete" {
-      NSNotificationCenter.defaultCenter()
-        .postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
+    if readyState == "complete" || readyState == "loaded" {
+      NSNotificationCenter.defaultCenter().postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
     }
   }
 
@@ -393,6 +397,11 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default) {
           handler in
             parent.stopLoading()
+            // The current displayed url is wrong, so easiest hack is:
+            if (parent.canGoBack) { // I don't think the !canGoBack case needs handling
+              parent.goBack()
+              parent.goForward()
+            }
           })
         alert.addAction(UIAlertAction(title: "Continue", style: UIAlertActionStyle.Default) {
           handler in
@@ -414,7 +423,7 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
       nd.webView?(nullWebView, didFailNavigation: nullWKNavigation,
         withError: error ?? NSError.init(domain: "", code: 0, userInfo: nil))
     }
-    print("\(error)")
+    print("didFailLoadWithError: \(error)")
     parent?.progress.didFailLoadWithError()
     parent?.kvoBroadcast()
   }

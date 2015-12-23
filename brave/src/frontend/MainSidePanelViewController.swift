@@ -37,14 +37,19 @@ class MainSidePanelViewController : UIViewController {
     topButtonsView.addSubview(historyButton)
     topButtonsView.addSubview(addBookmarkButton)
 
-    bookmarksButton.setTitle("B", forState: UIControlState.Normal)
+
+    bookmarksButton.setImage(UIImage(named: "bookmarklist"), forState: .Normal)
     bookmarksButton.addTarget(self, action: "showBookmarks", forControlEvents: .TouchUpInside)
 
-    historyButton.setTitle("H", forState: UIControlState.Normal)
+    historyButton.setImage(UIImage(named: "history"), forState: .Normal)
     historyButton.addTarget(self, action: "showHistory", forControlEvents: .TouchUpInside)
 
-    addBookmarkButton.setTitle("+", forState: UIControlState.Normal)
     addBookmarkButton.addTarget(self, action: "addBookmark", forControlEvents: .TouchUpInside)
+    addBookmarkButton.setImage(UIImage(named: "add"), forState: .Normal)
+
+    bookmarksButton.tintColor = BraveUX.ActionButtonTintColor
+    historyButton.tintColor = BraveUX.ActionButtonTintColor
+    addBookmarkButton.tintColor = UIColor.whiteColor()
 
     view.addSubview(history.view)
     view.addSubview(bookmarks.view)
@@ -81,18 +86,21 @@ class MainSidePanelViewController : UIViewController {
     bookmarksButton.snp_remakeConstraints {
       make in
       make.bottom.equalTo(self.topButtonsView)
+      make.height.equalTo(UIConstants.ToolbarHeight)
       make.centerX.equalTo(self.topButtonsView).dividedBy(2.0)
     }
 
     historyButton.snp_remakeConstraints {
       make in
       make.bottom.equalTo(self.topButtonsView)
+      make.height.equalTo(UIConstants.ToolbarHeight)
       make.centerX.equalTo(self.topButtonsView)
     }
 
     addBookmarkButton.snp_remakeConstraints {
       make in
       make.bottom.equalTo(self.topButtonsView)
+      make.height.equalTo(UIConstants.ToolbarHeight)
       make.centerX.equalTo(self.topButtonsView).multipliedBy(1.5)
     }
 

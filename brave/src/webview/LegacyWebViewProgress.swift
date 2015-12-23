@@ -129,7 +129,7 @@ public class LegacyWebViewProgress
       case "complete":
         // When loading consecutive pages, I often see a finishLoad for the previous page
         // arriving. I have tried webview.stopLoading, and still this seems to arrive. Bizarre.
-        let isMainDoc = _currentURL != nil && _currentURL == webView?.request?.mainDocumentURL
+        let isMainDoc = _currentURL != nil && _currentURL == webView?.URL
         if (isMainDoc) {
           completeProgress()
         }
