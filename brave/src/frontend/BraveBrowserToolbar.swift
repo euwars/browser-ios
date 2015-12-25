@@ -119,6 +119,8 @@ class BraveBrowserToolbar : BrowserToolbar {
     }
     super.updateConstraints()
 
+    stopReloadButton.hidden = true
+
     var backButtonWidth = backButton.imageView?.image?.size.width ?? 0
     var forwardButtonWidth = backButton.imageView?.image?.size.width ?? 0
 
