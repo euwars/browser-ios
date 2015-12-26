@@ -14,12 +14,6 @@ class BrowserScrollingController: NSObject {
         case None  // Brave added
     }
 
-    enum ToolbarState {
-        case Collapsed
-        case Visible
-        case Animating
-    }
-
     weak var browser: Browser? {
         willSet {
             self.scrollView?.delegate = nil
@@ -36,6 +30,8 @@ class BrowserScrollingController: NSObject {
     weak var footer: UIView?
     weak var urlBar: URLBarView?
     weak var snackBars: UIView?
+
+    var verticalTranslation = CGFloat(0)
 
     var footerBottomConstraint: Constraint?
     // TODO: Since SnapKit hasn't added support yet (Swift 2.0/iOS 9) for handling layoutGuides,
@@ -74,14 +70,11 @@ class BrowserScrollingController: NSObject {
 
     private var lastContentOffset: CGFloat = 0
     private var scrollDirection: ScrollDirection = .Down
-    private var toolbarState: ToolbarState = .Visible
 
     // Brave added
     // What I am seeing on older devices is when scroll direction is changed quickly, and the toolbar show/hides,
     // the first or second pan gesture after that will report the wrong direction (the gesture handling seems bugging during janky scrolling)
-    // This added check is a secondary validator of the scroll direction, however one can no longer scroll up and down in a single gesture
-    // to show and hide toolbars, they must be separate gestures.
-    // This all avoids a worst case where the toolbar hides/shows, triggers some jank, user swipes during jank, and the toolbar wrongly shows (and triggers more jank)
+    // This added check is a secondary validator of the scroll direction
     private var scrollViewWillBeginDragPoint: CGFloat = 0
 
     override init() {
@@ -90,19 +83,21 @@ class BrowserScrollingController: NSObject {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "pageUnload", name: kNotificationPageUnload, object: nil)
     }
 
-  func pageUnload() {
-    print("scroll controller pageUnload")
-    delay(0.1) {
-      self.showToolbars(animated: true)
+    func pageUnload() {
+      print("pageUnload: showtoolbars if hidden")
+      delay(0.1) {
+        self.showToolbars(animated: true)
+      }
     }
-  }
 
     func showToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
-      if toolbarState == .Visible || toolbarsShowing {
+      if verticalTranslation == 0 && headerTopOffset == 0 && !self.isLayoutPinnedToWindowExtents() {
         completion?(finished: true)
         return
       }
-      toolbarState = .Visible
+
+      layoutWebViewPinnedToHeaderFooter(triggerRedrawWithLayoutIfNeeded: false)
+
       let durationRatio = abs(headerTopOffset / headerFrame.height)
       let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
       self.animateToolbarsWithOffsets(
@@ -114,23 +109,17 @@ class BrowserScrollingController: NSObject {
         completion: completion)
     }
 
-    func hideToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
-      if toolbarState == .Collapsed || !toolbarsShowing || !checkScrollHeightIsLargeEnoughForScrolling() {
-        completion?(finished: true)
-        return
-      }
-
-      toolbarState = .Collapsed
-        let durationRatio = abs((headerFrame.height + headerTopOffset) / headerFrame.height)
-        let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
-        self.animateToolbarsWithOffsets(
-            animated: animated,
-            duration: actualDuration,
-            headerOffset: -headerFrame.height,
-            footerOffset: footerFrame.height - snackBarsFrame.height,
-            alpha: 0,
-            completion: completion)
-    }
+//    func hideToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
+//        let durationRatio = abs((headerFrame.height + headerTopOffset) / headerFrame.height)
+//        let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
+//        self.animateToolbarsWithOffsets(
+//            animated: animated,
+//            duration: actualDuration,
+//            headerOffset: -headerFrame.height,
+//            footerOffset: footerFrame.height - snackBarsFrame.height,
+//            alpha: 0,
+//            completion: completion)
+//    }
 
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if keyPath == "contentSize" {
@@ -147,7 +136,7 @@ private extension BrowserScrollingController {
     }
 
     @objc func handlePan(gesture: UIPanGestureRecognizer) {
-        if browserIsLoading() || BraveUX.IsToolbarHidingOff {
+        if browserIsLoading() /*|| BraveUX.IsToolbarHidingOff */ {
             return
         }
 
@@ -163,18 +152,8 @@ private extension BrowserScrollingController {
         }
 
         lastContentOffset = translation.y
-        if checkRubberbandingForDelta(delta) && checkScrollHeightIsLargeEnoughForScrolling() {
-            if scrollDirection == .Down && toolbarState != .Collapsed {
-                scrollWithDelta(delta)
-            }
-
-            if headerTopOffset == -headerFrame.height {
-                toolbarState = .Collapsed
-            } else if headerTopOffset == 0 {
-                toolbarState = .Visible
-            } else {
-                toolbarState = .Animating
-            }
+        if checkScrollHeightIsLargeEnoughForScrolling() {
+            scrollWithDelta(delta)
         }
 
         if gesture.state == .Ended || gesture.state == .Cancelled {
@@ -182,46 +161,33 @@ private extension BrowserScrollingController {
         }
     }
 
-    func checkRubberbandingForDelta(delta: CGFloat) -> Bool {
-        return !((delta < 0 && contentOffset.y + scrollViewHeight > contentSize.height &&
-                scrollViewHeight < contentSize.height) ||
-                contentOffset.y < delta)
-    }
-
     func scrollWithDelta(delta: CGFloat) {
-      if (!BraveUX.IsHighLoadAnimationAllowed) {
-        return
-      }
-
       if scrollViewHeight >= contentSize.height {
         return
       }
 
-      var updatedOffset = clamp(headerTopOffset - delta, min: -headerFrame.height, max: 0)
-
-      if toolbarState == .Visible && updatedOffset < 0 {
-        if contentOffset.y < UIConstants.ToolbarHeight {
-          return
-        }
-
-        let requiredOffsetForHide = self.contentOffset.y - UIConstants.ToolbarHeight
-        assertOffset(requiredOffsetForHide)
-        self.layoutWebViewPinnedToWindowExtents()
-        assertOffset(requiredOffsetForHide)
-
-        //scrollView?.contentOffset.y -= UIConstants.ToolbarHeight
+      if snackBars?.frame.size.height > 0 {
+        return
       }
 
-      headerTopOffset = updatedOffset
-      updatedOffset = footerBottomOffset + delta
-      footerBottomOffset = clamp(updatedOffset, min: 0, max: footerFrame.height - snackBarsFrame.height)
+      if headerTopOffset != 0 && headerTopOffset != -UIConstants.ToolbarHeight {
+        assert(verticalTranslation == 0)
+        return
+      }
 
-      let alpha = 1 - abs(headerTopOffset / headerFrame.height)
+      let updatedOffset = toolbarsShowing ? clamp(verticalTranslation - delta, min: -UIConstants.ToolbarHeight, max: 0) :
+        clamp(verticalTranslation - delta, min: 0, max: UIConstants.ToolbarHeight)
+      verticalTranslation = updatedOffset
+
+
+      header?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, verticalTranslation))
+      footer?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, -verticalTranslation));
+
+      var alpha = 1 - abs(verticalTranslation / UIConstants.ToolbarHeight)
+      if (!toolbarsShowing) {
+        alpha = 1 - alpha
+      }
       urlBar?.updateAlphaForSubviews(alpha)
-    }
-
-    func isHeaderDisplayedForGivenOffset(offset: CGFloat) -> Bool {
-        return offset > -headerFrame.height && offset < 0
     }
 
     func clamp(y: CGFloat, min: CGFloat, max: CGFloat) -> CGFloat {
@@ -232,13 +198,6 @@ private extension BrowserScrollingController {
         }
         return y
     }
-
-  func assertOffset(offset: CGFloat) {
-    if contentOffset.y != offset {
-      scrollView?.contentOffset.y = offset
-      self.scrollView?.setContentOffset(CGPointMake(self.scrollView!.contentOffset.x, offset), animated: false)
-    }
-  }
 
   func animateToolbarsWithOffsets(animated animated: Bool, duration: NSTimeInterval, headerOffset: CGFloat,
         footerOffset: CGFloat, alpha: CGFloat, completion: ((finished: Bool) -> Void)?) {
@@ -257,26 +216,15 @@ private extension BrowserScrollingController {
 
         let requiredOffsetForHide = self.contentOffset.y - UIConstants.ToolbarHeight
         if !isShow{
-          assertOffset(requiredOffsetForHide)
           self.layoutWebViewPinnedToWindowExtents()
-          assertOffset(requiredOffsetForHide)
+          scrollView?.contentOffset.y = requiredOffsetForHide
         }
 
         let completionWrapper: Bool -> Void = { finished in
           completion?(finished: finished)
-          if !finished {
-            return
-          }
-
           if !isShow {
-            self.assertOffset(requiredOffsetForHide)
-            return
+            self.scrollView?.contentOffset.y = requiredOffsetForHide
           }
-
-          let requiredOffset = self.contentOffset.y + UIConstants.ToolbarHeight
-          self.assertOffset(requiredOffset)
-          self.layoutWebViewPinnedToHeaderFooter(forceRedraw: true)
-          self.assertOffset(requiredOffset)
         }
 
         if animated {
@@ -287,7 +235,26 @@ private extension BrowserScrollingController {
         }
     }
 
-    func layoutWebViewPinnedToHeaderFooter(forceRedraw forceRedraw: Bool) {
+    // TODO track the constraint
+    func isLayoutPinnedToWindowExtents() -> Bool {
+      guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return false }
+      let view = app.browserViewController.webViewContainer
+      let constraints = view.constraintsAffectingLayoutForAxis(.Vertical)
+      for (_, value) in constraints.enumerate() {
+        if value.firstItem as? UIView == view {
+          if value.secondItem as? UIView == app.browserViewController.statusBarOverlay {
+            return true // is already set
+          }
+        }
+      }
+      return false
+    }
+
+    func layoutWebViewPinnedToHeaderFooter(triggerRedrawWithLayoutIfNeeded triggerRedrawWithLayoutIfNeeded: Bool) {
+      if !isLayoutPinnedToWindowExtents() {
+        return
+      }
+
       guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return }
       app.browserViewController.webViewContainer.snp_remakeConstraints {
         make in
@@ -295,28 +262,25 @@ private extension BrowserScrollingController {
         make.top.equalTo(app.browserViewController.header.snp_bottom)
         make.bottom.equalTo(app.browserViewController.footer.snp_top)
       }
-      if forceRedraw {
+
+      if triggerRedrawWithLayoutIfNeeded {
         app.browserViewController.webViewContainer.layoutIfNeeded()
       }
-    }
+      self.scrollView?.contentOffset.y += UIConstants.ToolbarHeight
+  }
 
     func layoutWebViewPinnedToWindowExtents() {
-      guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return }
-      let view = app.browserViewController.webViewContainer
-      let constraints = view.constraintsAffectingLayoutForAxis(.Vertical)
-      for (_, value) in constraints.enumerate() {
-        if value.firstItem as? UIView == view {
-          if value.secondItem as? UIView == app.browserViewController.statusBarOverlay {
-            return; // is already set
-          }
-        }
+      if isLayoutPinnedToWindowExtents() {
+        return
       }
 
+      guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return }
       app.browserViewController.webViewContainer.snp_remakeConstraints {
         make in
         make.left.right.bottom.equalTo(app.browserViewController.view)
         make.top.equalTo(app.browserViewController.statusBarOverlay.snp_bottom)
       }
+
       self.scrollView?.contentOffset.y -= UIConstants.ToolbarHeight
     }
 
@@ -333,47 +297,56 @@ extension BrowserScrollingController: UIGestureRecognizerDelegate {
 }
 
 extension BrowserScrollingController: UIScrollViewDelegate {
+
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if browserIsLoading() {
             return
         }
 
-      if (BraveUX.IsHighLoadAnimationAllowed) {
-        if (decelerate || (toolbarState == .Animating && !decelerate)) && checkScrollHeightIsLargeEnoughForScrolling() {
-            if scrollDirection == .Up {
-               showToolbars(animated: true)
-            } else if scrollDirection == .Down {
-                hideToolbars(animated: true)
-            }
-        }
-      } else {
         if (!decelerate) {
-          if scrollDirection == .Down && scrollView.contentOffset.y > UIConstants.ToolbarHeight {
-            hideToolbars(animated: true)
-          }
-
-          if (scrollDirection == .Up) {
-            showToolbars(animated: true)
-          }
-        }
+          removeTranslationAndSetLayout()
       }
     }
 
-  func scrollViewWillBeginDragging(scrollView: UIScrollView) {
-    self.scrollViewWillBeginDragPoint = scrollView.contentOffset.y
-  }
-
-  func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-    if (!BraveUX.IsHighLoadAnimationAllowed) {
-      if scrollDirection == .Down {
-        hideToolbars(animated: true)
-      }
-
-      if scrollDirection == .Up {
-        showToolbars(animated: true)
-      }
+  func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+    if contentOffset.y < 0 && verticalTranslation > UIConstants.ToolbarHeight / 2.0 && headerTopOffset != 0  {
+      // user has scrolled past top (rubberbanding area) and toolbar needs to show. We show toolbar, and pin offset to zero so that when the 
+      // toolbar shows, the page offset at top (i.e. y == 0) is shown
+      removeTranslationAndSetLayout()
+      scrollView.contentOffset.y = 0
     }
   }
+
+    func removeTranslationAndSetLayout() {
+      if verticalTranslation == 0 {
+        return
+      }
+
+      if verticalTranslation < 0 && headerTopOffset == 0 {
+        headerTopOffset = -UIConstants.ToolbarHeight
+        footerBottomOffset = UIConstants.ToolbarHeight
+        layoutWebViewPinnedToWindowExtents()
+        urlBar?.updateAlphaForSubviews(0)
+      } else if verticalTranslation > UIConstants.ToolbarHeight / 2.0 && headerTopOffset != 0 {
+        headerTopOffset = 0
+        footerBottomOffset = 0
+        layoutWebViewPinnedToHeaderFooter(triggerRedrawWithLayoutIfNeeded: true)
+        urlBar?.updateAlphaForSubviews(1.0)
+      }
+
+      verticalTranslation = 0
+      header?.layer.sublayerTransform = CATransform3DIdentity
+      footer?.layer.sublayerTransform = CATransform3DIdentity
+
+  }
+
+    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+      self.scrollViewWillBeginDragPoint = scrollView.contentOffset.y
+    }
+
+    func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        removeTranslationAndSetLayout()
+    }
 
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
         showToolbars(animated: true)
