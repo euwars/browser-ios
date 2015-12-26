@@ -736,23 +736,23 @@ class SettingsTableViewController: UITableViewController {
                 titleText: NSLocalizedString("Save Logins", comment: "Setting to enable the built-in password manager")),
         ]
 
-      #if BRAVE
-        generalSettings += [AdBlockSetting(settings:self),
-                            VaultAddressSetting(settings: self),
-          BoolSetting(prefs: prefs, prefKey: "•hidingoff•", defaultValue: false, titleText: "Debug: Turn off toolbar hiding", statusText: "", settingDidChange: {
-            value in
-            BraveUX.IsToolbarHidingOff = value
-          }),
-          BoolSetting(prefs: prefs, prefKey: "•forcescrollslow•", defaultValue: false, titleText: "Debug: Force slow scrolling", statusText: "Takes effect on new tab.", settingDidChange: {
-            value in
-            BraveUX.IsOverrideScrollingSpeedAndMakeSlower = value
-          }),
-          BoolSetting(prefs: prefs, prefKey: "•simulateslowdevice•", defaultValue: !BraveUX.IsHighLoadAnimationAllowed, titleText: "Debug: Set scrolling mode for older device type", statusText: "Changes toolbar hide/show behaviour.", settingDidChange: {
-            value in
-            BraveUX.IsHighLoadAnimationAllowed = !value
-          })
-          ]
-      #endif
+//      #if BRAVE
+//        generalSettings += [AdBlockSetting(settings:self),
+//                            VaultAddressSetting(settings: self),
+//          BoolSetting(prefs: prefs, prefKey: "•hidingoff•", defaultValue: false, titleText: "Debug: Turn off toolbar hiding", statusText: "", settingDidChange: {
+//            value in
+//            BraveUX.IsToolbarHidingOff = value
+//          }),
+//          BoolSetting(prefs: prefs, prefKey: "•forcescrollslow•", defaultValue: false, titleText: "Debug: Force slow scrolling", statusText: "Takes effect on new tab.", settingDidChange: {
+//            value in
+//            BraveUX.IsOverrideScrollingSpeedAndMakeSlower = value
+//          }),
+//          BoolSetting(prefs: prefs, prefKey: "•simulateslowdevice•", defaultValue: !BraveUX.IsHighLoadAnimationAllowed, titleText: "Debug: Set scrolling mode for older device type", statusText: "Changes toolbar hide/show behaviour.", settingDidChange: {
+//            value in
+//            BraveUX.IsHighLoadAnimationAllowed = !value
+//          })
+//          ]
+//      #endif
 
 
         // There is nothing to show in the Customize section if we don't include the compact tab layout

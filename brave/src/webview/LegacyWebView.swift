@@ -74,12 +74,12 @@ class LegacyWebView: UIWebView {
     scalesPageToFit = true
 
 #if !TEST
-    if (BraveUX.IsHighLoadAnimationAllowed && !BraveUX.IsOverrideScrollingSpeedAndMakeSlower) {
+   // if (BraveUX.IsHighLoadAnimationAllowed && !BraveUX.IsOverrideScrollingSpeedAndMakeSlower) {
       let rate = UIScrollViewDecelerationRateFast + (UIScrollViewDecelerationRateNormal - UIScrollViewDecelerationRateFast) * 0.5;
       scrollView.setValue(NSValue(CGSize: CGSizeMake(rate, rate)), forKey: "_decelerationFactor")
-    } else {
-      scrollView.decelerationRate = UIScrollViewDecelerationRateFast
-    }
+//    } else {
+//      scrollView.decelerationRate = UIScrollViewDecelerationRateFast
+//    }
 #endif
     setupSwipeGesture()
   }
@@ -153,11 +153,6 @@ class LegacyWebView: UIWebView {
     super.stopLoading()
     loadRequest(NSURLRequest(URL: NSURL(string: specialStopLoadUrl)!))
     self.progress.reset()
-    // The current displayed url is wrong, so easiest hack is:
-    if (canGoBack) { // I don't think the !canGoBack case needs handling
-      goBack()
-      goForward()
-    }
   }
 
   private func convertStringToDictionary(text: String?) -> [String:AnyObject]? {

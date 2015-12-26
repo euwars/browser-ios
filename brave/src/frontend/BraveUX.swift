@@ -9,8 +9,8 @@ struct BraveUX {
   static let WidthOfSlideOut = 260
 
   // debug settings
-  static var IsToolbarHidingOff = false
-  static var IsOverrideScrollingSpeedAndMakeSlower = false // overrides IsHighLoadAnimationAllowed effect
+//  static var IsToolbarHidingOff = false
+//  static var IsOverrideScrollingSpeedAndMakeSlower = false // overrides IsHighLoadAnimationAllowed effect
 
   // set to true to show borders around views
   static let DebugShowBorders = false
