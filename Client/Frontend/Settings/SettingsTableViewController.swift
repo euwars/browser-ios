@@ -637,6 +637,9 @@ private class SearchSetting: Setting {
     }
 }
 
+private class LoginsSetting: Setting {
+    let profile: Profile
+    var tabManager: TabManager!
 
     override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
 

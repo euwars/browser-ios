@@ -1,8 +1,8 @@
 import Shared
 
 class BraveBrowserViewController : BrowserViewController {
-  override func applyNormalModeTheme(force force:Bool) {
-    super.applyNormalModeTheme(force:false)
+  override func applyTheme(themeName: String) {
+    super.applyTheme(themeName)
 
     toolbar?.accessibilityLabel = "toolbar thing"
     headerBackdrop.accessibilityLabel = "headerBackdrop"

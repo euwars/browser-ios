@@ -170,6 +170,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        var shouldPerformAdditionalDelegateHandling = true
+
         log.debug("Did finish launching.")
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
             AdjustIntegration.sharedInstance.triggerApplicationDidFinishLaunchingWithOptions(launchOptions)
@@ -196,7 +198,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         log.debug("Done with applicationDidFinishLaunching.")
-        return true
+        return shouldPerformAdditionalDelegateHandling
     }
 
     func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
@@ -404,6 +406,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     if let reporter = activeCrashReporter {
       configureCrashReporter(reporter, optedIn: optedIn)
     }
+  }
+#endif
 }
 
 // MARK: - Root View Controller Animations
