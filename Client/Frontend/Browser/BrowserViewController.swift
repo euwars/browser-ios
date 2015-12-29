@@ -1302,10 +1302,12 @@ extension BrowserViewController: BrowserDelegate {
             browser.addHelper(logins, name: LoginsHelper.name())
         }
 
+#if !BRAVE
         let contextMenuHelper = ContextMenuHelper(browser: browser)
         contextMenuHelper.delegate = self
         browser.addHelper(contextMenuHelper, name: ContextMenuHelper.name())
-
+#endif
+      
         let errorHelper = ErrorPageHelper()
         browser.addHelper(errorHelper, name: ErrorPageHelper.name())
 
@@ -2321,16 +2323,20 @@ extension BrowserViewController: FxAContentViewControllerDelegate {
 
 extension BrowserViewController: ContextMenuHelperDelegate {
     func contextMenuHelper(contextMenuHelper: ContextMenuHelper, didLongPressElements elements: ContextMenuHelper.Elements, gestureRecognizer: UILongPressGestureRecognizer) {
-        // locationInView can return (0, 0) when the long press is triggered in an invalid page
-        // state (e.g., long pressing a link before the document changes, then releasing after a
-        // different page loads).
-        let touchPoint = gestureRecognizer.locationInView(view)
-#if BRAVE
+      // locationInView can return (0, 0) when the long press is triggered in an invalid page
+      // state (e.g., long pressing a link before the document changes, then releasing after a
+      // different page loads).
+      let touchPoint = gestureRecognizer.locationInView(view)
+      #if BRAVE
         if touchPoint == CGPointZero && UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad {
-            print("zero touchpoint for context menu: \(elements)")
-            return
-          }
-#endif
+          print("zero touchpoint for context menu: \(elements)")
+          return
+        }
+      #endif
+      showContextMenu(elements: elements, touchPoint: touchPoint)
+    }
+
+  func showContextMenu(elements elements: ContextMenuHelper.Elements, touchPoint: CGPoint) {
         let touchSize = CGSizeMake(0, 16)
 
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)

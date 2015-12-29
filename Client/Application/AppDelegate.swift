@@ -37,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         log.debug("Configuring window…")
 
-        self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        self.window = BraveMainWindow(frame: UIScreen.mainScreen().bounds)
         self.window!.backgroundColor = UIConstants.AppBackgroundColor
 
         // Short circuit the app if we want to email logs from the debug menu
