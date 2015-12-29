@@ -36,6 +36,8 @@ class SettingsTableViewCell: UITableViewCell {
 class Setting {
     private var _title: NSAttributedString?
 
+    weak var delegate: SettingsDelegate?
+
     // The url the SettingsContentViewController will show, e.g. Licenses and Privacy Policy.
     var url: NSURL? { return nil }
 
@@ -73,8 +75,9 @@ class Setting {
         }
     }
 
-    init(title: NSAttributedString? = nil) {
+    init(title: NSAttributedString? = nil, delegate: SettingsDelegate? = nil) {
         self._title = title
+        self.delegate = delegate
     }
 }
 
@@ -597,23 +600,20 @@ private class YourRightsSetting: Setting {
 //}
 
 // Opens the the SUMO page in a new tab
-//private class OpenSupportPageSetting: Setting {
-//    init() {
-//        super.init(title: NSAttributedString(string: NSLocalizedString("Help", comment: "Show the SUMO support page from the Support section in the settings. see http://mzl.la/1dmM8tZ"), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
-//    }
-//
-//    override func onClick(navigationController: UINavigationController?) {
-//        navigationController?.dismissViewControllerAnimated(true, completion: {
-//            if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
-//                let rootNavigationController = appDelegate.rootViewController
-//                rootNavigationController.popViewControllerAnimated(true)
-//                if let url = NSURL(string: "https://support.mozilla.org/products/ios") {
-//                    appDelegate.browserViewController.openURLInNewTab(url)
-//                }
-//            }
-//        })
-//    }
-//}
+private class OpenSupportPageSetting: Setting {
+    init(delegate: SettingsDelegate?) {
+        super.init(title: NSAttributedString(string: NSLocalizedString("Help", comment: "Show the SUMO support page from the Support section in the settings. see http://mzl.la/1dmM8tZ"), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]),
+            delegate: delegate)
+    }
+
+    override func onClick(navigationController: UINavigationController?) {
+        navigationController?.dismissViewControllerAnimated(true) {
+            if let url = NSURL(string: "https://support.mozilla.org/products/ios") {
+                self.delegate?.settingsOpenURLInNewTab(url)
+            }
+        }
+    }
+}
 
 // Opens the search settings pane
 private class SearchSetting: Setting {
@@ -637,6 +637,24 @@ private class SearchSetting: Setting {
     }
 }
 
+
+    override var accessoryType: UITableViewCellAccessoryType { return .DisclosureIndicator }
+
+    init(settings: SettingsTableViewController, delegate: SettingsDelegate?) {
+        self.profile = settings.profile
+        self.tabManager = settings.tabManager
+
+        let loginsTitle = NSLocalizedString("Logins", comment: "Label used as an item in Settings. When touched, the user will be navigated to the Logins/Password manager.")
+        super.init(title: NSAttributedString(string: loginsTitle, attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]),
+                   delegate: delegate)
+    }
+
+    override func onClick(navigationController: UINavigationController?) {
+        let viewController = LoginListViewController(profile: profile)
+        viewController.settingsDelegate = delegate
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+}
 
 private class ClearPrivateDataSetting: Setting {
     let profile: Profile
@@ -702,11 +720,18 @@ private class ChinaSyncServiceSetting: WithoutAccountSetting {
     }
 }
 
+@objc
+protocol SettingsDelegate: class {
+    func settingsOpenURLInNewTab(url: NSURL)
+}
+
 // The base settings view controller.
 class SettingsTableViewController: UITableViewController {
     private let Identifier = "CellIdentifier"
     private let SectionHeaderIdentifier = "SectionHeaderIdentifier"
     private var settings = [SettingSection]()
+
+    weak var settingsDelegate: SettingsDelegate?
 
     var profile: Profile!
     var tabManager: TabManager!
@@ -776,7 +801,7 @@ class SettingsTableViewController: UITableViewController {
             SettingSection(title: NSAttributedString(string: NSLocalizedString("General", comment: "General settings section title")), children: generalSettings)
         ]
 
-        //var privacySettings: [Setting] = [ClearPrivateDataSetting(settings: self)]
+        // var privacySettings: [Setting] = [LoginsSetting(settings: self, delegate: settingsDelegate), ClearPrivateDataSetting(settings: self)]
 
 //        if #available(iOS 9, *) {
 //            privacySettings += [
@@ -797,12 +822,12 @@ class SettingsTableViewController: UITableViewController {
 
 
         settings += [
-            //SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings),
-            //SettingSection(title: NSAttributedString(string: NSLocalizedString("Support", comment: "Support section title")), children: [
-                //ShowIntroductionSetting(settings: self),
-                //SendFeedbackSetting()
-                //OpenSupportPageSetting()
-            //]),
+          /**  SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings),
+            SettingSection(title: NSAttributedString(string: NSLocalizedString("Support", comment: "Support section title")), children: [
+                ShowIntroductionSetting(settings: self),
+                SendFeedbackSetting(),
+                OpenSupportPageSetting(delegate: settingsDelegate),
+            ]), **/
             SettingSection(title: NSAttributedString(string: NSLocalizedString("About", comment: "About settings section title")), children: [
                 VersionSetting(settings: self),
                 //LicenseAndAcknowledgementsSetting(),
@@ -973,7 +998,39 @@ class SettingsTableFooterView: UIView {
     }
 }
 
+struct SettingsTableSectionHeaderFooterViewUX {
+    static let titleHorizontalPadding: CGFloat = 15
+    static let titleVerticalPadding: CGFloat = 6
+}
+
 class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
+
+    enum TitleAlignment {
+        case Top
+        case Bottom
+    }
+
+    var titleAlignment: TitleAlignment = .Bottom {
+        didSet {
+            if oldValue != titleAlignment {
+                switch titleAlignment {
+                case .Top:
+                    titleLabel.snp_remakeConstraints { make in
+                        make.left.equalTo(self).offset(SettingsTableSectionHeaderFooterViewUX.titleHorizontalPadding)
+                        make.right.greaterThanOrEqualTo(self).offset(-SettingsTableSectionHeaderFooterViewUX.titleHorizontalPadding)
+                        make.top.equalTo(self).offset(SettingsTableSectionHeaderFooterViewUX.titleVerticalPadding)
+                    }
+                case .Bottom:
+                    titleLabel.snp_remakeConstraints { make in
+                        make.left.equalTo(self).offset(SettingsTableSectionHeaderFooterViewUX.titleHorizontalPadding)
+                        make.right.greaterThanOrEqualTo(self).offset(-SettingsTableSectionHeaderFooterViewUX.titleHorizontalPadding)
+                        make.bottom.equalTo(self).offset(-SettingsTableSectionHeaderFooterViewUX.titleVerticalPadding)
+                    }
+                }
+            }
+        }
+    }
+
     var showTopBorder: Bool = true {
         didSet {
             topBorder.hidden = !showTopBorder
@@ -986,26 +1043,22 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
         }
     }
 
-    var titleLabel: UILabel = {
+    lazy var titleLabel: UILabel = {
         var headerLabel = UILabel()
-        var frame = headerLabel.frame
-        frame.origin.x = 15
-        frame.origin.y = 25
-        headerLabel.frame = frame
         headerLabel.textColor = UIConstants.TableViewHeaderTextColor
         headerLabel.font = UIFont.systemFontOfSize(12.0, weight: UIFontWeightRegular)
         return headerLabel
     }()
 
-    private lazy var topBorder: CALayer = {
-        let topBorder = CALayer()
-        topBorder.backgroundColor = UIConstants.SeparatorColor.CGColor
+    private lazy var topBorder: UIView = {
+        let topBorder = UIView()
+        topBorder.backgroundColor = UIConstants.SeparatorColor
         return topBorder
     }()
 
-    private lazy var bottomBorder: CALayer = {
-        let bottomBorder = CALayer()
-        bottomBorder.backgroundColor = UIConstants.SeparatorColor.CGColor
+    private lazy var bottomBorder: UIView = {
+        let bottomBorder = UIView()
+        bottomBorder.backgroundColor = UIConstants.SeparatorColor
         return bottomBorder
     }()
 
@@ -1013,25 +1066,41 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView {
         super.init(reuseIdentifier: reuseIdentifier)
         contentView.backgroundColor = UIConstants.TableViewHeaderBackgroundColor
         addSubview(titleLabel)
+        addSubview(topBorder)
+        addSubview(bottomBorder)
         clipsToBounds = true
-        layer.addSublayer(topBorder)
-        layer.addSublayer(bottomBorder)
-    }
 
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        showTopBorder = true
-        showBottomBorder = true
+        setupInitialConstraints()
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        bottomBorder.frame = CGRectMake(0.0, frame.size.height - 0.5, frame.size.width, 0.5)
-        topBorder.frame = CGRectMake(0.0, 0.0, frame.size.width, 0.5)
-        titleLabel.sizeToFit()
+    func setupInitialConstraints() {
+        // Initially set title to the bottom
+        titleLabel.snp_makeConstraints { make in
+            make.left.equalTo(self).offset(SettingsTableSectionHeaderFooterViewUX.titleHorizontalPadding)
+            make.right.greaterThanOrEqualTo(self).offset(-SettingsTableSectionHeaderFooterViewUX.titleHorizontalPadding)
+            make.bottom.equalTo(self).offset(-SettingsTableSectionHeaderFooterViewUX.titleVerticalPadding)
+        }
+
+        bottomBorder.snp_makeConstraints { make in
+            make.bottom.left.right.equalTo(self)
+            make.height.equalTo(0.5)
+        }
+
+        topBorder.snp_makeConstraints { make in
+            make.top.left.right.equalTo(self)
+            make.height.equalTo(0.5)
+        }
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        showTopBorder = true
+        showBottomBorder = true
+        titleLabel.text = nil
+        titleAlignment = .Bottom
     }
 }

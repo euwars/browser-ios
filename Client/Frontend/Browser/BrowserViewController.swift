@@ -12,6 +12,7 @@ import SnapKit
 import XCGLogger
 import Alamofire
 import Account
+import ReadingList
 
 private let log = Logger.browserLogger
 
@@ -356,15 +357,8 @@ class BrowserViewController: UIViewController {
             make.edges.equalTo(self.header)
         }
 
-        let viewBindings: [String: AnyObject] = [
-            "header": header,
-            "topLayoutGuide": topLayoutGuide
-        ]
-        let topConstraint = NSLayoutConstraint.constraintsWithVisualFormat("V:[topLayoutGuide][header]", options: [], metrics: nil, views: viewBindings)
-        view.addConstraints(topConstraint)
-        scrollController.headerTopConstraint = topConstraint.first
-
         header.snp_makeConstraints { make in
+            scrollController.headerTopConstraint = make.top.equalTo(snp_topLayoutGuideBottom).constraint
             make.height.equalTo(UIConstants.ToolbarHeight)
             make.left.right.equalTo(self.view)
         }
@@ -421,6 +415,15 @@ class BrowserViewController: UIViewController {
             if !urls.isEmpty {
                 dispatch_async(dispatch_get_main_queue()) {
                     self.tabManager.addTabsForURLs(urls, zombie: false)
+                    if #available(iOS 9, *) {
+                        if let lastTab = cursor.asArray().last {
+                            var userData = [QuickActions.TabURLKey: lastTab.url]
+                            if let title = lastTab.title {
+                                userData[QuickActions.TabTitleKey] = title
+                            }
+                            QuickActions.sharedInstance.addDynamicApplicationShortcutItemOfType(.OpenLastTab, withUserData: userData, toApplication: UIApplication.sharedApplication())
+                        }
+                    }
                 }
             }
 
@@ -505,7 +508,7 @@ class BrowserViewController: UIViewController {
     }
 
     private func shouldRestoreTabs() -> Bool {
-        guard let tabsToRestore = tabManager.tabsToRestore() else { return false }
+        guard let tabsToRestore = TabManager.tabsToRestore() else { return false }
         let onlyNoHistoryTabs = !tabsToRestore.every { $0.sessionData?.urls.count > 1 || !AboutUtils.isAboutHomeURL($0.sessionData?.urls.first) }
         return !onlyNoHistoryTabs && !DebugSettingsBundleOptions.skipSessionRestore
     }
@@ -731,6 +734,15 @@ class BrowserViewController: UIViewController {
     func addBookmark(url: String, title: String?) {
         let shareItem = ShareItem(url: url, title: title, favicon: nil)
         profile.bookmarks.shareItem(shareItem)
+        if #available(iOS 9, *) {
+            var userData = [QuickActions.TabURLKey: shareItem.url]
+            if let title = shareItem.title {
+                userData[QuickActions.TabTitleKey] = title
+            }
+            QuickActions.sharedInstance.addDynamicApplicationShortcutItemOfType(.OpenLastBookmark,
+                withUserData: userData,
+                toApplication: UIApplication.sharedApplication())
+        }
 
         // Dispatch to the main thread to update the UI
         dispatch_async(dispatch_get_main_queue()) { _ in
@@ -887,6 +899,14 @@ class BrowserViewController: UIViewController {
         }
     }
 
+    func switchToTabForURLOrOpen(url: NSURL) {
+        if let tab = tabManager.getTabForURL(url) {
+            tabManager.selectTab(tab)
+        } else {
+            openURLInNewTab(url)
+        }
+    }
+
     func openURLInNewTab(url: NSURL) {
         if #available(iOS 9, *) {
             openURLInNewTab(url, isPrivate: tabTrayController?.privateMode ?? false)
@@ -903,7 +923,7 @@ class BrowserViewController: UIViewController {
         } else {
             request = nil
         }
-        let tabTrayController = self.tabTrayController ?? TabTrayController(tabManager: tabManager, profile: profile)
+        let tabTrayController = self.tabTrayController ?? TabTrayController(tabManager: tabManager, profile: profile, tabTrayDelegate: self)
         tabTrayController.changePrivacyMode(isPrivate)
         self.tabTrayController = tabTrayController
         tabManager.addTabAndSelect(request, isPrivate: isPrivate)
@@ -936,6 +956,48 @@ class BrowserViewController: UIViewController {
         webView.customUserAgent = ua != UserAgent.defaultUserAgent() ? ua : nil
     }
 #endif
+
+    private func presentActivityViewController(url: NSURL, tab: Browser? = nil, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) {
+        var activities = [UIActivity]()
+
+        if #available(iOS 9.0, *) {
+            if let tab = tab where (tab.getHelper(name: ReaderMode.name()) as? ReaderMode)?.state != .Active {
+                let requestDesktopSiteActivity = RequestDesktopSiteActivity(requestMobileSite: tab.desktopSite) {
+                    tab.toggleDesktopSite()
+                }
+                activities.append(requestDesktopSiteActivity)
+            }
+        }
+
+        let helper = ShareExtensionHelper(url: url, tab: tab, activities: activities)
+
+        let controller = helper.createActivityViewController({
+            // We don't know what share action the user has chosen so we simply always
+            // update the toolbar and reader mode bar to reflect the latest status.
+            if let tab = tab {
+                self.updateURLBarDisplayURL(tab)
+            }
+            self.updateReaderModeBar()
+        })
+
+        let setupPopover = { [unowned self] in
+            if let popoverPresentationController = controller.popoverPresentationController {
+                popoverPresentationController.sourceView = sourceView
+                popoverPresentationController.sourceRect = sourceRect
+                popoverPresentationController.permittedArrowDirections = arrowDirection
+                popoverPresentationController.delegate = self
+            }
+        }
+
+        setupPopover()
+
+        if controller.popoverPresentationController != nil {
+            displayedPopoverController = controller
+            updateDisplayedPopoverProperties = setupPopover
+        }
+
+        self.presentViewController(controller, animated: true, completion: nil)
+    }
 }
 
 /**
@@ -980,7 +1042,7 @@ extension BrowserViewController: URLBarDelegate {
 
     func urlBarDidPressTabs(urlBar: URLBarView) {
         self.webViewContainerToolbar.hidden = true
-        let tabTrayController = TabTrayController(tabManager: tabManager, profile: profile)
+        let tabTrayController = TabTrayController(tabManager: tabManager, profile: profile, tabTrayDelegate: self)
 
         if let tab = tabManager.selectedTab {
             screenshotHelper.takeScreenshot(tab)
@@ -1134,7 +1196,7 @@ extension BrowserViewController: BrowserToolbarDelegate {
             return
         }
 
-        guard let tab = tabManager.selectedTab where tab.webView?.URL != nil else {
+        guard let tab = tabManager.selectedTab where tab.webView?.URL != nil && (tab.getHelper(name: ReaderMode.name()) as? ReaderMode)?.state != .Active else {
             return
         }
 
@@ -1192,36 +1254,10 @@ extension BrowserViewController: BrowserToolbarDelegate {
     }
 
     func browserToolbarDidPressShare(browserToolbar: BrowserToolbarProtocol, button: UIButton) {
-        if let selectedTab = tabManager.selectedTab {
-            let helper = ShareExtensionHelper(tab: selectedTab)
-
-            let activityViewController = helper.createActivityViewController({
-                // We don't know what share action the user has chosen so we simply always
-                // update the toolbar and reader mode bar to refelect the latest status.
-                self.updateURLBarDisplayURL(selectedTab)
-                self.updateReaderModeBar()
-            })
-
-            let setupPopover = { [unowned self] in
-                if let popoverPresentationController = activityViewController.popoverPresentationController {
-                    let sourceView = self.navigationToolbar.shareButton
-                    popoverPresentationController.sourceView = sourceView.superview
-                    popoverPresentationController.sourceRect = sourceView.frame
-                    popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Up
-                    popoverPresentationController.delegate = self
-                }
-            }
-
-            setupPopover()
-
-            if activityViewController.popoverPresentationController != nil {
-                displayedPopoverController = activityViewController
-                updateDisplayedPopoverProperties = setupPopover
-            }
-
-            self.presentViewController(activityViewController, animated: true, completion: nil)
+        if let tab = tabManager.selectedTab, url = tab.displayURL {
+            let sourceView = self.navigationToolbar.shareButton
+            presentActivityViewController(url, tab: tab, sourceView: sourceView.superview, sourceRect: sourceView.frame, arrowDirection: .Up)
         }
-
     }
 }
 
@@ -1493,10 +1529,10 @@ extension BrowserViewController: TabManagerDelegate {
 
             if tab.isPrivate {
                 readerModeCache = MemoryReaderModeCache.sharedInstance
-                applyPrivateModeTheme()
+                applyTheme(Theme.PrivateMode)
             } else {
                 readerModeCache = DiskReaderModeCache.sharedInstance
-                applyNormalModeTheme()
+                applyTheme(Theme.NormalMode)
             }
             ReaderModeHandlers.readerModeCache = readerModeCache
 
@@ -1700,6 +1736,9 @@ extension BrowserViewController: WKNavigationDelegate {
             return
         }
 
+        // The challenge may come from a background tab, so ensure it's the one visible.
+        tabManager.selectTab(tab)
+
         let loginsHelper = tab.getHelper(name: LoginsHelper.name()) as? LoginsHelper
         Authenticator.handleAuthRequest(self, challenge: challenge, loginsHelper: loginsHelper).uponQueue(dispatch_get_main_queue()) { res in
             if let credentials = res.successValue {
@@ -1735,14 +1774,14 @@ extension BrowserViewController: WKNavigationDelegate {
         }
 
         if tab === tabManager.selectedTab {
-          UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil)
-          // must be followed by LayoutChanged, as ScreenChanged will make VoiceOver
-          // cursor land on the correct initial element, but if not followed by LayoutChanged,
-          // VoiceOver will sometimes be stuck on the element, not allowing user to move
-          // forward/backward. Strange, but LayoutChanged fixes that.
-          UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil)
+            UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil)
+            // must be followed by LayoutChanged, as ScreenChanged will make VoiceOver
+            // cursor land on the correct initial element, but if not followed by LayoutChanged,
+            // VoiceOver will sometimes be stuck on the element, not allowing user to move
+            // forward/backward. Strange, but LayoutChanged fixes that.
+            UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil)
         } else {
-          screenshotHelper.takeDelayedScreenshot(tab)
+            screenshotHelper.takeDelayedScreenshot(tab)
         }
 
         addOpenInViewIfNeccessary(webView.URL)
@@ -2292,6 +2331,8 @@ extension BrowserViewController: ContextMenuHelperDelegate {
             return
           }
 #endif
+        let touchSize = CGSizeMake(0, 16)
+
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
         var dialogTitle: String?
         actionSheetController.view.tag = LegacyWebView.kContextMenuBlockNavigation
@@ -2326,6 +2367,12 @@ extension BrowserViewController: ContextMenuHelperDelegate {
                 pasteBoard.URL = url
             }
             actionSheetController.addAction(copyAction)
+
+            let shareTitle = NSLocalizedString("Share Link", comment: "Context menu item for sharing a link URL")
+            let shareAction = UIAlertAction(title: shareTitle, style: UIAlertActionStyle.Default) { _ in
+                self.presentActivityViewController(url, sourceView: self.view, sourceRect: CGRect(origin: touchPoint, size: touchSize), arrowDirection: .Any)
+            }
+            actionSheetController.addAction(shareAction)
         }
 
         if let url = elements.image {
@@ -2390,7 +2437,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
         // If we're showing an arrow popup, set the anchor to the long press location.
         if let popoverPresentationController = actionSheetController.popoverPresentationController {
             popoverPresentationController.sourceView = view
-            popoverPresentationController.sourceRect = CGRect(origin: touchPoint, size: CGSizeMake(0, 16))
+            popoverPresentationController.sourceRect = CGRect(origin: touchPoint, size: touchSize)
             popoverPresentationController.permittedArrowDirections = .Any
         }
 
@@ -2444,85 +2491,56 @@ extension BrowserViewController: SessionRestoreHelperDelegate {
     }
 }
 
+extension BrowserViewController: TabTrayDelegate {
+    // This function animates and resets the browser chrome transforms when
+    // the tab tray dismisses.
+    func tabTrayDidDismiss(tabTray: TabTrayController) {
+        // animate and reset transform for browser chrome
+        urlBar.updateAlphaForSubviews(1)
+
+        [header,
+            footer,
+            readerModeBar,
+            footerBackdrop,
+            headerBackdrop].forEach { view in
+                view?.transform = CGAffineTransformIdentity
+        }
+    }
+
+    func tabTrayDidAddBookmark(tab: Browser) {
+        guard let url = tab.url?.absoluteString where url.characters.count > 0 else { return }
+        self.addBookmark(url, title: tab.title)
+    }
+
+
+    func tabTrayDidAddToReadingList(tab: Browser) -> ReadingListClientRecord? {
+        guard let url = tab.url?.absoluteString where url.characters.count > 0 else { return nil }
+        return profile.readingList?.createRecordWithURL(url, title: tab.title ?? url, addedBy: UIDevice.currentDevice().name).successValue
+    }
+
+    func tabTrayRequestsPresentationOf(viewController viewController: UIViewController) {
+        self.presentViewController(viewController, animated: false, completion: nil)
+    }
+}
+
 // MARK: Browser Chrome Theming
-extension BrowserViewController {
+extension BrowserViewController: Themeable {
 
-    func applyPrivateModeTheme(force force: Bool = false) {
-        BrowserLocationView.appearance().baseURLFontColor = UIColor.lightGrayColor()
-        BrowserLocationView.appearance().hostFontColor = UIColor.whiteColor()
-        BrowserLocationView.appearance().backgroundColor = UIConstants.PrivateModeLocationBackgroundColor
+    func applyTheme(themeName: String) {
+        urlBar.applyTheme(themeName)
+        toolbar?.applyTheme(themeName)
+        readerModeBar?.applyTheme(themeName)
 
-        ToolbarTextField.appearance().backgroundColor = UIConstants.PrivateModeLocationBackgroundColor
-        ToolbarTextField.appearance().textColor = UIColor.whiteColor()
-        ToolbarTextField.appearance().clearButtonTintColor = UIColor.whiteColor()
-        ToolbarTextField.appearance().highlightColor = UIConstants.PrivateModeTextHighlightColor
-
-        URLBarView.appearance().locationBorderColor = UIConstants.PrivateModeLocationBorderColor
-        URLBarView.appearance().locationActiveBorderColor = UIConstants.PrivateModePurple
-        URLBarView.appearance().progressBarTint = UIConstants.PrivateModePurple
-        URLBarView.appearance().cancelTextColor = UIColor.whiteColor()
-        URLBarView.appearance().actionButtonTintColor = UIConstants.PrivateModeActionButtonTintColor
-
-        BrowserToolbar.appearance().actionButtonTintColor = UIConstants.PrivateModeActionButtonTintColor
-
-        TabsButton.appearance().borderColor = UIConstants.PrivateModePurple
-        TabsButton.appearance().borderWidth = 1
-        TabsButton.appearance().titleFont = UIConstants.DefaultChromeBoldFont
-        TabsButton.appearance().titleBackgroundColor = UIConstants.AppBackgroundColor
-        TabsButton.appearance().textColor = UIConstants.PrivateModePurple
-        TabsButton.appearance().insets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
-
-        ReaderModeBarView.appearance().backgroundColor = UIConstants.PrivateModeReaderModeBackgroundColor
-        ReaderModeBarView.appearance().buttonTintColor = UIColor.whiteColor()
-
-        if force {
-            forceApplyTheme()
+        switch(themeName) {
+        case Theme.NormalMode:
+            header.blurStyle = .ExtraLight
+            footerBackground?.blurStyle = .ExtraLight
+        case Theme.PrivateMode:
+            header.blurStyle = .Dark
+            footerBackground?.blurStyle = .Dark
+        default:
+            log.debug("Unknown Theme \(themeName)")
         }
-
-        header.blurStyle = .Dark
-        footerBackground?.blurStyle = .Dark
-    }
-
-    func applyNormalModeTheme(force force: Bool = false) {
-        BrowserLocationView.appearance().baseURLFontColor = BrowserLocationViewUX.BaseURLFontColor
-        BrowserLocationView.appearance().hostFontColor = BrowserLocationViewUX.HostFontColor
-        BrowserLocationView.appearance().backgroundColor = UIColor.whiteColor()
-
-        ToolbarTextField.appearance().backgroundColor = UIColor.whiteColor()
-        ToolbarTextField.appearance().textColor = UIColor.blackColor()
-        ToolbarTextField.appearance().highlightColor = AutocompleteTextFieldUX.HighlightColor
-        ToolbarTextField.appearance().clearButtonTintColor = nil
-
-        URLBarView.appearance().locationBorderColor = URLBarViewUX.TextFieldBorderColor
-        URLBarView.appearance().locationActiveBorderColor = URLBarViewUX.TextFieldActiveBorderColor
-        URLBarView.appearance().progressBarTint = URLBarViewUX.ProgressTintColor
-        URLBarView.appearance().cancelTextColor = UIColor.blackColor()
-        URLBarView.appearance().actionButtonTintColor = UIColor.darkGrayColor()
-
-        BrowserToolbar.appearance().actionButtonTintColor = UIColor.darkGrayColor()
-
-        TabsButton.appearance().borderColor = TabsButtonUX.BorderColor
-        TabsButton.appearance().borderWidth = TabsButtonUX.BorderStrokeWidth
-        TabsButton.appearance().titleFont = TabsButtonUX.TitleFont
-        TabsButton.appearance().titleBackgroundColor = TabsButtonUX.TitleBackgroundColor
-        TabsButton.appearance().textColor = TabsButtonUX.TitleColor
-        TabsButton.appearance().insets = TabsButtonUX.TitleInsets
-
-        ReaderModeBarView.appearance().backgroundColor = UIColor.whiteColor()
-        ReaderModeBarView.appearance().buttonTintColor = UIColor.darkGrayColor()
-
-        if force {
-            forceApplyTheme()
-        }
-
-        header.blurStyle = .ExtraLight
-        footerBackground?.blurStyle = .ExtraLight
-    }
-
-    func forceApplyTheme() {
-        urlBar.forceApplyTheme()
-        toolbar?.forceApplyTheme()
-        readerModeBar?.forceApplyTheme()
     }
 }
 
@@ -2566,5 +2584,5 @@ class BlurWrapper: UIView {
 }
 
 protocol Themeable {
-    func forceApplyTheme()
+    func applyTheme(themeName: String)
 }

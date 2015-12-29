@@ -4,6 +4,10 @@
 
 import Foundation
 import SnapKit
+import Shared
+import XCGLogger
+
+private let log = Logger.browserLogger
 
 struct TabsButtonUX {
     static let TitleColor: UIColor = UIColor.blackColor()
@@ -12,8 +16,30 @@ struct TabsButtonUX {
     static let TitleFont: UIFont = UIConstants.DefaultChromeSmallFontBold
     static let BorderStrokeWidth: CGFloat = 0
     static let BorderColor: UIColor = UIColor.clearColor()
-    static let inset = CGFloat(12)
-    static let TitleInsets = UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
+    static let TitleInsets = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+
+    static let Themes: [String: Theme] = {
+        var themes = [String: Theme]()
+        var theme = Theme()
+        theme.borderColor = UIConstants.PrivateModePurple
+        theme.borderWidth = 1
+        theme.font = UIConstants.DefaultChromeBoldFont
+        theme.backgroundColor = UIConstants.AppBackgroundColor
+        theme.textColor = UIConstants.PrivateModePurple
+        theme.insets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        themes[Theme.PrivateMode] = theme
+
+        theme = Theme()
+        theme.borderColor = BorderColor
+        theme.borderWidth = BorderStrokeWidth
+        theme.font = TitleFont
+        theme.backgroundColor = TitleBackgroundColor
+        theme.textColor = TitleColor
+        theme.insets = TitleInsets
+        themes[Theme.NormalMode] = theme
+
+        return themes
+    }()
 }
 
 class TabsButton: UIControl {
@@ -111,6 +137,23 @@ class TabsButton: UIControl {
       }
 
         return button
+    }
+}
+
+extension TabsButton: Themeable {
+    func applyTheme(themeName: String) {
+
+        guard let theme = TabsButtonUX.Themes[themeName] else {
+            log.error("Unable to apply unknown theme \(themeName)")
+            return
+        }
+
+        borderColor = theme.borderColor!
+        borderWidth = theme.borderWidth!
+        titleFont = theme.font
+        titleBackgroundColor = theme.backgroundColor
+        textColor = theme.textColor
+        insets = theme.insets!
     }
 }
 

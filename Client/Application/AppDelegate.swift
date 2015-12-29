@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window!.backgroundColor = UIConstants.AppBackgroundColor
 
         // Short circuit the app if we want to email logs from the debug menu
-        if DebugSettingsBundleOptions.emailLogsOnLaunch {
+        if DebugSettingsBundleOptions.launchIntoEmailComposer {
             self.window?.rootViewController = UIViewController()
             presentEmailComposerWithLogs()
             return true
@@ -184,6 +184,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             Logger.browserLogger.deleteOldLogsDownToSizeLimit()
         }
 
+
+        if #available(iOS 9, *) {
+            // If a shortcut was launched, display its information and take the appropriate action
+            if let shortcutItem = launchOptions?[UIApplicationLaunchOptionsShortcutItemKey] as? UIApplicationShortcutItem {
+
+                QuickActions.sharedInstance.launchedShortcutItem = shortcutItem
+                // This will block "performActionForShortcutItem:completionHandler" from being called.
+                shouldPerformAdditionalDelegateHandling = false
+            }
+        }
+
         log.debug("Done with applicationDidFinishLaunching.")
         return true
     }
@@ -217,7 +228,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // We sync in the foreground only, to avoid the possibility of runaway resource usage.
     // Eventually we'll sync in response to notifications.
     func applicationDidBecomeActive(application: UIApplication) {
-        guard !DebugSettingsBundleOptions.emailLogsOnLaunch else {
+        guard !DebugSettingsBundleOptions.launchIntoEmailComposer else {
             return
         }
 
@@ -226,6 +237,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // We could load these here, but then we have to futz with the tab counter
         // and making NSURLRequests.
         self.browserViewController.loadQueuedTabs()
+
+        // handle quick actions is available
+        if #available(iOS 9, *) {
+            var quickActions = QuickActions.sharedInstance
+            if let shortcut = quickActions.launchedShortcutItem {
+                // dispatch asynchronously so that BVC is all set up for handling new tabs
+                // when we try and open them
+                quickActions.handleShortCutItem(shortcut, withBrowserViewController: browserViewController)
+                quickActions.launchedShortcutItem = nil
+            }
+        }
     }
 
     func applicationDidEnterBackground(application: UIApplication) {
@@ -306,16 +328,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let buildNumber = NSBundle.mainBundle().objectForInfoDictionaryKey(String(kCFBundleVersionKey)) as? NSString {
             let mailComposeViewController = MFMailComposeViewController()
             mailComposeViewController.mailComposeDelegate = self
-            mailComposeViewController.setSubject("Email logs for iOS client version v\(appVersion) (\(buildNumber))")
-            do {
-                let logNamesAndData = try Logger.diskLogFilenamesAndData()
-                logNamesAndData.forEach { nameAndData in
-                    if let data = nameAndData.1 {
-                        mailComposeViewController.addAttachmentData(data, mimeType: "text/plain", fileName: nameAndData.0)
+            mailComposeViewController.setSubject("Debug Info for iOS client version v\(appVersion) (\(buildNumber))")
+
+            if DebugSettingsBundleOptions.attachLogsToDebugEmail {
+                do {
+                    let logNamesAndData = try Logger.diskLogFilenamesAndData()
+                    logNamesAndData.forEach { nameAndData in
+                        if let data = nameAndData.1 {
+                            mailComposeViewController.addAttachmentData(data, mimeType: "text/plain", fileName: nameAndData.0)
+                        }
                     }
+                } catch _ {
+                    print("Failed to retrieve logs from device")
                 }
-            } catch _ {
-                print("Failed to retrieve logs from device")
+            }
+
+            if DebugSettingsBundleOptions.attachTabStateToDebugEmail {
+                if let tabStateDebugData = TabManager.tabRestorationDebugInfo().dataUsingEncoding(NSUTF8StringEncoding) {
+                    mailComposeViewController.addAttachmentData(tabStateDebugData, mimeType: "text/plain", fileName: "tabState.txt")
+                }
             }
 
             self.window?.rootViewController?.presentViewController(mailComposeViewController, animated: true, completion: nil)
@@ -326,6 +357,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String {
             if let urlToOpen = NSURL(string: alertURL) {
                 browserViewController.openURLInNewTab(urlToOpen)
+
+                if #available(iOS 9, *) {
+                    var userData = [QuickActions.TabURLKey: alertURL]
+                    if let title = notification.userInfo?[TabSendTitleKey] as? String {
+                        userData[QuickActions.TabTitleKey] = title
+                    }
+                    QuickActions.sharedInstance.addDynamicApplicationShortcutItemOfType(.OpenLastTab, withUserData: userData, toApplication: UIApplication.sharedApplication())
+                }
             }
         }
     }
@@ -334,6 +373,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let alertURL = notification.userInfo?[TabSendURLKey] as? String,
             let title = notification.userInfo?[TabSendTitleKey] as? String {
                 browserViewController.addBookmark(alertURL, title: title)
+
+                if #available(iOS 9, *) {
+                    let userData = [QuickActions.TabURLKey: alertURL,
+                        QuickActions.TabTitleKey: title]
+                    QuickActions.sharedInstance.addDynamicApplicationShortcutItemOfType(.OpenLastBookmark, withUserData: userData, toApplication: UIApplication.sharedApplication())
+                }
         }
     }
 
@@ -346,46 +391,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    @available(iOS 9.0, *)
+    func application(application: UIApplication, performActionForShortcutItem shortcutItem: UIApplicationShortcutItem, completionHandler: Bool -> Void) {
+        let handledShortCutItem = QuickActions.sharedInstance.handleShortCutItem(shortcutItem, withBrowserViewController: browserViewController)
+
+        completionHandler(handledShortCutItem)
+    }
+
 #if !BRAVE
   var activeCrashReporter: CrashReporter?
   func configureActiveCrashReporter(optedIn: Bool?) {
     if let reporter = activeCrashReporter {
       configureCrashReporter(reporter, optedIn: optedIn)
     }
-  }
-
-  public func configureCrashReporter(reporter: CrashReporter, optedIn: Bool?) {
-    let configureReporter: () -> () = {
-      let addUploadParameterForKey: String -> Void = { key in
-        if let value = NSBundle.mainBundle().objectForInfoDictionaryKey(key) as? String {
-          reporter.addUploadParameter(value, forKey: key)
-        }
-      }
-
-      addUploadParameterForKey("AppID")
-      addUploadParameterForKey("BuildID")
-      addUploadParameterForKey("ReleaseChannel")
-      addUploadParameterForKey("Vendor")
-    }
-
-    if let optedIn = optedIn {
-      // User has explicitly opted-in for sending crash reports. If this is not true, then the user has
-      // explicitly opted-out of crash reporting so don't bother starting breakpad or stop if it was running
-      if optedIn {
-        reporter.start(true)
-        configureReporter()
-        reporter.setUploadingEnabled(true)
-      } else {
-        reporter.stop()
-      }
-    }
-      // We haven't asked the user for their crash reporting preference yet. Log crashes anyways but don't send them.
-    else {
-      reporter.start(true)
-      configureReporter()
-    }
-  }
-#endif
 }
 
 // MARK: - Root View Controller Animations
