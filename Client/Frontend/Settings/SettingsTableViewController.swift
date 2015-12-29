@@ -567,22 +567,22 @@ private class YourRightsSetting: Setting {
 }
 
 // Opens the on-boarding screen again
-//private class ShowIntroductionSetting: Setting {
-//    let profile: Profile
-//
-//    init(settings: SettingsTableViewController) {
-//        self.profile = settings.profile
-//        super.init(title: NSAttributedString(string: NSLocalizedString("Show Tour", comment: "Show the on-boarding screen again from the settings"), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
-//    }
-//
-//    override func onClick(navigationController: UINavigationController?) {
-//        navigationController?.dismissViewControllerAnimated(true, completion: {
-//            if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
-//                appDelegate.browserViewController.presentIntroViewController(true)
-//            }
-//        })
-//    }
-//}
+private class ShowIntroductionSetting: Setting {
+    let profile: Profile
+
+    init(settings: SettingsTableViewController) {
+        self.profile = settings.profile
+        super.init(title: NSAttributedString(string: NSLocalizedString("Show Tour", comment: "Show the on-boarding screen again from the settings"), attributes: [NSForegroundColorAttributeName: UIConstants.TableViewRowTextColor]))
+    }
+
+    override func onClick(navigationController: UINavigationController?) {
+        navigationController?.dismissViewControllerAnimated(true, completion: {
+            if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
+                appDelegate.browserViewController.presentIntroViewController(true)
+            }
+        })
+    }
+}
 
 //private class SendFeedbackSetting: Setting {
 //    override var title: NSAttributedString? {
@@ -764,8 +764,8 @@ class SettingsTableViewController: UITableViewController {
                 titleText: NSLocalizedString("Save Logins", comment: "Setting to enable the built-in password manager")),
         ]
 
-//      #if BRAVE
-//        generalSettings += [AdBlockSetting(settings:self),
+      #if BRAVE
+        generalSettings += [AdBlockSetting(settings:self),
 //                            VaultAddressSetting(settings: self),
 //          BoolSetting(prefs: prefs, prefKey: "•hidingoff•", defaultValue: false, titleText: "Debug: Turn off toolbar hiding", statusText: "", settingDidChange: {
 //            value in
@@ -779,8 +779,8 @@ class SettingsTableViewController: UITableViewController {
 //            value in
 //            BraveUX.IsHighLoadAnimationAllowed = !value
 //          })
-//          ]
-//      #endif
+          ]
+      #endif
 
 
         // There is nothing to show in the Customize section if we don't include the compact tab layout
@@ -825,12 +825,12 @@ class SettingsTableViewController: UITableViewController {
 
 
         settings += [
-          /**  SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings),
+           // SettingSection(title: NSAttributedString(string: privacyTitle), children: privacySettings),
             SettingSection(title: NSAttributedString(string: NSLocalizedString("Support", comment: "Support section title")), children: [
                 ShowIntroductionSetting(settings: self),
-                SendFeedbackSetting(),
-                OpenSupportPageSetting(delegate: settingsDelegate),
-            ]), **/
+             //   SendFeedbackSetting(),
+            //    OpenSupportPageSetting(delegate: settingsDelegate),
+            ]),
             SettingSection(title: NSAttributedString(string: NSLocalizedString("About", comment: "About settings section title")), children: [
                 VersionSetting(settings: self),
                 //LicenseAndAcknowledgementsSetting(),

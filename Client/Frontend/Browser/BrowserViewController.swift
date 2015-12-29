@@ -439,15 +439,14 @@ class BrowserViewController: UIViewController {
         super.viewWillAppear(animated)
         log.debug("BVC super.viewWillAppear done.")
 
-#if !BRAVE
         // On iPhone, if we are about to show the On-Boarding, blank out the browser so that it does
         // not flash before we present. This change of alpha also participates in the animation when
         // the intro view is dismissed.
- //todo brave turn this back on when Intro screen is hooked up again?
         if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
             self.view.alpha = (profile.prefs.intForKey(IntroViewControllerSeenProfileKey) != nil) ? 1.0 : 0.0
         }
 
+#if !BRAVE
         if activeCrashReporter?.previouslyCrashed ?? false {
             log.debug("Previously crashed.")
 
@@ -2240,20 +2239,20 @@ extension BrowserViewController: ReaderModeBarViewDelegate {
 
 extension BrowserViewController: IntroViewControllerDelegate {
     func presentIntroViewController(force: Bool = false) -> Bool{
-//        if force || profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
-//            let introViewController = IntroViewController()
-//            introViewController.delegate = self
-//            // On iPad we present it modally in a controller
-//            if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
-//                introViewController.preferredContentSize = CGSize(width: IntroViewControllerUX.Width, height: IntroViewControllerUX.Height)
-//                introViewController.modalPresentationStyle = UIModalPresentationStyle.FormSheet
-//            }
-//            presentViewController(introViewController, animated: true) {
-//                self.profile.prefs.setInt(1, forKey: IntroViewControllerSeenProfileKey)
-//            }
-//
-//            return true
-//        }
+        if force || profile.prefs.intForKey(IntroViewControllerSeenProfileKey) == nil {
+            let introViewController = IntroViewController()
+            introViewController.delegate = self
+            // On iPad we present it modally in a controller
+            if UIDevice.currentDevice().userInterfaceIdiom == .Pad {
+                introViewController.preferredContentSize = CGSize(width: IntroViewControllerUX.Width, height: IntroViewControllerUX.Height)
+                introViewController.modalPresentationStyle = UIModalPresentationStyle.FormSheet
+            }
+            presentViewController(introViewController, animated: true) {
+                self.profile.prefs.setInt(1, forKey: IntroViewControllerSeenProfileKey)
+            }
+
+            return true
+        }
 
         return false
     }
