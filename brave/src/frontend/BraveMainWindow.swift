@@ -77,10 +77,9 @@ class BraveMainWindow : UIWindow {
       do {
         guard let json = try NSJSONSerialization.JSONObjectWithData((response.dataUsingEncoding(NSUTF8StringEncoding))!, options: [])
           as? [String:AnyObject] else { return nil }
-        if let image = json["imagesrc"] as? String,
-          let url = json["link"] as? String {
-            return ContextMenuHelper.Elements(link: NSURL(string: url), image: NSURL(string: image))
-        }
+        let image = json["imagesrc"] as? String
+        let url = json["link"] as? String
+        return ContextMenuHelper.Elements(link: url != nil ? NSURL(string: url!) : nil, image: image != nil ? NSURL(string: image!) : nil)
       } catch {
       }
       return nil
