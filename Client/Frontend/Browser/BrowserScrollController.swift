@@ -82,6 +82,10 @@ class BrowserScrollingController: NSObject {
     }
 
     func pageUnload() {
+#if CONTENT_INSET_SCROLLING
+      layoutWebViewPinnedToWindowExtents()
+      setInset(UIConstants.ToolbarHeight)
+#endif
       delay(0.1) {
         self.showToolbars(animated: true)
       }
@@ -93,7 +97,9 @@ class BrowserScrollingController: NSObject {
         return
       }
 
+#if !CONTENT_INSET_SCROLLING
       layoutWebViewPinnedToHeaderFooter(triggerRedrawWithLayoutIfNeeded: false)
+#endif
 
       let durationRatio = abs(headerTopOffset / headerFrame.height)
       let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
@@ -158,6 +164,16 @@ private extension BrowserScrollingController {
         }
     }
 
+#if CONTENT_INSET_SCROLLING
+    func setInset(inset: CGFloat) {
+      scrollView?.contentInset = UIEdgeInsetsMake(inset, 0, inset, 0)
+    }
+
+    func getInset() -> CGFloat {
+      return scrollView?.contentInset.top ?? 0
+    }
+#endif
+
     func scrollWithDelta(delta: CGFloat) {
       if scrollViewHeight >= contentSize.height {
         return
@@ -167,15 +183,28 @@ private extension BrowserScrollingController {
         return
       }
 
+
+#if !CONTENT_INSET_SCROLLING
       if headerTopOffset != 0 && headerTopOffset != -UIConstants.ToolbarHeight {
         assert(verticalTranslation == 0)
         return
       }
+#endif
 
       let updatedOffset = toolbarsShowing ? clamp(verticalTranslation - delta, min: -UIConstants.ToolbarHeight, max: 0) :
         clamp(verticalTranslation - delta, min: 0, max: UIConstants.ToolbarHeight)
+
+#if CONTENT_INSET_SCROLLING
+      if verticalTranslation == updatedOffset {
+        return
+      }
+#endif
+
       verticalTranslation = updatedOffset
 
+#if CONTENT_INSET_SCROLLING
+      setInset(UIConstants.ToolbarHeight + updatedOffset)
+#endif
 
       header?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, verticalTranslation))
       footer?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, -verticalTranslation));
@@ -247,6 +276,7 @@ private extension BrowserScrollingController {
       return false
     }
 
+#if !CONTENT_INSET_SCROLLING
     func layoutWebViewPinnedToHeaderFooter(triggerRedrawWithLayoutIfNeeded triggerRedrawWithLayoutIfNeeded: Bool) {
       if !isLayoutPinnedToWindowExtents() {
         return
@@ -265,6 +295,7 @@ private extension BrowserScrollingController {
       }
       self.scrollView?.contentOffset.y += UIConstants.ToolbarHeight
   }
+#endif
 
     func layoutWebViewPinnedToWindowExtents() {
       if isLayoutPinnedToWindowExtents() {
@@ -277,8 +308,9 @@ private extension BrowserScrollingController {
         make.left.right.bottom.equalTo(app.browserViewController.view)
         make.top.equalTo(app.browserViewController.statusBarOverlay.snp_bottom)
       }
-
+#if !CONTENT_INSET_SCROLLING
       self.scrollView?.contentOffset.y -= UIConstants.ToolbarHeight
+#endif
     }
 
     func checkScrollHeightIsLargeEnoughForScrolling() -> Bool {
@@ -294,7 +326,7 @@ extension BrowserScrollingController: UIGestureRecognizerDelegate {
 }
 
 extension BrowserScrollingController: UIScrollViewDelegate {
-
+#if !CONTENT_INSET_SCROLLING
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if browserIsLoading() {
             return
@@ -344,7 +376,7 @@ extension BrowserScrollingController: UIScrollViewDelegate {
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         removeTranslationAndSetLayout()
     }
-
+#endif
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
         showToolbars(animated: true)
         return true
