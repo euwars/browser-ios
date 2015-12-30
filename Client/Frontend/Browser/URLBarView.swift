@@ -30,7 +30,7 @@ struct URLBarViewUX {
     static let TabsButtonHeight: CGFloat = 18.0
     static let ToolbarButtonInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
-    static let Themes: [String: Theme] = {
+    static var Themes: [String: Theme] = {
         var themes = [String: Theme]()
         var theme = Theme()
         theme.borderColor = UIConstants.PrivateModeLocationBorderColor
@@ -838,7 +838,7 @@ class CurveView: UIView {
 }
 
 class ToolbarTextField: AutocompleteTextField {
-    static let Themes: [String: Theme] = {
+    static var Themes: [String: Theme] = {
         var themes = [String: Theme]()
         var theme = Theme()
         theme.backgroundColor = UIConstants.PrivateModeLocationBackgroundColor

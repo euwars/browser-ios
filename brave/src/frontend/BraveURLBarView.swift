@@ -18,6 +18,30 @@ class BraveURLBarView : URLBarView {
 
     leftSidePanelButton.addTarget(self, action: "SELdidClickLeftSlideOut", forControlEvents: UIControlEvents.TouchUpInside)
     leftSidePanelButton.setImage(UIImage(named: "listpanel"), forState: .Normal)
+    leftSidePanelButton.tintColor = BraveUX.ActionButtonTintColor
+
+    ToolbarTextField.appearance().clearButtonTintColor = nil
+
+    var theme = Theme()
+    theme.URLFontColor = BraveUX.LocationBarTextColor_URLBaseComponent
+    theme.hostFontColor = BraveUX.LocationBarTextColor_URLHostComponent
+    theme.backgroundColor = BraveUX.LocationBarNormalModeBackgroundColor_NonPrivateMode
+    BrowserLocationViewUX.Themes[Theme.NormalMode] = theme
+
+    theme = Theme()
+    theme.backgroundColor = BraveUX.LocationBarEditModeBackgroundColor
+    theme.textColor = BraveUX.LocationBarEditModeTextColor
+    theme.highlightColor = BraveUX.AutocompleteTextFieldHighlightColor
+    ToolbarTextField.Themes[Theme.NormalMode] = theme
+
+    theme = Theme()
+    theme.borderColor = BraveUX.TextFieldBorderColor_NoFocus
+    theme.activeBorderColor = BraveUX.TextFieldBorderColor_HasFocus
+    theme.tintColor = URLBarViewUX.ProgressTintColor
+    theme.textColor = BraveUX.LocationBarTextColor
+    theme.buttonTintColor = BraveUX.ActionButtonTintColor
+    URLBarViewUX.Themes[Theme.NormalMode] = theme
+
   }
 
   override func updateAlphaForSubviews(alpha: CGFloat) {
@@ -83,6 +107,16 @@ class BraveURLBarView : URLBarView {
     self.leftSidePanelButton.alpha = inOverlayMode ? 0 : 1
     super.transitionToOverlay(didCancel)
     bookmarkButton.hidden = true
+
+    locationTextField?.backgroundColor = BraveUX.LocationBarEditModeBackgroundColor
+    locationTextField?.alpha = 1.0
+    locationView.backgroundColor = locationTextField?.backgroundColor
+  }
+
+  override func leaveOverlayMode(didCancel cancel: Bool) {
+    super.leaveOverlayMode(didCancel: cancel)
+    locationView.backgroundColor = BraveUX.LocationBarNormalModeBackgroundColor_NonPrivateMode
+
   }
 
   override func updateConstraints() {
@@ -91,10 +125,9 @@ class BraveURLBarView : URLBarView {
     curveShape.hidden = true
     bookmarkButton.hidden = true
 
-    // I have to set this late (as in here) as it gets overridden if set earlier
-    locationTextField?.backgroundColor = BraveUX.LocationTextEntryBackgroundColor
-    stopReloadButton.tintColor = BraveUX.ActionButtonTintColor
-    leftSidePanelButton.tintColor = BraveUX.ActionButtonTintColor
+    // In edit mode you can see bits of the locationView underneath at the left edge
+    locationView.progressView.hidden = inOverlayMode
+
     // TODO : remove this entirely
     progressBar.hidden = true
     progressBar.alpha = 0.0
