@@ -82,7 +82,6 @@ class BrowserScrollingController: NSObject {
     }
 
     func pageUnload() {
-      print("pageUnload: showtoolbars if hidden")
       delay(0.1) {
         self.showToolbars(animated: true)
       }

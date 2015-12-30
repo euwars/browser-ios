@@ -82,6 +82,17 @@ class LegacyWebView: UIWebView {
 //    }
 #endif
     setupSwipeGesture()
+    addPullToRefreshToWebView()
+  }
+
+  func addPullToRefreshToWebView(){
+    let refresh = ODRefreshControl(inScrollView: scrollView)
+    refresh.addTarget(self, action: "onPullDownToReload:", forControlEvents: UIControlEvents.ValueChanged)
+  }
+
+  func onPullDownToReload(refresh:UIRefreshControl){
+    reload()
+    refresh.endRefreshing()
   }
 
   func internalProgressNotification(notification: NSNotification) {
@@ -316,7 +327,9 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
       }
 
       let locationChanged = LegacyWebView.isTopFrameRequest(request)
-      if locationChanged && (navigationType == .LinkClicked || navigationType == .Other) {
+      if locationChanged {
+        // TODO Maybe separate page unload from link clicked.
+        NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: _parent)
         _parent.URL = request.URL
       }
 
