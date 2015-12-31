@@ -344,13 +344,15 @@ var isInRefreshQuietPeriod:Bool = false
 
 extension BrowserScrollingController: UIScrollViewDelegate {
   func scrollViewDidScroll(scrollView: UIScrollView) {
+    guard let webView = browser?.webView else { return }
+    let position = -webView.convertPoint(webView.frame.origin, fromView: nil).y
     if contentOffset.y < 0 && !isInRefreshQuietPeriod && !isLayoutPinnedToWindowExtents() {
       if refreshControl == nil {
-        refreshControl = ODRefreshControl(inScrollView: browser?.webView!)
+        refreshControl = ODRefreshControl(inScrollView: getApp().rootViewController.view)
         refreshControl?.backgroundColor = UIColor.blackColor()
       }
       refreshControl?.hidden = false
-      refreshControl?.frame = CGRectMake(0, 0, refreshControl?.frame.size.width ?? 0, -contentOffset.y)
+      refreshControl?.frame = CGRectMake(0, position, refreshControl?.frame.size.width ?? 0, -contentOffset.y)
 
       if contentOffset.y < -64 {
         isInRefreshQuietPeriod = true
@@ -364,7 +366,7 @@ extension BrowserScrollingController: UIScrollViewDelegate {
         UIView.animateWithDuration(0.5, animations: { refreshControl?.backgroundColor = UIColor.clearColor() })
         UIView.animateWithDuration(0.5, delay: 0.2, options: .AllowAnimatedContent, animations: {
             scrollView.contentOffset.y = 0
-            refreshControl?.frame = CGRectMake(0, 0, refreshControl?.frame.size.width ?? 0, 0)
+            refreshControl?.frame = CGRectMake(0, position, refreshControl?.frame.size.width ?? 0, 0)
           }, completion: {
             finished in
             blockOtherGestures(false, views: scrollView.subviews)
@@ -375,9 +377,8 @@ extension BrowserScrollingController: UIScrollViewDelegate {
             refreshControl?.backgroundColor = UIColor.blackColor()
         })
       }
-
     } else if refreshControl?.hidden == false {
-      refreshControl?.frame = CGRectMake(0, 0, refreshControl?.frame.size.width ?? 0, -contentOffset.y)
+      refreshControl?.frame = CGRectMake(0, position, refreshControl?.frame.size.width ?? 0, -contentOffset.y)
     }
 
     if contentOffset.y >= 0 && refreshControl?.hidden == false && !isInRefreshQuietPeriod {
