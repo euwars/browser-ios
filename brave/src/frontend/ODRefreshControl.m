@@ -9,20 +9,23 @@
 //
 
 #import "ODRefreshControl.h"
+#define scaling 0.66f
 
-const CGFloat kMinTopPadding    = 9.0f;
-const CGFloat kMaxTopPadding    = 5.0f;
-const CGFloat kMinTopRadius     = 12.5f;
-const CGFloat kMaxTopRadius     = 16.0f;
-const CGFloat kMinBottomRadius  = 3.0f;
-const CGFloat kMaxBottomRadius  = 16.0f;
-const CGFloat kMinBottomPadding = 4.0f;
-const CGFloat kMaxBottomPadding = 6.0f;
-const CGFloat kMinArrowSize     = 2.0f;
-const CGFloat kMaxArrowSize     = 3.0f;
-const CGFloat kMinArrowRadius   = 5.0f;
-const CGFloat kMaxArrowRadius   = 7.0f;
-const CGFloat kMaxDistance      = 53.0f;
+const CGFloat kMinTopPadding    = 9.0f * scaling;
+const CGFloat kMaxTopPadding    = 5.0f  * scaling;
+const CGFloat kMinTopRadius     = 12.5f  * scaling;
+const CGFloat kMaxTopRadius     = 16.0f  * scaling;
+const CGFloat kMinBottomRadius  = 3.0f  * scaling;
+const CGFloat kMaxBottomRadius  = 16.0f  * scaling;
+const CGFloat kMinBottomPadding = 4.0f  * scaling;
+const CGFloat kMaxBottomPadding = 6.0f  * scaling;
+const CGFloat kMinArrowSize     = 2.0f  * scaling;
+const CGFloat kMaxArrowSize     = 3.0f  * scaling;
+const CGFloat kMinArrowRadius   = 5.0f  * scaling;
+const CGFloat kMaxArrowRadius   = 7.0f  * scaling;
+const CGFloat kMaxDistance      = 53.0f  * scaling;
+
+UIView *_activity;
 
 @interface ODRefreshControlDefaultContentView : UIView <ODRefreshControlContentView>
 
@@ -38,7 +41,6 @@ const CGFloat kMaxDistance      = 53.0f;
     CAShapeLayer *_shapeLayer;
     CAShapeLayer *_arrowLayer;
     CAShapeLayer *_highlightLayer;
-    UIView *_activity;
     BOOL _refreshing;
 }
 
@@ -343,30 +345,29 @@ static inline CGFloat lerp(CGFloat a, CGFloat b, CGFloat p)
 }
 
 @property (nonatomic, readwrite) BOOL refreshing;
-@property (nonatomic, assign) UIScrollView *scrollView;
-@property (nonatomic, assign) UIEdgeInsets originalContentInset;
+@property (nonatomic, assign) UIView *parentView;
+
 
 @end
 
 @implementation ODRefreshControl
 
-- (id)initInScrollView:(UIScrollView *)scrollView {
-    return [self initInScrollView:scrollView activityIndicatorView:nil];
+- (id)initInScrollView:(UIView *)parentView {
+    return [self initInScrollView:parentView activityIndicatorView:nil];
 }
 
-- (id)initInScrollView:(UIScrollView *)scrollView activityIndicatorView:(UIView *)activity
+- (id)initInScrollView:(UIView *)parentView activityIndicatorView:(UIView *)activity
 {
-    self = [super initWithFrame:CGRectMake(0, 0, scrollView.frame.size.width, 0)];
+    self = [super initWithFrame:CGRectMake(0, 0, parentView.frame.size.width, 0)];
     
     if (self) {
-        self.scrollView = scrollView;
-        self.originalContentInset = scrollView.contentInset;
-        
+        self.parentView = parentView;
+
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [scrollView addSubview:self];
-        [scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
-        [scrollView addObserver:self forKeyPath:@"contentInset" options:NSKeyValueObservingOptionNew context:nil];
-        
+        [parentView addSubview:self];
+//        [parentView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
+//        [parentView addObserver:self forKeyPath:@"contentInset" options:NSKeyValueObservingOptionNew context:nil];
+
         _contentView = [[ODRefreshControlDefaultContentView alloc] initWithFrame:self.bounds activityIndicatorView:activity];
         _contentView.clipsToBounds = YES;
         _contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -377,18 +378,18 @@ static inline CGFloat lerp(CGFloat a, CGFloat b, CGFloat p)
 
 - (void)dealloc
 {
-    [self.scrollView removeObserver:self forKeyPath:@"contentOffset"];
-    [self.scrollView removeObserver:self forKeyPath:@"contentInset"];
-    self.scrollView = nil;
+//    [self.parentView removeObserver:self forKeyPath:@"contentOffset"];
+//    [self.parentView removeObserver:self forKeyPath:@"contentInset"];
+    self.parentView = nil;
 }
 
 - (void)willMoveToSuperview:(UIView *)newSuperview
 {
     [super willMoveToSuperview:newSuperview];
     if (!newSuperview) {
-        [self.scrollView removeObserver:self forKeyPath:@"contentOffset"];
-        [self.scrollView removeObserver:self forKeyPath:@"contentInset"];
-        self.scrollView = nil;
+//        [self.parentView removeObserver:self forKeyPath:@"contentOffset"];
+//        [self.parentView removeObserver:self forKeyPath:@"contentInset"];
+        self.parentView = nil;
     }
 }
 
@@ -456,121 +457,128 @@ static inline CGFloat lerp(CGFloat a, CGFloat b, CGFloat p)
     return 0.0f;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if ([keyPath isEqualToString:@"contentInset"]) {
-        if (!_ignoreInset) {
-            UIEdgeInsets originalContentInset = [[change objectForKey:@"new"] UIEdgeInsetsValue];
-            originalContentInset.top -= _currentTopInset;
-            self.originalContentInset = originalContentInset;
-            self.frame = CGRectMake(0, 0, self.scrollView.frame.size.width, 0);
-            _lastOffset = self.scrollView.contentOffset.y + self.originalContentInset.top;
-        }
-        return;
-    }
-    
-    if (!self.enabled || _ignoreOffset) {
-        return;
-    }
-    
-    CGFloat offset = [[change objectForKey:@"new"] CGPointValue].y + self.originalContentInset.top;
-    CGFloat height = -MIN(0.0f, offset);
-    self.frame = CGRectMake(0, -height - self.originalContentInset.top + [self navigationBarInset], self.scrollView.frame.size.width, height);
-    
-    if (_refreshing) {
-        _lastOffset = offset;
-        if (offset != 0) {
-            _ignoreInset = YES;
-            _ignoreOffset = YES;
-            
-            if (offset < 0) {
-                // Set the inset depending on the situation
-                if (offset >= -[_contentView openHeight]) {
-                    if (!self.scrollView.dragging) {
-                        if (!_didSetInset) {
-                            _didSetInset = YES;
-                            _hasSectionHeaders = NO;
-                            if([self.scrollView isKindOfClass:[UITableView class]]){
-                                for (int i = 0; i < [(UITableView *)self.scrollView numberOfSections]; ++i) {
-                                    if ([(UITableView *)self.scrollView rectForHeaderInSection:i].size.height) {
-                                        _hasSectionHeaders = YES;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if (_hasSectionHeaders) {
-                            _currentTopInset = MIN(-offset, [_contentView openHeight]);
-                            [self.scrollView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
-                        } else {
-                            _currentTopInset = [_contentView openHeight];
-                            [self.scrollView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
-                        }
-                    } else if (_didSetInset && _hasSectionHeaders) {
-                        _currentTopInset = -offset;
-                        [self.scrollView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
-                    }
-                }
-            } else if (_hasSectionHeaders) {
-                _currentTopInset = 0.0f;
-                [self.scrollView setContentInset:self.originalContentInset];
-            }
-            _ignoreInset = NO;
-            _ignoreOffset = NO;
-        }
-        return;
-    } else {
-        // Check if we can trigger a new refresh and if we can draw the control
-        BOOL dontDraw = NO;
-        if (!_canRefresh) {
-            if (self.scrollView.isDragging && _lastOffset == 0 && offset <= 0) {
-                _canRefresh = YES;
-                _didSetInset = NO;
-            } else {
-                dontDraw = YES;
-            }
-        } else {
-            if (offset >= 0) {
-                // Don't draw if the control is not visible
-                dontDraw = YES;
-            }
-        }
-        if (offset > 0 && _lastOffset > offset && !self.scrollView.isTracking) {
-            // If we are scrolling too fast, don't draw, and don't trigger unless the scrollView bounced back
-            _canRefresh = NO;
-            dontDraw = YES;
-        }
-        if (dontDraw) {
-            self.frame = CGRectMake(0, 0, self.scrollView.frame.size.width, 0);
-            _lastOffset = offset;
-            return;
-        }
-    }
-    
-    _lastOffset = offset;
-    
-    if (_canRefresh && height >= [_contentView triggerHeight]) {
-        [_contentView beginRefreshing:YES];
-        self.refreshing = YES;
-        _canRefresh = NO;
-        [self sendActionsForControlEvents:UIControlEventValueChanged];
-    }
-    [_contentView layoutIfNeeded];
-}
+//- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+//{
+//    if ([keyPath isEqualToString:@"contentInset"]) {
+//        if (!_ignoreInset) {
+//            UIEdgeInsets originalContentInset = [[change objectForKey:@"new"] UIEdgeInsetsValue];
+//            originalContentInset.top -= _currentTopInset;
+//            self.originalContentInset = originalContentInset;
+//            self.frame = CGRectMake(0, 0, self.parentView.frame.size.width, 0);
+//            _lastOffset = self.parentView.contentOffset.y + self.originalContentInset.top;
+//        }
+//        return;
+//    }
+//    
+//    if (!self.enabled || _ignoreOffset) {
+//        return;
+//    }
+//    
+//    CGFloat offset = [[change objectForKey:@"new"] CGPointValue].y + self.originalContentInset.top;
+//    CGFloat height = -MIN(0.0f, offset);
+//    self.frame = CGRectMake(0, -height - self.originalContentInset.top + [self navigationBarInset], self.parentView.frame.size.width, height);
+//    
+//    if (_refreshing) {
+//        _lastOffset = offset;
+//        if (offset != 0) {
+//            _ignoreInset = YES;
+//            _ignoreOffset = YES;
+//            
+//            if (offset < 0) {
+//                // Set the inset depending on the situation
+//                if (offset >= -[_contentView openHeight]) {
+//                    if (!self.parentView.dragging) {
+//                        if (!_didSetInset) {
+//                            _didSetInset = YES;
+//                            _hasSectionHeaders = NO;
+//                            if([self.parentView isKindOfClass:[UITableView class]]){
+//                                for (int i = 0; i < [(UITableView *)self.parentView numberOfSections]; ++i) {
+//                                    if ([(UITableView *)self.parentView rectForHeaderInSection:i].size.height) {
+//                                        _hasSectionHeaders = YES;
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        if (_hasSectionHeaders) {
+//                            _currentTopInset = MIN(-offset, [_contentView openHeight]);
+//                            [self.parentView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
+//                        } else {
+//                            _currentTopInset = [_contentView openHeight];
+//                            [self.parentView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
+//                        }
+//                    } else if (_didSetInset && _hasSectionHeaders) {
+//                        _currentTopInset = -offset;
+//                        [self.parentView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
+//                    }
+//                }
+//            } else if (_hasSectionHeaders) {
+//                _currentTopInset = 0.0f;
+//                [self.parentView setContentInset:self.originalContentInset];
+//            }
+//            _ignoreInset = NO;
+//            _ignoreOffset = NO;
+//        }
+//        return;
+//    } else {
+//        // Check if we can trigger a new refresh and if we can draw the control
+//        BOOL dontDraw = NO;
+//        if (!_canRefresh) {
+//            if (self.parentView.isDragging && _lastOffset == 0 && offset <= 0) {
+//                _canRefresh = YES;
+//                _didSetInset = NO;
+//            } else {
+//                dontDraw = YES;
+//            }
+//        } else {
+//            if (offset >= 0) {
+//                // Don't draw if the control is not visible
+//                dontDraw = YES;
+//            }
+//        }
+//        if (offset > 0 && _lastOffset > offset && !self.parentView.isTracking) {
+//            // If we are scrolling too fast, don't draw, and don't trigger unless the parentView bounced back
+//            _canRefresh = NO;
+//            dontDraw = YES;
+//        }
+//        if (dontDraw) {
+//            self.frame = CGRectMake(0, 0, self.parentView.frame.size.width, 0);
+//            _lastOffset = offset;
+//            return;
+//        }
+//    }
+//    
+//    _lastOffset = offset;
+//    
+//    if (_canRefresh && height >= [_contentView triggerHeight]) {
+//        [_contentView beginRefreshing:YES];
+//        self.refreshing = YES;
+//        _canRefresh = NO;
+//        [self sendActionsForControlEvents:UIControlEventValueChanged];
+//    }
+//    [_contentView layoutIfNeeded];
+//}
 
 #pragma mark - Public methods
 
+-(void)animate
+{
+  assert(_activity);
+  [(UIActivityIndicatorView *)_activity startAnimating];
+}
+
+
 - (void)beginRefreshing
 {
-    [_contentView beginRefreshing:NO];
+    [_contentView beginRefreshing:YES];
     
-    CGPoint offset = self.scrollView.contentOffset;
-    _ignoreInset = YES;
-    _currentTopInset = [_contentView openHeight];
-    self.scrollView.contentInset = UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right);
-    _ignoreInset = NO;
-    [self.scrollView setContentOffset:offset animated:NO];
-    
+//    CGPoint offset = self.parentView.contentOffset;
+//    _ignoreInset = YES;
+//    _currentTopInset = [_contentView openHeight];
+//    self.parentView.contentInset = UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right);
+//    _ignoreInset = NO;
+//    [self.parentView setContentOffset:offset animated:NO];
+
     self.refreshing = YES;
     _canRefresh = NO;
 }
@@ -578,21 +586,21 @@ static inline CGFloat lerp(CGFloat a, CGFloat b, CGFloat p)
 - (void)endRefreshing
 {
     if (_refreshing) {
-        // Create a temporary retain-cycle, so the scrollView won't be released
+        // Create a temporary retain-cycle, so the parentView won't be released
         // halfway through the end animation.
         // This allows for the refresh control to clean up the observer,
-        // in the case the scrollView is released while the animation is running
-        __block UIScrollView *blockScrollView = self.scrollView;
+        // in the case the parentView is released while the animation is running
+        //__block UIView *blockScrollView = self.parentView;
         [UIView animateWithDuration:0.4 animations:^{
             _ignoreInset = YES;
             _currentTopInset = 0.0f;
-            [blockScrollView setContentInset:self.originalContentInset];
+           // [blockScrollView setContentInset:self.originalContentInset];
             _ignoreInset = NO;
         } completion:^(BOOL finished) {
-            // We need to use the scrollView somehow in the end block,
+            // We need to use the parentView somehow in the end block,
             // or it'll get released in the animation block.
             _ignoreInset = YES;
-            [blockScrollView setContentInset:self.originalContentInset];
+           // [blockScrollView setContentInset:self.originalContentInset];
             _ignoreInset = NO;
         }];
         [_contentView endRefreshing];

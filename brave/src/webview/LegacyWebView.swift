@@ -82,17 +82,6 @@ class LegacyWebView: UIWebView {
 //    }
 #endif
     setupSwipeGesture()
-    addPullToRefreshToWebView()
-  }
-
-  func addPullToRefreshToWebView(){
-    let refresh = ODRefreshControl(inScrollView: scrollView)
-    refresh.addTarget(self, action: "onPullDownToReload:", forControlEvents: UIControlEvents.ValueChanged)
-  }
-
-  func onPullDownToReload(refresh:UIRefreshControl){
-    reload()
-    refresh.endRefreshing()
   }
 
   func internalProgressNotification(notification: NSNotification) {
