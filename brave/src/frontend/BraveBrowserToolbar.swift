@@ -61,8 +61,7 @@ class BraveBrowserToolbar : BrowserToolbar {
     BraveBrowserToolbar.currentInstance = self
 
     bookmarkButton.hidden = true
-    //stopReloadButton.hidden = true
-    //  Button.hidden = true
+    stopReloadButton.hidden = true
 
     tabsContainer.addSubview(tabsButton)
     addSubview(tabsContainer)
@@ -131,7 +130,6 @@ class BraveBrowserToolbar : BrowserToolbar {
 
     func commonButtonsToRightOfBackForward(make: ConstraintMaker, bottomInset: Int = 0) {
       common(make, bottomInset: bottomInset)
-        //         make.width.equalTo(self.snp_width).dividedBy(Double(BraveUX.BottomToolbarNumberButtonsToRightOfBackForward) + 0.5)
 
       let bounds = UIScreen.mainScreen().bounds
       let w = min(bounds.width, bounds.height)

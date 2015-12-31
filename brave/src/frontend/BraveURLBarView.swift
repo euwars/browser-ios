@@ -70,9 +70,9 @@ class BraveURLBarView : URLBarView {
         return [locationTextField, cancelButton]
       } else {
         if toolbarIsShowing {
-          return [backButton, forwardButton, leftSidePanelButton, locationView, stopReloadButton, shareButton, tabsButton]
+          return [backButton, forwardButton, leftSidePanelButton, locationView, shareButton, tabsButton]
         } else {
-          return [leftSidePanelButton, locationView, stopReloadButton, progressBar]
+          return [leftSidePanelButton, locationView, progressBar]
         }
       }
     }
@@ -90,7 +90,7 @@ class BraveURLBarView : URLBarView {
       self.tabsButton.hidden = false
     }
 
-    self.stopReloadButton.hidden = inOverlayMode
+    self.stopReloadButton.hidden = true
 
     progressBar.hidden = true
     bookmarkButton.hidden = true
@@ -140,10 +140,10 @@ class BraveURLBarView : URLBarView {
         if self.toolbarIsShowing {
           // Firefox is not referring to the bottom toolbar, it is asking is this class showing more tool buttons
           make.leading.equalTo(self.leftSidePanelButton.snp_trailing)
-          make.trailing.equalTo(self.stopReloadButton.snp_leading)
+          make.trailing.equalTo(self.shareButton.snp_leading)
         } else {
           make.leading.equalTo(self.leftSidePanelButton.snp_trailing)
-          make.trailing.equalTo(self.stopReloadButton.snp_leading)  //.offset(-14)
+          make.trailing.equalTo(self).offset(-5)
         }
 
         make.height.equalTo(URLBarViewUX.LocationHeight)
@@ -175,7 +175,7 @@ class BraveURLBarView : URLBarView {
       }
     }
   //  leftSidePanelButton.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10)
-    stopReloadButton.contentEdgeInsets =  UIEdgeInsetsMake(0, 10, 0, 10)
+    //stopReloadButton.contentEdgeInsets =  UIEdgeInsetsMake(0, 10, 0, 10)
 
   }
 
