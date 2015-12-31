@@ -37,7 +37,6 @@ class MainSidePanelViewController : UIViewController {
     topButtonsView.addSubview(historyButton)
     topButtonsView.addSubview(addBookmarkButton)
 
-
     bookmarksButton.setImage(UIImage(named: "bookmarklist"), forState: .Normal)
     bookmarksButton.addTarget(self, action: "showBookmarks", forControlEvents: .TouchUpInside)
 
@@ -45,7 +44,7 @@ class MainSidePanelViewController : UIViewController {
     historyButton.addTarget(self, action: "showHistory", forControlEvents: .TouchUpInside)
 
     addBookmarkButton.addTarget(self, action: "addBookmark", forControlEvents: .TouchUpInside)
-    addBookmarkButton.setImage(UIImage(named: "add"), forState: .Normal)
+    addBookmarkButton.setImage(UIImage(named: "bookmark"), forState: .Normal)
 
     bookmarksButton.tintColor = BraveUX.ActionButtonTintColor
     historyButton.tintColor = BraveUX.ActionButtonTintColor
@@ -83,14 +82,14 @@ class MainSidePanelViewController : UIViewController {
       make.height.equalTo(44.0)
     }
 
-    bookmarksButton.snp_remakeConstraints {
+    historyButton.snp_remakeConstraints {
       make in
       make.bottom.equalTo(self.topButtonsView)
       make.height.equalTo(UIConstants.ToolbarHeight)
       make.centerX.equalTo(self.topButtonsView).dividedBy(2.0)
     }
 
-    historyButton.snp_remakeConstraints {
+    bookmarksButton.snp_remakeConstraints {
       make in
       make.bottom.equalTo(self.topButtonsView)
       make.height.equalTo(UIConstants.ToolbarHeight)
