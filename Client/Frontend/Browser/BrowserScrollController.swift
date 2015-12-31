@@ -337,14 +337,15 @@ extension BrowserScrollingController: UIScrollViewDelegate {
       }
     }
 
-  func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-    if contentOffset.y < 0 && verticalTranslation > UIConstants.ToolbarHeight / 2.0 && headerTopOffset != 0  {
-      // user has scrolled past top (rubberbanding area) and toolbar needs to show. We show toolbar, and pin offset to zero so that when the 
-      // toolbar shows, the page offset at top (i.e. y == 0) is shown
-      removeTranslationAndSetLayout()
-      scrollView.contentOffset.y = 0
+
+    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+      if contentOffset.y < 0 && verticalTranslation > UIConstants.ToolbarHeight / 2.0 && headerTopOffset != 0  {
+        // user has scrolled past top (rubberbanding area) and toolbar needs to show. Hack the scrollview to not bounce back
+        let offsetY = scrollView.contentOffset.y
+        scrollView.contentInset = UIEdgeInsetsMake(44, 0, 0, 0)
+        scrollView.setContentOffset(CGPoint(x: 0, y: offsetY), animated: false)
+      }
     }
-  }
 
     func removeTranslationAndSetLayout() {
       if verticalTranslation == 0 {
@@ -374,8 +375,14 @@ extension BrowserScrollingController: UIScrollViewDelegate {
     }
 
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
-        removeTranslationAndSetLayout()
-    }
+      self.removeTranslationAndSetLayout()
+      guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return }
+      app.browserViewController.webViewContainer.layoutIfNeeded()
+      if scrollView.contentInset != UIEdgeInsetsZero {
+        scrollView.contentOffset.y = 0
+        scrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
+      }
+  }
 #endif
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
         showToolbars(animated: true)
