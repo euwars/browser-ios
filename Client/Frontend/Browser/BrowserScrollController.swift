@@ -183,6 +183,9 @@ private extension BrowserScrollingController {
         return
       }
 
+      if refreshControl?.hidden == false {
+        return
+      }
 
 #if !CONTENT_INSET_SCROLLING
       if headerTopOffset != 0 && headerTopOffset != -UIConstants.ToolbarHeight {
