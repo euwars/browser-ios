@@ -43,7 +43,7 @@ class LegacyWebView: UIWebView {
   var URL: NSURL?
   var internalIsLoadingEndedFlag: Bool = false;
   var knownFrameContexts = Set<NSObject>()
-
+  static var containerWebViewForCallbacks = { return ContainerWebView() }()
   // From http://stackoverflow.com/questions/14268230/has-anybody-found-a-way-to-load-https-pages-with-an-invalid-server-certificate-u
   var loadingUnvalidatedHTTPSPage: Bool = false
 
@@ -72,6 +72,7 @@ class LegacyWebView: UIWebView {
   private func commonInit() {
     delegate = self.webViewDelegate
     scalesPageToFit = true
+    scrollView.showsHorizontalScrollIndicator = false
 
 #if !TEST
    // if (BraveUX.IsHighLoadAnimationAllowed && !BraveUX.IsOverrideScrollingSpeedAndMakeSlower) {
@@ -121,6 +122,22 @@ class LegacyWebView: UIWebView {
     super.loadRequest(request)
   }
 
+  func loadingCompleted() {
+    if let nd = navigationDelegate {
+      LegacyWebView.containerWebViewForCallbacks.legacyWebView = self
+      nd.webView?(LegacyWebView.containerWebViewForCallbacks, didFinishNavigation: nullWKNavigation)
+    }
+
+    internalIsLoadingEndedFlag = true
+    configuration.userContentController.injectJsIntoPage()
+    NSNotificationCenter.defaultCenter().postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
+    LegacyUserContentController.injectJsIntoAllFrames(self, script: "document.body.style.webkitTouchCallout='none'")
+
+    #if !TEST
+      replaceImagesUsingTheVault(self)
+    #endif
+  }
+
   func kvoBroadcast(kvos: [KVOStrings]? = nil) {
     if let _kvos = kvos {
       for item in _kvos {
@@ -146,6 +163,7 @@ class LegacyWebView: UIWebView {
   }
 
   func reloadFromOrigin() {
+    progress.setProgress(0.3)
     self.reload()
   }
 
@@ -341,40 +359,28 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
   func webViewDidFinishLoad(webView: UIWebView) {
     assert(NSThread.isMainThread())
 
-    guard let _parent = parent else { return }
-    let readyState = _parent.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
+    guard let parent = parent else { return }
+    let readyState = parent.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
 
     //print("readyState:\(readyState)")
 
-    _parent.progress.webViewDidFinishLoad(documentReadyState: readyState)
-
-    _parent.title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? ""
-    if let item = _parent.backForwardList.currentItem {
-      item.title = _parent.title
+    parent.title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? ""
+    if let item = parent.backForwardList.currentItem {
+      item.title = parent.title
     }
 
     if let scrapedUrl = webView.stringByEvaluatingJavaScriptFromString("window.location.href") {
-      if !_parent.progress.pathContainsCompleted(scrapedUrl) {
-        _parent.URL = NSURL(string: scrapedUrl)
-        if let item = _parent.backForwardList.currentItem {
-          item.URL = _parent.URL ?? item.URL
+      if !parent.progress.pathContainsCompleted(scrapedUrl) {
+        parent.URL = NSURL(string: scrapedUrl)
+        if let item = parent.backForwardList.currentItem {
+          item.URL = parent.URL ?? item.URL
         }
       }
     }
 
-    if (!webView.loading) {
-      _parent.configuration.userContentController.injectJsIntoPage()
-      #if !TEST
-      _parent.replaceImagesUsingTheVault(webView)
-      #endif
-    }
+    parent.progress.webViewDidFinishLoad(documentReadyState: readyState)
 
-    _parent.kvoBroadcast()
-
-    // For testing
-    if readyState == "complete" || readyState == "loaded" {
-      NSNotificationCenter.defaultCenter().postNotificationName(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
-    }
+    parent.kvoBroadcast()
   }
 
   func webView(webView: UIWebView, didFailLoadWithError error: NSError?) {
