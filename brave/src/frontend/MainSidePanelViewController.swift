@@ -14,7 +14,7 @@ class MainSidePanelViewController : UIViewController {
   let addBookmarkButton = UIButton()
 
   //let triangleViewContainer = UIView()
-  let triangleView = UIView()
+  let triangleView = UIImageView()
 
   let tabTitleViewContainer = UIView()
   let tabTitleView = UILabel()
@@ -32,10 +32,12 @@ class MainSidePanelViewController : UIViewController {
     view.addSubview(tabTitleViewContainer)
     tabTitleViewContainer.addSubview(tabTitleView)
     topButtonsView.addSubview(triangleView)
-
     topButtonsView.addSubview(bookmarksButton)
     topButtonsView.addSubview(historyButton)
     topButtonsView.addSubview(addBookmarkButton)
+
+    triangleView.image = UIImage(named: "triangle-nub")
+    triangleView.contentMode = UIViewContentMode.Center
 
     bookmarksButton.setImage(UIImage(named: "bookmarklist"), forState: .Normal)
     bookmarksButton.addTarget(self, action: "showBookmarks", forControlEvents: .TouchUpInside)
@@ -142,11 +144,10 @@ class MainSidePanelViewController : UIViewController {
   }
 
   func moveTabIndicator(button: UIButton) {
-    triangleView.backgroundColor = UIColor.redColor()
     triangleView.snp_remakeConstraints {
       make in
       make.width.equalTo(button)
-      make.height.equalTo(8)
+      make.height.equalTo(6)
       make.left.equalTo(button)
       make.top.equalTo(button.snp_bottom)
     }
