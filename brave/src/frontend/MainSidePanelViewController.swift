@@ -19,17 +19,43 @@ class MainSidePanelViewController : UIViewController {
   let tabTitleViewContainer = UIView()
   let tabTitleView = UILabel()
 
+  // Wrap everything in a UIScrollView the view animation will not try to shrink the view
+  // add subviews to containerView not self.view
+  let containerView = UIView()
+
+  override func loadView() {
+    self.view = UIScrollView(frame: UIScreen.mainScreen().bounds)
+  }
+
+  func viewAsScrollView() -> UIScrollView {
+    return self.view as! UIScrollView
+  }
+
+  func setupContainerViewSize() {
+    containerView.frame = CGRectMake(0, 0, CGFloat(BraveUX.WidthOfSlideOut), self.view.frame.height)
+    viewAsScrollView().contentSize = CGSizeMake(containerView.frame.width, containerView.frame.height)
+  }
+
+  override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    setupContainerViewSize()
+  }
+
   override func viewDidLoad() {
-    view.backgroundColor = UIColor(white: 77/255.0, alpha: 1.0)
+    viewAsScrollView().scrollEnabled = false
+
+    view.addSubview(containerView)
+    setupContainerViewSize()
+    containerView.backgroundColor = UIColor(white: 77/255.0, alpha: 1.0)
 
     tabTitleViewContainer.backgroundColor = UIColor.whiteColor()
     tabTitleView.textColor = self.view.tintColor
     bookmarks.profile = getApp().profile
     history.profile = getApp().profile
 
-    view.addSubview(topButtonsView)
+    containerView.addSubview(topButtonsView)
 
-    view.addSubview(tabTitleViewContainer)
+    containerView.addSubview(tabTitleViewContainer)
     tabTitleViewContainer.addSubview(tabTitleView)
     topButtonsView.addSubview(triangleView)
     topButtonsView.addSubview(bookmarksButton)
@@ -52,14 +78,14 @@ class MainSidePanelViewController : UIViewController {
     historyButton.tintColor = BraveUX.ActionButtonTintColor
     addBookmarkButton.tintColor = UIColor.whiteColor()
 
-    view.addSubview(history.view)
-    view.addSubview(bookmarks.view)
+    containerView.addSubview(history.view)
+    containerView.addSubview(bookmarks.view)
 
     showBookmarks()
 
     bookmarks.view.hidden = false
 
-    view.bringSubviewToFront(topButtonsView)
+    containerView.bringSubviewToFront(topButtonsView)
   }
 
   func addBookmark() {
@@ -77,10 +103,15 @@ class MainSidePanelViewController : UIViewController {
   }
 
   func setupConstraints() {
+//        containerView.snp_makeConstraints() {
+//          make in
+//          make.edges.equalTo(view)
+//        }
+
     topButtonsView.snp_remakeConstraints {
       make in
-      make.top.equalTo(view).offset(spaceForStatusBar())
-      make.left.right.equalTo(view)
+      make.top.equalTo(containerView).offset(spaceForStatusBar())
+      make.left.right.equalTo(containerView)
       make.height.equalTo(44.0)
     }
 
@@ -107,7 +138,7 @@ class MainSidePanelViewController : UIViewController {
 
     tabTitleViewContainer.snp_remakeConstraints {
       make in
-      make.right.left.equalTo(view)
+      make.right.left.equalTo(containerView)
       make.top.equalTo(topButtonsView.snp_bottom)
       make.height.equalTo(44.0)
     }
@@ -115,16 +146,16 @@ class MainSidePanelViewController : UIViewController {
     tabTitleView.snp_remakeConstraints {
       make in
       make.right.top.bottom.equalTo(tabTitleViewContainer)
-      make.left.lessThanOrEqualTo(view).inset(24)
+      make.left.lessThanOrEqualTo(containerView).inset(24)
     }
 
     bookmarks.view.snp_remakeConstraints { make in
-      make.left.right.bottom.equalTo(view)
+      make.left.right.bottom.equalTo(containerView)
       make.top.equalTo(tabTitleView.snp_bottom)
     }
 
     history.view.snp_remakeConstraints { make in
-      make.left.right.bottom.equalTo(view)
+      make.left.right.bottom.equalTo(containerView)
       make.top.equalTo(tabTitleView.snp_bottom)
     }
   }

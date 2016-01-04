@@ -120,13 +120,13 @@ class BraveTopViewController : UIViewController {
     
     let width = leftSlideOutShowing ? BraveUX.WidthOfSlideOut : 0
     let animation = {
-          self.mainSidePanel.view.snp_remakeConstraints {
-            make in
-            make.bottom.left.top.equalTo(self.view)
-            make.width.equalTo(width)
-          }
-          self.view.layoutIfNeeded()
-          self.setNeedsStatusBarAppearanceUpdate()
+      self.mainSidePanel.view.snp_remakeConstraints {
+        make in
+        make.bottom.left.top.equalTo(self.view)
+        make.width.equalTo(width)
+      }
+      self.view.layoutIfNeeded()
+      self.setNeedsStatusBarAppearanceUpdate()
     }
 
     UIView.animateWithDuration(0.2, animations: animation, completion: {
