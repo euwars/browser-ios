@@ -46,13 +46,7 @@ public class LegacyWebViewProgress
   }
 
   func completeProgress() {
-    if let nd = webView?.navigationDelegate {
-      let container = ContainerWebView()
-      container.legacyWebView = webView
-      nd.webView?(container, didFinishNavigation: nullWKNavigation)
-    }
-
-    webView?.internalIsLoadingEndedFlag = true
+    webView?.loadingCompleted()
     setProgress(1.0)
   }
 
@@ -104,6 +98,11 @@ public class LegacyWebViewProgress
   public func webViewDidFinishLoad(documentReadyState documentReadyState:String?) {
     _loadingCount--;
     incrementProgress()
+
+    if webView?.loading == false {
+      completeProgress()
+      return
+    }
 
     if let readyState = documentReadyState {
       switch readyState {
