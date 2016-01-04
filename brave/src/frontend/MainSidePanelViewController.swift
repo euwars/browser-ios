@@ -64,6 +64,7 @@ class MainSidePanelViewController : UIViewController {
 
     triangleView.image = UIImage(named: "triangle-nub")
     triangleView.contentMode = UIViewContentMode.Center
+    triangleView.alpha = 0.9
 
     bookmarksButton.setImage(UIImage(named: "bookmarklist"), forState: .Normal)
     bookmarksButton.addTarget(self, action: "showBookmarks", forControlEvents: .TouchUpInside)
