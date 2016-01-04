@@ -31,6 +31,7 @@ class BrowserScrollingController: NSObject {
     weak var urlBar: URLBarView?
     weak var snackBars: UIView?
 
+    var keyboardIsShowing = false
     var verticalTranslation = CGFloat(0)
 
     var footerBottomConstraint: Constraint?
@@ -79,7 +80,18 @@ class BrowserScrollingController: NSObject {
         super.init()
 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "pageUnload", name: kNotificationPageUnload, object: nil)
+
+      NSNotificationCenter.defaultCenter().addObserver(self, selector:"keyboardWillAppear:", name: UIKeyboardWillShowNotification, object: nil)
+      NSNotificationCenter.defaultCenter().addObserver(self, selector:"keyboardWillDisappear:", name: UIKeyboardWillHideNotification, object: nil)
     }
+
+  func keyboardWillAppear(notification: NSNotification){
+    keyboardIsShowing = true
+  }
+  
+  func keyboardWillDisappear(notification: NSNotification){
+    keyboardIsShowing = false
+  }
 
     func pageUnload() {
 #if CONTENT_INSET_SCROLLING
@@ -342,6 +354,7 @@ var refreshControl:ODRefreshControl?
 // stop refresh interaction while animating
 var isInRefreshQuietPeriod:Bool = false
 
+
 extension BrowserScrollingController: UIScrollViewDelegate {
   func scrollViewDidScroll(scrollView: UIScrollView) {
     guard let webView = browser?.webView else { return }
@@ -354,7 +367,7 @@ extension BrowserScrollingController: UIScrollViewDelegate {
       refreshControl?.hidden = false
       refreshControl?.frame = CGRectMake(0, position, refreshControl?.frame.size.width ?? 0, -contentOffset.y)
 
-      if contentOffset.y < -64 {
+      if contentOffset.y < -64 && !keyboardIsShowing {
         isInRefreshQuietPeriod = true
 
         let currentOffset =  scrollView.contentOffset.y
