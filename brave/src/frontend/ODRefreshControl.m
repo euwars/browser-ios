@@ -9,7 +9,7 @@
 //
 
 #import "ODRefreshControl.h"
-#define scaling 0.66f
+#define scaling 0.9f
 
 const CGFloat kMinTopPadding    = 9.0f * scaling;
 const CGFloat kMaxTopPadding    = 5.0f  * scaling;
@@ -456,108 +456,6 @@ static inline CGFloat lerp(CGFloat a, CGFloat b, CGFloat p)
     }
     return 0.0f;
 }
-
-//- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-//{
-//    if ([keyPath isEqualToString:@"contentInset"]) {
-//        if (!_ignoreInset) {
-//            UIEdgeInsets originalContentInset = [[change objectForKey:@"new"] UIEdgeInsetsValue];
-//            originalContentInset.top -= _currentTopInset;
-//            self.originalContentInset = originalContentInset;
-//            self.frame = CGRectMake(0, 0, self.parentView.frame.size.width, 0);
-//            _lastOffset = self.parentView.contentOffset.y + self.originalContentInset.top;
-//        }
-//        return;
-//    }
-//    
-//    if (!self.enabled || _ignoreOffset) {
-//        return;
-//    }
-//    
-//    CGFloat offset = [[change objectForKey:@"new"] CGPointValue].y + self.originalContentInset.top;
-//    CGFloat height = -MIN(0.0f, offset);
-//    self.frame = CGRectMake(0, -height - self.originalContentInset.top + [self navigationBarInset], self.parentView.frame.size.width, height);
-//    
-//    if (_refreshing) {
-//        _lastOffset = offset;
-//        if (offset != 0) {
-//            _ignoreInset = YES;
-//            _ignoreOffset = YES;
-//            
-//            if (offset < 0) {
-//                // Set the inset depending on the situation
-//                if (offset >= -[_contentView openHeight]) {
-//                    if (!self.parentView.dragging) {
-//                        if (!_didSetInset) {
-//                            _didSetInset = YES;
-//                            _hasSectionHeaders = NO;
-//                            if([self.parentView isKindOfClass:[UITableView class]]){
-//                                for (int i = 0; i < [(UITableView *)self.parentView numberOfSections]; ++i) {
-//                                    if ([(UITableView *)self.parentView rectForHeaderInSection:i].size.height) {
-//                                        _hasSectionHeaders = YES;
-//                                        break;
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        if (_hasSectionHeaders) {
-//                            _currentTopInset = MIN(-offset, [_contentView openHeight]);
-//                            [self.parentView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
-//                        } else {
-//                            _currentTopInset = [_contentView openHeight];
-//                            [self.parentView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
-//                        }
-//                    } else if (_didSetInset && _hasSectionHeaders) {
-//                        _currentTopInset = -offset;
-//                        [self.parentView setContentInset:UIEdgeInsetsMake(_currentTopInset + self.originalContentInset.top, self.originalContentInset.left, self.originalContentInset.bottom, self.originalContentInset.right)];
-//                    }
-//                }
-//            } else if (_hasSectionHeaders) {
-//                _currentTopInset = 0.0f;
-//                [self.parentView setContentInset:self.originalContentInset];
-//            }
-//            _ignoreInset = NO;
-//            _ignoreOffset = NO;
-//        }
-//        return;
-//    } else {
-//        // Check if we can trigger a new refresh and if we can draw the control
-//        BOOL dontDraw = NO;
-//        if (!_canRefresh) {
-//            if (self.parentView.isDragging && _lastOffset == 0 && offset <= 0) {
-//                _canRefresh = YES;
-//                _didSetInset = NO;
-//            } else {
-//                dontDraw = YES;
-//            }
-//        } else {
-//            if (offset >= 0) {
-//                // Don't draw if the control is not visible
-//                dontDraw = YES;
-//            }
-//        }
-//        if (offset > 0 && _lastOffset > offset && !self.parentView.isTracking) {
-//            // If we are scrolling too fast, don't draw, and don't trigger unless the parentView bounced back
-//            _canRefresh = NO;
-//            dontDraw = YES;
-//        }
-//        if (dontDraw) {
-//            self.frame = CGRectMake(0, 0, self.parentView.frame.size.width, 0);
-//            _lastOffset = offset;
-//            return;
-//        }
-//    }
-//    
-//    _lastOffset = offset;
-//    
-//    if (_canRefresh && height >= [_contentView triggerHeight]) {
-//        [_contentView beginRefreshing:YES];
-//        self.refreshing = YES;
-//        _canRefresh = NO;
-//        [self sendActionsForControlEvents:UIControlEventValueChanged];
-//    }
-//    [_contentView layoutIfNeeded];
-//}
 
 #pragma mark - Public methods
 
