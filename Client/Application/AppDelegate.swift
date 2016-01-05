@@ -412,6 +412,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 // MARK: - Root View Controller Animations
 extension AppDelegate: UINavigationControllerDelegate {
+#if !BRAVE
     func navigationController(navigationController: UINavigationController,
         animationControllerForOperation operation: UINavigationControllerOperation,
         fromViewController fromVC: UIViewController,
@@ -424,6 +425,7 @@ extension AppDelegate: UINavigationControllerDelegate {
                 return nil
             }
     }
+#endif
 }
 
 extension AppDelegate: TabManagerStateDelegate {

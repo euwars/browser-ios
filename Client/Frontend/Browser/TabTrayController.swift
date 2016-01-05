@@ -107,7 +107,7 @@ class TabCell: UICollectionViewCell {
 
         super.init(frame: frame)
 
-        self.opaque = true
+        //self.opaque = true
 
         self.animator = SwipeAnimator(animatingView: self.backgroundHolder, container: self)
         self.closeButton.addTarget(self, action: "SELclose", forControlEvents: UIControlEvents.TouchUpInside)
@@ -333,6 +333,20 @@ class TabTrayController: UIViewController {
 // MARK: View Controller Callbacks
     override func viewDidLoad() {
         super.viewDidLoad()
+#if BRAVE
+        var image = self.tabManager.selectedTab?.screenshot!
+    //image = image?.applyLightEffect()
+    image = image?.applyBlurWithRadius(4.0, blurType: BOXFILTER, tintColor: nil, saturationDeltaFactor: 1.0, maskImage: nil)
+
+        let imageview = UIImageView(image: image)
+        self.view.addSubview(imageview)
+        imageview.snp_makeConstraints() {
+            make in
+            make.left.right.equalTo(self.view)
+            make.top.equalTo(self.view).inset(20 + 44)
+            make.bottom.equalTo(self.view).inset(44)
+        }
+#endif
 
         view.accessibilityLabel = NSLocalizedString("Tabs Tray", comment: "Accessibility label for the Tabs Tray view.")
 
@@ -356,7 +370,7 @@ class TabTrayController: UIViewController {
         collectionView.delegate = tabLayoutDelegate
 
         collectionView.registerClass(TabCell.self, forCellWithReuseIdentifier: TabCell.Identifier)
-        collectionView.backgroundColor = TabTrayControllerUX.BackgroundColor
+        collectionView.backgroundColor = UIColor.clearColor()
 
         view.addSubview(collectionView)
         view.addSubview(navBar)
@@ -564,7 +578,11 @@ class TabTrayController: UIViewController {
             self.tabManager.selectTab(tab)
         }, completion: { finished in
             if finished {
-                self.navigationController?.popViewControllerAnimated(true)
+                #if BRAVE
+                    self.dismissViewControllerAnimated(true, completion: nil)
+                #else
+                    self.navigationController?.popViewControllerAnimated(true)
+                #endif
             }
         })
     }
@@ -592,7 +610,11 @@ extension TabTrayController: TabSelectionDelegate {
     func didSelectTabAtIndex(index: Int) {
         let tab = tabsToDisplay[index]
         tabManager.selectTab(tab)
-        self.navigationController?.popViewControllerAnimated(true)
+        #if BRAVE
+            self.dismissViewControllerAnimated(true, completion: nil)
+        #else
+            self.navigationController?.popViewControllerAnimated(true)
+        #endif
     }
 }
 
@@ -621,7 +643,11 @@ extension TabTrayController: TabManagerDelegate {
                 tabManager.selectTab(tab)
                 // don't pop the tab tray view controller if it is not in the foreground
                 if self.presentedViewController == nil {
-                    self.navigationController?.popViewControllerAnimated(true)
+                    #if BRAVE
+                        self.dismissViewControllerAnimated(true, completion: nil)
+                    #else
+                        self.navigationController?.popViewControllerAnimated(true)
+                    #endif
                 }
             }
         })
@@ -1007,7 +1033,12 @@ extension TabTrayController: UIViewControllerPreviewingDelegate {
     func previewingContext(previewingContext: UIViewControllerPreviewing, commitViewController viewControllerToCommit: UIViewController) {
         guard let tpvc = viewControllerToCommit as? TabPeekViewController else { return }
         tabManager.selectTab(tpvc.tab)
-        self.navigationController?.popViewControllerAnimated(true)
+
+        #if BRAVE
+            self.dismissViewControllerAnimated(true, completion: nil)
+        #else
+            self.navigationController?.popViewControllerAnimated(true)
+        #endif
 
         delegate?.tabTrayDidDismiss(self)
 
