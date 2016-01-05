@@ -370,15 +370,6 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
             item.title = parent.title
         }
 
-        if let scrapedUrl = webView.stringByEvaluatingJavaScriptFromString("window.location.href") {
-            if !parent.progress.pathContainsCompleted(scrapedUrl) {
-                parent.URL = NSURL(string: scrapedUrl)
-                if let item = parent.backForwardList.currentItem {
-                    item.URL = parent.URL ?? item.URL
-                }
-            }
-        }
-
         parent.progress.webViewDidFinishLoad(documentReadyState: readyState)
 
         parent.kvoBroadcast()
