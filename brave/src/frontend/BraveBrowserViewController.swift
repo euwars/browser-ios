@@ -16,7 +16,6 @@ class BraveBrowserViewController : BrowserViewController {
     footerBackground?.blurStyle = .Dark
   }
 
-
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
 

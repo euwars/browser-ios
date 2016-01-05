@@ -78,7 +78,7 @@ class BrowserViewController: UIViewController {
     // Backdrop used for displaying greyed background for private tabs
     var webViewContainerBackdrop: UIView!
 
-    var scrollController = BrowserScrollingController()
+    var scrollController = BraveScrollController()
 
     private var keyboardState: KeyboardState?
 
