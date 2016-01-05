@@ -252,7 +252,7 @@ class MainSidePanelViewController : UIViewController {
                 return
             }
             
-            let shouldShow = view.frame.width / CGFloat(BraveUX.WidthOfSlideOut) > 0.8
+            let shouldShow = view.frame.width / CGFloat(BraveUX.WidthOfSlideOut) > CGFloat(BraveUX.PanelClosingThresholdWhenDragging)
             if shouldShow {
                 show(true)
             } else {

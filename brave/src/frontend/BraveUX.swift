@@ -10,6 +10,8 @@ struct BraveUX {
 
     static let PullToReloadDistance = 100
 
+    static let PanelClosingThresholdWhenDragging = 0.3 // a percent range 1.0 to 0
+
     // debug settings
     //  static var IsToolbarHidingOff = false
     //  static var IsOverrideScrollingSpeedAndMakeSlower = false // overrides IsHighLoadAnimationAllowed effect
