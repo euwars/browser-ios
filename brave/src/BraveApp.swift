@@ -24,6 +24,12 @@ class BraveApp {
         return _singleton
     }
 
+#if !TEST
+    class func getCurrentWebView() -> BraveWebView? {
+        return getApp().browserViewController.tabManager.selectedTab?.webView
+    }
+#endif
+
     private init() {
     }
 
