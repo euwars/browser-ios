@@ -136,7 +136,7 @@ class TabManager : NSObject {
         return tabs[index]
     }
 
-    subscript(webView: LegacyWebView) -> Browser? {
+    subscript(webView: BraveWebView) -> Browser? {
         for tab in tabs {
             if tab.webView === webView {
                 return tab

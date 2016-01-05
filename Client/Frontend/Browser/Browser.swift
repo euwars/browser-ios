@@ -21,8 +21,8 @@ protocol BrowserHelper {
 protocol BrowserDelegate {
     func browser(browser: Browser, didAddSnackbar bar: SnackBar)
     func browser(browser: Browser, didRemoveSnackbar bar: SnackBar)
-    func browser(browser: Browser, didCreateWebView webView: LegacyWebView)
-    func browser(browser: Browser, willDeleteWebView webView: LegacyWebView)
+    func browser(browser: Browser, didCreateWebView webView: BraveWebView)
+    func browser(browser: Browser, willDeleteWebView webView: BraveWebView)
 }
 
 class Browser: NSObject {
@@ -40,7 +40,7 @@ class Browser: NSObject {
         }
     }
 
-    var webView: LegacyWebView?
+    var webView: BraveWebView?
     var browserDelegate: BrowserDelegate?
     var bars = [SnackBar]()
     var favicons = [Favicon]()
@@ -113,7 +113,7 @@ class Browser: NSObject {
             configuration!.preferences = WKPreferences()
             configuration!.preferences.javaScriptCanOpenWindowsAutomatically = false
 #endif
-            let webView = LegacyWebView(frame: CGRectZero)
+            let webView = BraveWebView(frame: CGRectZero)
             configuration = nil
 
             webView.accessibilityLabel = NSLocalizedString("Web content", comment: "Accessibility label for the main web content view")
@@ -139,7 +139,7 @@ class Browser: NSObject {
         }
     }
 
-    func restore(webView: LegacyWebView) {
+    func restore(webView: BraveWebView) {
         // Pulls restored session data from a previous SavedTab to load into the Browser. If it's nil, a session restore
         // has already been triggered via custom URL, so we use the last request to trigger it again; otherwise,
         // we extract the information needed to restore the tabs and create a NSURLRequest with the custom session restore URL
@@ -403,9 +403,9 @@ class Browser: NSObject {
 
 private class HelperManager: NSObject, WKScriptMessageHandler {
     private var helpers = [String: BrowserHelper]()
-    private weak var webView: LegacyWebView?
+    private weak var webView: BraveWebView?
 
-    init(webView: LegacyWebView) {
+    init(webView: BraveWebView) {
         self.webView = webView
     }
 

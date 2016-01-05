@@ -43,7 +43,7 @@ func jsonParseArray(messageJSON: String?) -> [NSDictionary] {
   return []
 }
 
-extension LegacyWebView {
+extension BraveWebView {
   func replaceImagesUsingTheVault(webView: UIWebView) {
     let isJsResourcesLoaded = webView.stringByEvaluatingJavaScriptFromString("typeof _brave_adInfo !== 'undefined'")
     

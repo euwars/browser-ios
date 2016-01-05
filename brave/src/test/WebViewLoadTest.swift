@@ -21,9 +21,9 @@ class WebViewLoadTest: XCTestCase {
     }
   }
 
-  func loadSite(site:String, webview:LegacyWebView) ->Bool {
+  func loadSite(site:String, webview:BraveWebView) ->Bool {
     let url = NSURL(string: "http://" + site)
-    expectationForNotification(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil, handler:nil)
+    expectationForNotification(BraveWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil, handler:nil)
     webview.loadRequest(NSURLRequest(URL: url!))
     var isOk = true
     waitForExpectationsWithTimeout(15) { (error:NSError?) -> Void in
@@ -33,7 +33,7 @@ class WebViewLoadTest: XCTestCase {
     }
 
     webview.stopLoading()
-    expectationForNotification(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil, handler:nil)
+    expectationForNotification(BraveWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil, handler:nil)
     webview.loadHTMLString("<html><head></head><body></body></html>", baseURL: nil)
     waitForExpectationsWithTimeout(2, handler: nil)
 
@@ -42,7 +42,7 @@ class WebViewLoadTest: XCTestCase {
 
 
   func loadSites(sites:[String]) {
-    let w = LegacyWebView(frame: CGRectMake(0,0,200,200))
+    let w = BraveWebView(frame: CGRectMake(0,0,200,200))
     for site in sites {
         print("\(site)")
         self.loadSite(site, webview: w)
@@ -99,7 +99,7 @@ class WebViewLoadTest: XCTestCase {
       "businessinsider.com", "imore.com", "kotaku.com", "huffingtonpost.com"]
     var dict = [String:[[Double]]]()
 
-    let webview = LegacyWebView(frame: CGRectMake(0,0,200,200))
+    let webview = BraveWebView(frame: CGRectMake(0,0,200,200))
     for _ in 0..<3 {
       for i in 0..<2 {
         adblockOn(i == 1)
@@ -158,7 +158,7 @@ class WebViewLoadTest: XCTestCase {
   // It is very useful to stress the app, you can watch memory, or just see if there are any major errors
   // in the console.
   func testStressUsingAlexa500() {
-    let w = LegacyWebView(frame: CGRectMake(0,0,200,200))
+    let w = BraveWebView(frame: CGRectMake(0,0,200,200))
     var count = 0
     for site in sites500 {
       print("Site: \(count++) \(site)")
@@ -168,7 +168,7 @@ class WebViewLoadTest: XCTestCase {
 #endif
 
   func testOpenUrlUsingBraveSchema() {
-    expectationForNotification(LegacyWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil, handler:nil)
+    expectationForNotification(BraveWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil, handler:nil)
     let site = "google.ca"
     let ok = UIApplication.sharedApplication().openURL(
       NSURL(string: "brave://open-url?url=https%253A%252F%252F" + site)!)

@@ -1268,7 +1268,7 @@ extension BrowserViewController: WindowCloseHelperDelegate {
 
 extension BrowserViewController: BrowserDelegate {
 
-    func browser(browser: Browser, didCreateWebView webView: LegacyWebView) {
+    func browser(browser: Browser, didCreateWebView webView: BraveWebView) {
         webViewContainer.insertSubview(webView, atIndex: 0)
         webView.snp_makeConstraints { make in
             make.top.equalTo(webViewContainerToolbar.snp_bottom)
@@ -1324,7 +1324,7 @@ extension BrowserViewController: BrowserDelegate {
       #endif
     }
 
-    func browser(browser: Browser, willDeleteWebView webView: LegacyWebView) {
+    func browser(browser: Browser, willDeleteWebView webView: BraveWebView) {
         webView.removeObserver(self, forKeyPath: KVOEstimatedProgress)
         webView.removeObserver(self, forKeyPath: KVOLoading)
         webView.removeObserver(self, forKeyPath: KVOCanGoBack)
@@ -2340,7 +2340,7 @@ extension BrowserViewController: ContextMenuHelperDelegate {
 
         let actionSheetController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
         var dialogTitle: String?
-        actionSheetController.view.tag = LegacyWebView.kContextMenuBlockNavigation
+        actionSheetController.view.tag = BraveWebView.kContextMenuBlockNavigation
 
         if let url = elements.link, currentTab = tabManager.selectedTab {
             dialogTitle = url.absoluteString

@@ -4,31 +4,31 @@
 
 
 class BravePageUnloadHelper: NSObject, BrowserHelper {
-  private weak var browser: Browser?
-  weak var delegate: ContextMenuHelperDelegate?
+    private weak var browser: Browser?
+    weak var delegate: ContextMenuHelperDelegate?
 
-  class func name() -> String {
-    return "PageUnloadHelper"
-  }
+    class func name() -> String {
+        return "PageUnloadHelper"
+    }
 
-  required init(browser: Browser) {
-    super.init()
+    required init(browser: Browser) {
+        super.init()
 
-    self.browser = browser
+        self.browser = browser
 
-    let path = NSBundle.mainBundle().pathForResource("PageUnload", ofType: "js")!
-    let source = try! NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
-    let userScript = WKUserScript(source: source, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: true)
-    browser.webView!.configuration.userContentController.addUserScript(userScript)
-  }
+        let path = NSBundle.mainBundle().pathForResource("PageUnload", ofType: "js")!
+        let source = try! NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
+        let userScript = WKUserScript(source: source, injectionTime: WKUserScriptInjectionTime.AtDocumentEnd, forMainFrameOnly: true)
+        browser.webView!.configuration.userContentController.addUserScript(userScript)
+    }
 
-  func scriptMessageHandlerName() -> String? {
-    return "pageUnloadMessageHandler"
-  }
+    func scriptMessageHandlerName() -> String? {
+        return "pageUnloadMessageHandler"
+    }
 
-  func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
+    func userContentController(userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
 
-    //guard let data = message.body as? [String: AnyObject] else { return }
-    NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: browser?.webView)
-  }
+        //guard let data = message.body as? [String: AnyObject] else { return }
+        NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: browser?.webView)
+    }
 }
