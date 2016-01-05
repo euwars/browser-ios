@@ -6,7 +6,6 @@ let kNotificationLeftSlideOutClicked = "kNotificationLeftSlideOutClicked"
 class BraveTopViewController : UIViewController {
   var browser:BraveBrowserViewController
   var mainSidePanel:MainSidePanelViewController
-  var leftSlideOutShowing = false
 
   var clickDetectionView = UIButton()
 
@@ -93,46 +92,29 @@ class BraveTopViewController : UIViewController {
       return true
     }
 
-    return leftSlideOutShowing
+    return mainSidePanel.view.frame.width == CGFloat(BraveUX.WidthOfSlideOut)
   }
 
   func leftSlideOutClicked(_:NSNotification) {
     toggleLeftPanel()
   }
 
+
+  func specialTouchEventHandling(touchPoint: CGPoint, phase: UITouchPhase ) {
+    mainSidePanel.onTouchToHide(touchPoint, phase: phase)
+  }
+
   func toggleLeftPanel() {
-    leftSlideOutShowing = !leftSlideOutShowing
-    mainSidePanel.showAndSetDelegate(leftSlideOutShowing, delegate:self)
-    mainSidePanel.view.layoutIfNeeded()
-
-    if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
-      if leftSlideOutShowing {
-        view.addSubview(clickDetectionView)
-        clickDetectionView.snp_remakeConstraints {
-          make in
-          make.edges.equalTo(browser.view)
-        }
-        clickDetectionView.layoutIfNeeded()
-      } else {
-        clickDetectionView.removeFromSuperview()
-      }
-    }
-    
-    let width = leftSlideOutShowing ? BraveUX.WidthOfSlideOut : 0
-    let animation = {
-      self.mainSidePanel.view.snp_remakeConstraints {
+    clickDetectionView.removeFromSuperview()
+    if UIDevice.currentDevice().userInterfaceIdiom == .Phone && mainSidePanel.view.hidden {
+      view.addSubview(clickDetectionView)
+      clickDetectionView.snp_remakeConstraints {
         make in
-        make.bottom.left.top.equalTo(self.view)
-        make.width.equalTo(width)
+        make.edges.equalTo(browser.view)
       }
-      self.view.layoutIfNeeded()
-      self.setNeedsStatusBarAppearanceUpdate()
+      clickDetectionView.layoutIfNeeded()
     }
-
-    UIView.animateWithDuration(0.2, animations: animation, completion: {
-      finished in
-      self.mainSidePanel.finishedAnimation(showing: width != 0)
-    })
+    mainSidePanel.showAndSetDelegate(mainSidePanel.view.hidden, delegate:self)
   }
 }
 

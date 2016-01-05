@@ -21,12 +21,11 @@ class BraveMainWindow : UIWindow {
   override func sendEvent(event: UIEvent) {
     super.sendEvent(event)
 
-    if ((getApp().rootViewController.visibleViewController as? BraveTopViewController) == nil) {
-      return
-    }
+    guard let braveTopVC = getApp().rootViewController.visibleViewController as? BraveTopViewController else { return }
 
  //   print("\(event.touchesForWindow(self))")
     if let touches = event.touchesForWindow(self), let touch = touches.first where touches.count == 1 {
+      braveTopVC.specialTouchEventHandling(touch.locationInView(self), phase: touch.phase)
       switch touch.phase {
       case .Began:  // A finger touched the screen
         tapLocation = touch.locationInView(self)

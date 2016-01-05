@@ -41,6 +41,7 @@ class MainSidePanelViewController : UIViewController {
     setupContainerViewSize()
   }
 
+
   override func viewDidLoad() {
     viewAsScrollView().scrollEnabled = false
 
@@ -87,6 +88,7 @@ class MainSidePanelViewController : UIViewController {
     bookmarks.view.hidden = false
 
     containerView.bringSubviewToFront(topButtonsView)
+    view.hidden = true
   }
 
   func addBookmark() {
@@ -104,11 +106,6 @@ class MainSidePanelViewController : UIViewController {
   }
 
   func setupConstraints() {
-//        containerView.snp_makeConstraints() {
-//          make in
-//          make.edges.equalTo(view)
-//        }
-
     topButtonsView.snp_remakeConstraints {
       make in
       make.top.equalTo(containerView).offset(spaceForStatusBar())
@@ -194,26 +191,101 @@ class MainSidePanelViewController : UIViewController {
     return Double(UIConstants.ToolbarHeight) + spaceForStatusBar()
   }
 
-  func showAndSetDelegate(showing: Bool, delegate: HomePanelDelegate?) {
+  private func show(showing: Bool) {
     if (showing) {
       view.hidden = false
       bookmarks.tableView.backgroundColor = UIColor(white: 242/255.0, alpha: 1.0)
       history.tableView.backgroundColor = bookmarks.tableView.backgroundColor
+      setupConstraints()
+    }
+    view.layoutIfNeeded()
+
+    let width = showing ? BraveUX.WidthOfSlideOut : 0
+    let animation = {
+      guard let superview = self.view.superview else { return }
+      self.view.snp_remakeConstraints {
+        make in
+        make.bottom.left.top.equalTo(superview)
+        make.width.equalTo(width)
+      }
+      superview.layoutIfNeeded()
+
+      guard let topVC = getApp().rootViewController.visibleViewController else { return }
+      topVC.setNeedsStatusBarAppearanceUpdate()
+    }
+
+    var percentComplete = Double(view.frame.width) / Double(BraveUX.WidthOfSlideOut)
+    if showing {
+      percentComplete = 1.0 - percentComplete
+    }
+    let duration = 0.2 * percentComplete
+    UIView.animateWithDuration(duration, animations: animation)
+    if (!showing) { // for reasons unknown, wheh put in a animation completion block, this is called immediately
+      delay(duration) { self.view.hidden = true }
+    }
+  }
+
+  func showAndSetDelegate(showing: Bool, delegate: HomePanelDelegate?) {
+    if (showing) {
       bookmarks.homePanelDelegate = delegate
       bookmarks.reloadData()
       history.homePanelDelegate = delegate
       history.reloadData()
-      setupConstraints()
     } else {
       bookmarks.homePanelDelegate = nil
       history.homePanelDelegate = nil
     }
+    show(showing)
   }
 
-  func finishedAnimation(showing showing: Bool) {
-    if !showing { 
-      view.hidden = true
+  var loc = CGFloat(-1)
+  func onTouchToHide(touchPoint: CGPoint, phase: UITouchPhase) {
+      if view.hidden {
+        return
+      }
+
+      let isFullWidth = fabs(view.frame.width - CGFloat(BraveUX.WidthOfSlideOut)) < 0.5
+
+      func complete() {
+        if isFullWidth {
+          loc = CGFloat(-1)
+          return
+        }
+
+        let shouldShow = view.frame.width / CGFloat(BraveUX.WidthOfSlideOut) > 0.8
+        if shouldShow {
+          show(true)
+        } else {
+          showAndSetDelegate(false, delegate: nil)
+        }
     }
+
+      let isOnEdge = fabs(touchPoint.x - view.frame.width) < 10
+      if !isOnEdge && loc < 0 && phase != .Began {
+        return
+      }
+
+      switch phase {
+      case .Began:  // A finger touched the screen
+        loc = isOnEdge ? touchPoint.x : CGFloat(-1)
+        break
+      case .Moved, .Stationary:
+        if loc < 0 || touchPoint.x > loc {
+          complete()
+          return
+        }
+
+        view.snp_remakeConstraints {
+          make in
+          make.bottom.left.top.equalTo(self.view.superview!)
+          make.width.equalTo(CGFloat(BraveUX.WidthOfSlideOut) - (loc - touchPoint.x))
+        }
+        self.view.layoutIfNeeded()
+        break
+      case .Ended, .Cancelled:
+        complete()
+        break
+      }
   }
 }
 
