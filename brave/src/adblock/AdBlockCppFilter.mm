@@ -9,52 +9,53 @@ ABPFilterParser parser;
 
 @implementation AdBlockCppFilter
 
-static NSData *loadData()
+-(void)setAdblockDataFile:(NSData *)data
 {
-  NSString *path = [[NSBundle mainBundle] pathForResource:@"ABPFilterParserData" ofType: @"dat"];
-  assert(path);
-  NSData *data = [NSData dataWithContentsOfFile:path];
-  assert(data);
-  return data;
+    @synchronized(self) {
+        self.data = data;
+        parser.deserialize((char *)self.data.bytes);
+    }
+}
+
+-(BOOL)hasAdblockDataFile
+{
+    @synchronized(self) {
+        return self.data;
+    }
 }
 
 + (instancetype)singleton
 {
-  static AdBlockCppFilter *instance = nil;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    instance = [[self alloc] init];
-  });
-  return instance;
-}
-
-- (instancetype)init
-{
-  if (self = [super init]) {
-    self.data = loadData();
-    parser.deserialize((char *)self.data.bytes);
-  }
-  return self;
+    static AdBlockCppFilter *instance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        instance = [[self alloc] init];
+    });
+    return instance;
 }
 
 - (BOOL)checkWithCppABPFilter:(NSString *)url
               mainDocumentUrl:(NSString *)mainDoc
              acceptHTTPHeader:(NSString *)acceptHeader
 {
-  FilterOption option = FONoFilterOption;
-  if (acceptHeader) {
-    if ([acceptHeader rangeOfString:@"/css"].location != NSNotFound) {
-      option  = FOStylesheet;
+    if (![self hasAdblockDataFile]) {
+        return false;
     }
-    else if ([acceptHeader rangeOfString:@"image/"].location != NSNotFound) {
-      option  = FOImage;
-    }
-    else if ([acceptHeader rangeOfString:@"javascript"].location != NSNotFound) {
-      option  = FOScript;
-    }
-  }
 
-  return parser.matches(url.UTF8String, option, mainDoc.UTF8String);
+    FilterOption option = FONoFilterOption;
+    if (acceptHeader) {
+        if ([acceptHeader rangeOfString:@"/css"].location != NSNotFound) {
+            option  = FOStylesheet;
+        }
+        else if ([acceptHeader rangeOfString:@"image/"].location != NSNotFound) {
+            option  = FOImage;
+        }
+        else if ([acceptHeader rangeOfString:@"javascript"].location != NSNotFound) {
+            option  = FOScript;
+        }
+    }
+
+    return parser.matches(url.UTF8String, option, mainDoc.UTF8String);
 }
 
 @end

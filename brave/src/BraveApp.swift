@@ -93,6 +93,8 @@ class BraveApp {
             dispatch_get_main_queue(), {
                 BraveApp.removePref(kAppBootingIncompleteFlag)
         })
+
+        AdBlocker.singleton.loadData()
     }
 
     // This can only be checked ONCE, the flag is cleared after this.
