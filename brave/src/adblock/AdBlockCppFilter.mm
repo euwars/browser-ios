@@ -20,7 +20,7 @@ ABPFilterParser parser;
 -(BOOL)hasAdblockDataFile
 {
     @synchronized(self) {
-        return self.data;
+        return self.data != nil;
     }
 }
 
