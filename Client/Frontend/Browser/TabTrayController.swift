@@ -293,6 +293,15 @@ class TabTrayController: UIViewController {
         return delegate
     }()
 
+    #if BRAVE
+    override func dismissViewControllerAnimated(flag: Bool, completion: (() -> Void)?) {
+        super.dismissViewControllerAnimated(flag, completion:completion)
+        UIView.animateWithDuration(0.2) {
+            getApp().browserViewController.view.alpha = 1.0
+        }
+    }
+    #endif
+
     init(tabManager: TabManager, profile: Profile) {
         self.tabManager = tabManager
         self.profile = profile
@@ -330,23 +339,13 @@ class TabTrayController: UIViewController {
         self.collectionView.reloadData()
     }
 
+    @objc func onTappedBackground(gesture: UITapGestureRecognizer) {
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+
 // MARK: View Controller Callbacks
     override func viewDidLoad() {
         super.viewDidLoad()
-#if BRAVE
-        var image = self.tabManager.selectedTab?.screenshot!
-    //image = image?.applyLightEffect()
-    image = image?.applyBlurWithRadius(4.0, blurType: BOXFILTER, tintColor: nil, saturationDeltaFactor: 1.0, maskImage: nil)
-
-        let imageview = UIImageView(image: image)
-        self.view.addSubview(imageview)
-        imageview.snp_makeConstraints() {
-            make in
-            make.left.right.equalTo(self.view)
-            make.top.equalTo(self.view).inset(20 + 44)
-            make.bottom.equalTo(self.view).inset(44)
-        }
-#endif
 
         view.accessibilityLabel = NSLocalizedString("Tabs Tray", comment: "Accessibility label for the Tabs Tray view.")
 
@@ -371,6 +370,16 @@ class TabTrayController: UIViewController {
 
         collectionView.registerClass(TabCell.self, forCellWithReuseIdentifier: TabCell.Identifier)
         collectionView.backgroundColor = UIColor.clearColor()
+
+#if BRAVE
+        collectionView.backgroundView = UIView(frame: view.frame)
+        collectionView.backgroundView?.snp_makeConstraints() {
+            make in
+            make.edges.equalTo(collectionView)
+        }
+        collectionView.backgroundView?.userInteractionEnabled = true
+        collectionView.backgroundView?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "onTappedBackground:"))
+#endif
 
         view.addSubview(collectionView)
         view.addSubview(navBar)
@@ -451,9 +460,6 @@ class TabTrayController: UIViewController {
     }
 
 // MARK: Selectors
-    func SELdidClickDone() {
-        presentingViewController!.dismissViewControllerAnimated(true, completion: nil)
-    }
 
     func SELdidClickSettingsItem() {
         let settingsTableViewController = SettingsTableViewController()

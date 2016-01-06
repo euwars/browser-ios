@@ -10,8 +10,11 @@ class SettingsNavigationController: UINavigationController {
     func SELdone() {
         if let delegate = popoverDelegate {
             delegate.dismissPresentedModalViewController(self, animated: true)
+            getApp().browserViewController.view.alpha = CGFloat(BraveUX.BrowserViewAlphaWhenShowingTabTray)
         } else {
-            self.dismissViewControllerAnimated(true, completion: nil)
+            self.dismissViewControllerAnimated(true, completion: {
+                getApp().browserViewController.view.alpha = CGFloat(BraveUX.BrowserViewAlphaWhenShowingTabTray)
+            })
         }
     }
 }

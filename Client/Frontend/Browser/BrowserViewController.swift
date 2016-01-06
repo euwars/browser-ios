@@ -1049,9 +1049,10 @@ extension BrowserViewController: URLBarDelegate {
 
         //self.navigationController?.pushViewController(tabTrayController, animated: true)
         #if BRAVE
-        tabTrayController.modalPresentationStyle = .CurrentContext
-        tabTrayController.modalTransitionStyle = .CrossDissolve
-        self.navigationController?.presentViewController(tabTrayController, animated: true, completion: nil)
+            tabTrayController.modalPresentationStyle = .OverCurrentContext
+            tabTrayController.modalTransitionStyle = .CrossDissolve
+            self.navigationController?.presentViewController(tabTrayController, animated: true, completion: nil)
+            UIView.animateWithDuration(0.2, animations: { self.view.alpha = CGFloat(BraveUX.BrowserViewAlphaWhenShowingTabTray) })
         #endif
         self.tabTrayController = tabTrayController
     }
