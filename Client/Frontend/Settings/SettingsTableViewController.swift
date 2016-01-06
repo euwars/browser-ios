@@ -576,12 +576,20 @@ private class ShowIntroductionSetting: Setting {
     }
 
     override func onClick(navigationController: UINavigationController?) {
-        navigationController?.dismissViewControllerAnimated(true, completion: {
+        #if BRAVE
+            navigationController?.dismissViewControllerAnimated(true, completion: {
+            // now that settings is dismissed, need to dismiss the tab tray view
+            var top = UIApplication.sharedApplication().keyWindow?.rootViewController
+            while (top?.presentedViewController != nil) {
+                top = top?.presentedViewController
+            }
+            top?.dismissViewControllerAnimated(true, completion: {
             if let appDelegate = UIApplication.sharedApplication().delegate as? AppDelegate {
                 appDelegate.browserViewController.presentIntroViewController(true)
             }
-        })
-    }
+            })})
+        #endif
+        }
 }
 
 //private class SendFeedbackSetting: Setting {
