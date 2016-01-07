@@ -16,4 +16,4 @@ do
  cp ${f} ~/Library/MobileDevice/Provisioning\ Profiles/${UUID}.mobileprovision
 done
 
-(cd adhoc && sh checkdevices.sh)
+###(cd adhoc && sh checkdevices.sh)
