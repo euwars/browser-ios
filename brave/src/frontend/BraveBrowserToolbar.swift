@@ -29,8 +29,6 @@ extension UIImage{
 class BraveBrowserToolbar : BrowserToolbar {
     static var tabsCount = 0
 
-    // let leftSidePanelButton: UIButton
-
     lazy var tabsButton: TabsButton = {
         let tabsButton = TabsButton()
         tabsButton.titleLabel.text = "\(tabsCount)"
@@ -42,10 +40,21 @@ class BraveBrowserToolbar : BrowserToolbar {
 
     lazy var addTabButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "add"), forState: .Normal)
+        let image = UIImage(named: "add")
         //TODO button.setImage(UIImage(named: "backPressed"), forState: .Highlighted)
         //.accessibilityLabel = NSLocalizedString("Back", comment: "Accessibility Label for the browser toolbar Back button")
         button.addTarget(self, action: "onClickAddTab", forControlEvents: UIControlEvents.TouchUpInside)
+
+        // Button is grey without upping the brightness
+        // TODO remove this when the icon changes
+        func hackToMakeWhite(image: UIImage) -> UIImage {
+            let brightnessFilter = CIFilter(name: "CIColorControls")!
+            brightnessFilter.setValue(1.0, forKey: "inputBrightness")
+            brightnessFilter.setValue(CIImage(image: image), forKey: kCIInputImageKey)
+            return UIImage(CGImage: CIContext(options:nil).createCGImage(brightnessFilter.outputImage!, fromRect:brightnessFilter.outputImage!.extent), scale: image.scale, orientation: .Up)
+        }
+
+        button.setImage(hackToMakeWhite(image!), forState: .Normal)
         return button
     }()
 
@@ -105,20 +114,19 @@ class BraveBrowserToolbar : BrowserToolbar {
         BraveURLBarView.tabButtonPressed()
     }
 
-    // I need to set this quite late or it is overridden
-    // Calling this before doing the first layout is the easiest hack.
-    // TODO: find less hacky-looking way
-    func hackToSetButtonColor() {
-        self.actionButtonTintColor = BraveUX.ActionButtonTintColor
-        self.actionButtons.forEach { $0.tintColor = self.actionButtonTintColor }
+    // TODO find a way to do this properly with themes.
+    func styleHacks() {
+        backgroundColor = UIColor.clearColor()
+        tabsButton.labelBackground.backgroundColor = BraveUX.ActionButtonTintColor
+        shareButton.tintColor = BraveUX.ActionButtonTintColor
+        backButton.tintColor = BraveUX.ActionButtonTintColor
+        forwardButton.tintColor = BraveUX.ActionButtonTintColor
     }
 
     override func updateConstraints() {
-        backgroundColor = UIColor.clearColor()
-        delay(0) {
-            self.hackToSetButtonColor()
-        }
         super.updateConstraints()
+
+        styleHacks()
 
         stopReloadButton.hidden = true
 

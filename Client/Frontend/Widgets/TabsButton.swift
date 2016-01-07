@@ -59,14 +59,14 @@ class TabsButton: UIControl {
         return view
     }()
 
-    private lazy var labelBackground: UIView = {
+    lazy var labelBackground: UIView = {
         let background = UIView()
         background.layer.cornerRadius = TabsButtonUX.CornerRadius
         background.userInteractionEnabled = false
         return background
     }()
 
-    private lazy var borderView: InnerStrokedView = {
+    lazy var borderView: InnerStrokedView = {
         let border = InnerStrokedView()
         border.strokeWidth = TabsButtonUX.BorderStrokeWidth
         border.cornerRadius = TabsButtonUX.CornerRadius
