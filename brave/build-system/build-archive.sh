@@ -1,4 +1,4 @@
-(cd .. && ./brave-proj.py)
+(cd .. && ./setup.sh)
 [[ -e /usr/local/bin/ios ]] || gem install cupertino
 (cd profiles && sh install-adhoc-profiles-from-portal.sh $1 $2) || exit 1 
 (cd -- "$(dirname -- "$0")" && cd ../.. && \
