@@ -52,7 +52,7 @@ static CTPParser parser;
     if (!safeHosts) {
         char *findFirstPartyHosts = parser.findFirstPartyHosts(mainDoc.UTF8String);
         if (!findFirstPartyHosts)
-            return NO;
+            return YES;
         safeHosts = [[NSString stringWithUTF8String:findFirstPartyHosts] componentsSeparatedByString:@","];
         self.firstPartyHostsCache[mainDoc] = safeHosts;
     }

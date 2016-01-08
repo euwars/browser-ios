@@ -3,7 +3,7 @@ private let _singleton = TrackingProtection()
 class TrackingProtection {
     static let prefKeyBraveTPOn = "braveTrackingProtection"
     static let prefKeyBraveTPOnDefaultValue = true
-    static let dataVersion = "0"
+    static let dataVersion = "1"
     var isEnabled = true
 
     var parser: TrackingProtectionCpp = TrackingProtectionCpp()
@@ -20,7 +20,6 @@ class TrackingProtection {
         return _singleton
     }
 
-
     func shouldBlock(request: NSURLRequest) -> Bool {
         // synchronize code from this point on.
         objc_sync_enter(self)
@@ -31,15 +30,22 @@ class TrackingProtection {
         }
 
         guard let url = request.URL,
-            domain = request.mainDocumentURL?.hostWithGenericSubdomainPrefixRemoved() else {
+            var mainDocDomain = request.mainDocumentURL?.host else {
                 return false
         }
 
-        let isBlocked = parser.checkHostIsBlocked(url.hostWithGenericSubdomainPrefixRemoved(), mainDocumentHost: domain)
+        mainDocDomain = stripGenericSubdomainPrefixFromUrl(stripLocalhostWebServer(mainDocDomain))
 
-        if isBlocked {
-            print("blocked \(url.absoluteString)")
+        guard var host = url.host else { return false}
+        if host.contains(mainDocDomain) {
+            return false // ignore top level doc
         }
+
+        host = stripGenericSubdomainPrefixFromUrl(stripLocalhostWebServer(host))
+
+        let isBlocked = parser.checkHostIsBlocked(host, mainDocumentHost: mainDocDomain)
+
+        //if isBlocked { print("blocked \(url.absoluteString)") }
         return isBlocked
     }
 }

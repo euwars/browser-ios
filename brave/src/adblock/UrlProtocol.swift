@@ -21,8 +21,8 @@ class URLProtocol: NSURLProtocol {
         if NSURLProtocol.propertyForKey(markerRequestHandled, inRequest: request) != nil {
             return false
         }
-        TrackingProtection.singleton.shouldBlock(request)
-        return AdBlocker.singleton.shouldBlock(request)
+
+        return TrackingProtection.singleton.shouldBlock(request) || AdBlocker.singleton.shouldBlock(request)
     }
 
     override class func canonicalRequestForRequest(request: NSURLRequest) -> NSURLRequest {
