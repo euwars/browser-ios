@@ -21,7 +21,7 @@ class URLProtocol: NSURLProtocol {
         if NSURLProtocol.propertyForKey(markerRequestHandled, inRequest: request) != nil {
             return false
         }
-
+        TrackingProtection.singleton.shouldBlock(request)
         return AdBlocker.singleton.shouldBlock(request)
     }
 

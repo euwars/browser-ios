@@ -22,6 +22,7 @@
 // BRAVE
 #import "LegacyJSContext.h"
 #import "AdBlockCppFilter.h"
+#import "TrackingProtectionCpp.h"
 #import "UIView+ShowBorders.h"
 #import "ODRefreshControl.h"
 #endif

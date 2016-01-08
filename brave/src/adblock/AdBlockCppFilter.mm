@@ -3,7 +3,7 @@
 #import "AdBlockCppFilter.h"
 #include "ABPFilterParser.h"
 
-ABPFilterParser parser;
+static ABPFilterParser parser;
 
 @interface AdBlockCppFilter()
 @property (nonatomic, retain) NSData *data;

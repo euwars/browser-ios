@@ -102,7 +102,8 @@ class BraveApp {
                 BraveApp.removePref(kAppBootingIncompleteFlag)
         })
 
-        AdBlocker.singleton.loadData()
+        AdBlocker.singleton.networkFileLoader.loadData()
+        TrackingProtection.singleton.networkFileLoader.loadData()
     }
 
     // This can only be checked ONCE, the flag is cleared after this.
@@ -161,5 +162,8 @@ class BraveApp {
         }))
     }
     #endif
-    
+
+    static func showErrorAlert(title title: String,  error: String) {
+        UIAlertView(title: title, message: error, delegate: nil, cancelButtonTitle: "Close").show()
+    }
 }

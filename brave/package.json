@@ -1,6 +1,7 @@
 {
   "name": "brave",
   "dependencies": {
-    "abp-filter-parser-cpp": "0.2.9"
+    "abp-filter-parser-cpp": "1.0.15",
+    "tracking-protection": ""
   }
 }
