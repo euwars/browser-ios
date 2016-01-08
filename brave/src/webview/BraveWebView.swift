@@ -350,6 +350,10 @@ extension BraveWebView: UIWebViewDelegate {
         }
         progress.webViewDidStartLoad()
         kvoBroadcast([KVOStrings.kvoLoading])
+
+        #if !TEST
+            let _ = HideEmptyImages(webView: self)
+        #endif
     }
 
     func webViewDidFinishLoad(webView: UIWebView) {
