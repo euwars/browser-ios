@@ -4,7 +4,6 @@
 (cd ../Client && rm -rf Configuration &&  ln -sfn ../brave/xcconfig Configuration)
 
 npm update
-(cd node_modules/abp-filter-parser-cpp && build/Release/sample)
 
 #output a placeholder id, Archive builds will generate a real build id
 echo GENERATED_BUILD_ID=1  > xcconfig/build-id.xcconfig
