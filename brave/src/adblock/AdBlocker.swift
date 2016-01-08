@@ -87,16 +87,18 @@ class AdBlocker {
         }
 
         guard let url = request.URL,
-            domain = request.mainDocumentURL?.host else {
+            var domain = request.mainDocumentURL?.host else {
                 return false
         }
+
+        domain = stripLocalhostWebServer(domain)
 
         if let host = url.host where host.contains(domain) {
             return false
         }
 
         // A cache entry is like: fifoOfCachedUrlChunks[0]["www.microsoft.com_http://some.url"] = true/false for blocking
-        let key = "\(domain)_\(url.absoluteString)"
+        let key = "\(domain)_" + stripLocalhostWebServer(url.absoluteString)
 
         if let urlIsBlocked = fifoOfCachedUrlChunks.containsAndIsBlocked(key) {
             return urlIsBlocked

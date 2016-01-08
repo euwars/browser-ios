@@ -4,19 +4,6 @@
 
 import Foundation
 
-extension String {
-  func regexReplacePattern(pattern:String,  with:String) -> String {
-    let regex = try! NSRegularExpression(pattern:pattern, options: [])
-    return regex.stringByReplacingMatchesInString(self, options: [], range: NSMakeRange(0, self.characters.count), withTemplate: with)
-  }
-}
-
-extension NSURL {
-  func hostWithGenericSubdomainPrefixRemoved() -> String? {
-    return host?.regexReplacePattern("^(m\\.|www\\.|mobile\\.)", with:"");
-  }
-}
-
 var loadedCache = [String: String]()
 func loadJs(name: String) -> String {
   if let cached = loadedCache[name] {
@@ -58,7 +45,7 @@ extension BraveWebView {
     
     guard var host = webView.request?.URL?.hostWithGenericSubdomainPrefixRemoved() else { return }
     // TODO: ffox code has a function surely to clean up URL
-    host = host.regexReplacePattern(".+error\\.html\\?url=http", with: "http")
+    host = stripLocalhostWebServer(host)
     let divSizeQuery = loadJs("adInfo-divquerytemplate").stringByReplacingOccurrencesOfString("HOST", withString: host)
     
     let jsonResult = webView.stringByEvaluatingJavaScriptFromString(divSizeQuery)
