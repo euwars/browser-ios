@@ -24,6 +24,8 @@ class BraveScrollController: NSObject {
         }
     }
 
+    static var hideShowToolbarEnabled = true
+
     weak var header: UIView?
     weak var footer: UIView?
     weak var urlBar: URLBarView?
@@ -122,18 +124,6 @@ class BraveScrollController: NSObject {
             completion: completion)
     }
 
-    //    func hideToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
-    //        let durationRatio = abs((headerFrame.height + headerTopOffset) / headerFrame.height)
-    //        let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
-    //        self.animateToolbarsWithOffsets(
-    //            animated: animated,
-    //            duration: actualDuration,
-    //            headerOffset: -headerFrame.height,
-    //            footerOffset: footerFrame.height - snackBarsFrame.height,
-    //            alpha: 0,
-    //            completion: completion)
-    //    }
-
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if keyPath == "contentSize" {
             if !checkScrollHeightIsLargeEnoughForScrolling() && !toolbarsShowing {
@@ -150,6 +140,10 @@ private extension BraveScrollController {
 
     @objc func handlePan(gesture: UIPanGestureRecognizer) {
         if browserIsLoading() /*|| BraveUX.IsToolbarHidingOff */ {
+            return
+        }
+
+        if !BraveScrollController.hideShowToolbarEnabled {
             return
         }
 

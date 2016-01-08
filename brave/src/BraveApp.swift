@@ -101,7 +101,10 @@ class BraveApp {
             dispatch_get_main_queue(), {
                 BraveApp.removePref(kAppBootingIncompleteFlag)
         })
+        #if !TEST
+            BraveScrollController.hideShowToolbarEnabled = BraveApp.getPref(BraveUX.PrefKeyIsToolbarHidingEnabled) as? Bool ?? true
 
+        #endif
         AdBlocker.singleton.networkFileLoader.loadData()
         TrackingProtection.singleton.networkFileLoader.loadData()
     }

@@ -13,6 +13,8 @@ struct BraveUX {
 
     static let BrowserViewAlphaWhenShowingTabTray = 0.3
 
+    static let PrefKeyIsToolbarHidingEnabled = "PrefKeyIsToolbarHidingEnabled"
+
     // debug settings
     //  static var IsToolbarHidingOff = false
     //  static var IsOverrideScrollingSpeedAndMakeSlower = false // overrides IsHighLoadAnimationAllowed effect

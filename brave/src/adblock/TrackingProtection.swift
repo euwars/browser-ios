@@ -1,8 +1,7 @@
 private let _singleton = TrackingProtection()
 
 class TrackingProtection {
-    static let prefKeyBraveTPOn = "braveTrackingProtection"
-    static let prefKeyBraveTPOnDefaultValue = true
+    static let prefKeyTrackingProtectionOn = "braveTrackingProtection"
     static let dataVersion = "1"
     var isEnabled = true
 
@@ -18,6 +17,20 @@ class TrackingProtection {
 
     class var singleton: TrackingProtection {
         return _singleton
+    }
+
+    private init() {
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "prefsChanged:", name: NSUserDefaultsDidChangeNotification, object: nil)
+        updateEnabledState()
+    }
+
+    func updateEnabledState() {
+        let obj = BraveApp.getPref(TrackingProtection.prefKeyTrackingProtectionOn)
+        isEnabled = obj as? Bool ?? true
+    }
+
+    @objc func prefsChanged(info: NSNotification) {
+        updateEnabledState()
     }
 
     func shouldBlock(request: NSURLRequest) -> Bool {

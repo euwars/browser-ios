@@ -773,12 +773,10 @@ class SettingsTableViewController: UITableViewController {
         ]
 
       #if BRAVE
-        generalSettings += [AdBlockSetting(settings:self),
-//                            VaultAddressSetting(settings: self),
-//          BoolSetting(prefs: prefs, prefKey: "•hidingoff•", defaultValue: false, titleText: "Debug: Turn off toolbar hiding", statusText: "", settingDidChange: {
-//            value in
-//            BraveUX.IsToolbarHidingOff = value
-//          }),
+        generalSettings += [
+            BoolSetting(prefs: prefs, prefKey: AdBlocker.prefKeyAdBlockOn, defaultValue: true, titleText: "Block Ads"),
+            BoolSetting(prefs: prefs, prefKey: TrackingProtection.prefKeyTrackingProtectionOn, defaultValue: true, titleText: "Tracking Protection"),
+            BoolSetting(prefs: prefs, prefKey: BraveUX.PrefKeyIsToolbarHidingEnabled , defaultValue: true, titleText: "Hide toolbar when scrolling", statusText: nil, settingDidChange:  { value in BraveScrollController.hideShowToolbarEnabled = value })
 //          BoolSetting(prefs: prefs, prefKey: "•forcescrollslow•", defaultValue: false, titleText: "Debug: Force slow scrolling", statusText: "Takes effect on new tab.", settingDidChange: {
 //            value in
 //            BraveUX.IsOverrideScrollingSpeedAndMakeSlower = value
@@ -794,13 +792,14 @@ class SettingsTableViewController: UITableViewController {
         // There is nothing to show in the Customize section if we don't include the compact tab layout
         // setting on iPad. When more options are added that work on both device types, this logic can
         // be changed.
+#if !BRAVE
         if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
             generalSettings +=  [
                 BoolSetting(prefs: prefs, prefKey: "CompactTabLayout", defaultValue: true,
                     titleText: NSLocalizedString("Use Compact Tabs", comment: "Setting to enable compact tabs in the tab overview"))
             ]
         }
-
+#endif
         settings += [
 //            SettingSection(title: nil, children: [
 //                // Without a Firefox Account:
