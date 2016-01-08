@@ -38,7 +38,7 @@ class BraveWebView: UIWebView {
     lazy var configuration: BraveWebViewConfiguration = { return BraveWebViewConfiguration(webView: self) }()
     lazy var backForwardList: WebViewBackForwardList = { return WebViewBackForwardList(webView: self) } ()
     lazy var progress: WebViewProgress = { return WebViewProgress(parent: self) }()
-    lazy var webViewDelegate: WebViewDelegate = { return WebViewDelegate(parent: self) }()
+    var certificateInvalidConnection:NSURLConnection?
 
     var estimatedProgress: Double = 0
     var title: String = ""
@@ -72,7 +72,7 @@ class BraveWebView: UIWebView {
     }
 
     private func commonInit() {
-        delegate = self.webViewDelegate
+        delegate = self
         scalesPageToFit = true
 
         scrollView.showsHorizontalScrollIndicator = false
@@ -270,8 +270,7 @@ class BraveWebView: UIWebView {
 
 }
 
-class WebViewDelegate: NSObject, UIWebViewDelegate {
-    weak var parent:BraveWebView?
+extension BraveWebView: UIWebViewDelegate {
 
     class LegacyNavigationAction : WKNavigationAction {
         var writableRequest: NSURLRequest
@@ -290,43 +289,37 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
         }
     }
 
-    init(parent: BraveWebView) {
-        self.parent = parent
-    }
 
-    var certificateInvalidConnection:NSURLConnection?
 
     func webView(webView: UIWebView,shouldStartLoadWithRequest request: NSURLRequest, navigationType: UIWebViewNavigationType ) -> Bool {
-        guard let parent = parent else { return false }
-
         if AboutUtils.isAboutHomeURL(request.URL) {
-            parent.progress.completeProgress()
+            progress.completeProgress()
         }
 
-        if let url = request.URL where url.absoluteString.contains(parent.specialStopLoadUrl) {
-            parent.progress.completeProgress()
+        if let url = request.URL where url.absoluteString.contains(specialStopLoadUrl) {
+            progress.completeProgress()
             return false
         }
 
-        if let contextMenu = parent.window?.rootViewController?.presentedViewController
+        if let contextMenu = window?.rootViewController?.presentedViewController
             where contextMenu.view.tag == BraveWebView.kContextMenuBlockNavigation {
                 // When showing a context menu, the webview will often still navigate (ex. news.google.com)
                 // We need to block navigation using this tag.
                 return false
         }
 
-        if parent.loadingUnvalidatedHTTPSPage {
+        if loadingUnvalidatedHTTPSPage {
             certificateInvalidConnection = NSURLConnection(request: request, delegate: self)
             certificateInvalidConnection?.start()
             return false
         }
 
-        var result = parent.progress.shouldStartLoadWithRequest(request, navigationType: navigationType)
+        var result = progress.shouldStartLoadWithRequest(request, navigationType: navigationType)
         if !result {
             return false
         }
 
-        if let nd = parent.navigationDelegate {
+        if let nd = navigationDelegate {
             let action:LegacyNavigationAction =
             LegacyNavigationAction(type: convertNavActionToWKType(navigationType), request: request)
 
@@ -339,42 +332,41 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
         let locationChanged = BraveWebView.isTopFrameRequest(request)
         if locationChanged {
             // TODO Maybe separate page unload from link clicked.
-            NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: parent)
-            parent.URL = request.URL
+            NSNotificationCenter.defaultCenter().postNotificationName(kNotificationPageUnload, object: self)
+            URL = request.URL
         }
 
-        parent.kvoBroadcast()
+        kvoBroadcast()
 
         return result
     }
 
 
     func webViewDidStartLoad(webView: UIWebView) {
-        parent?.backForwardList.update(webView)
+        backForwardList.update(webView)
 
-        if let nd = parent?.navigationDelegate {
+        if let nd = navigationDelegate {
             nd.webView?(nullWebView, didStartProvisionalNavigation: nullWKNavigation)
         }
-        parent?.progress.webViewDidStartLoad()
-        parent?.kvoBroadcast([KVOStrings.kvoLoading])
+        progress.webViewDidStartLoad()
+        kvoBroadcast([KVOStrings.kvoLoading])
     }
 
     func webViewDidFinishLoad(webView: UIWebView) {
         assert(NSThread.isMainThread())
 
-        guard let parent = parent else { return }
-        let readyState = parent.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
+        let readyState = stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
 
         //print("readyState:\(readyState)")
 
-        parent.title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? ""
-        if let item = parent.backForwardList.currentItem {
-            item.title = parent.title
+        title = webView.stringByEvaluatingJavaScriptFromString("document.title") ?? ""
+        if let item = backForwardList.currentItem {
+            item.title = title
         }
 
-        parent.progress.webViewDidFinishLoad(documentReadyState: readyState)
+        progress.webViewDidFinishLoad(documentReadyState: readyState)
 
-        parent.kvoBroadcast()
+        kvoBroadcast()
     }
 
     func webView(webView: UIWebView, didFailLoadWithError error: NSError?) {
@@ -388,27 +380,26 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
                 error?.code == NSURLErrorServerCertificateHasUnknownRoot    ||
                 error?.code == NSURLErrorServerCertificateNotYetValid)
             {
-                guard let parent = parent, url = parent.URL else { return }
-
-                let alert = UIAlertController(title: "Certificate Error", message: "The identity of \(url.absoluteString) can't be verified", preferredStyle: UIAlertControllerStyle.Alert)
+                let alert = UIAlertController(title: "Certificate Error", message: "The identity of \(URL?.absoluteString) can't be verified", preferredStyle: UIAlertControllerStyle.Alert)
                 alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Default) {
                     handler in
-                    parent.stopLoading()
+                    self.stopLoading()
                     // The current displayed url is wrong, so easiest hack is:
-                    if (parent.canGoBack) { // I don't think the !canGoBack case needs handling
-                        parent.goBack()
-                        parent.goForward()
+                    if (self.canGoBack) { // I don't think the !canGoBack case needs handling
+                        self.goBack()
+                        self.goForward()
                     }
-                    })
+                })
                 alert.addAction(UIAlertAction(title: "Continue", style: UIAlertActionStyle.Default) {
                     handler in
-                    parent.loadingUnvalidatedHTTPSPage = true;
-                    parent.loadRequest(NSURLRequest(URL: url))
-                    
-                    })
-                
+                    self.loadingUnvalidatedHTTPSPage = true;
+                    if let url = self.URL {
+                        self.loadRequest(NSURLRequest(URL: url))
+                    }
+                })
+
                 #if !TEST
-                    parent.window?.rootViewController?.presentViewController(alert, animated: true, completion: nil)
+                    window?.rootViewController?.presentViewController(alert, animated: true, completion: nil)
                 #endif
                 return
             }
@@ -416,17 +407,17 @@ class WebViewDelegate: NSObject, UIWebViewDelegate {
         
         NSNotificationCenter.defaultCenter()
             .postNotificationName(BraveWebView.kNotificationWebViewLoadCompleteOrFailed, object: nil)
-        if let nd = parent?.navigationDelegate {
+        if let nd = navigationDelegate {
             nd.webView?(nullWebView, didFailNavigation: nullWKNavigation,
                 withError: error ?? NSError.init(domain: "", code: 0, userInfo: nil))
         }
         print("didFailLoadWithError: \(error)")
-        parent?.progress.didFailLoadWithError()
-        parent?.kvoBroadcast()
+        progress.didFailLoadWithError()
+        kvoBroadcast()
     }
 }
 
-extension WebViewDelegate : NSURLConnectionDelegate, NSURLConnectionDataDelegate {
+extension BraveWebView : NSURLConnectionDelegate, NSURLConnectionDataDelegate {
     func connection(connection: NSURLConnection, willSendRequestForAuthenticationChallenge challenge: NSURLAuthenticationChallenge) {
         guard let trust = challenge.protectionSpace.serverTrust else { return }
         let cred = NSURLCredential(forTrust: trust)
@@ -434,9 +425,9 @@ extension WebViewDelegate : NSURLConnectionDelegate, NSURLConnectionDataDelegate
     }
     
     func connection(connection: NSURLConnection, didReceiveResponse response: NSURLResponse) {
-        guard let parent = parent, url = parent.URL else { return }
-        parent.loadingUnvalidatedHTTPSPage = false
-        parent.loadRequest(NSURLRequest(URL: url))
+        guard let url = URL else { return }
+        loadingUnvalidatedHTTPSPage = false
+        loadRequest(NSURLRequest(URL: url))
         certificateInvalidConnection?.cancel()
     }    
 }
