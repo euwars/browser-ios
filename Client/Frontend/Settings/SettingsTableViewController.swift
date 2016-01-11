@@ -257,6 +257,12 @@ private class WithoutAccountSetting: AccountSetting {
 //}
 
 private class SyncNowSetting: WithAccountSetting {
+    private lazy var timestampFormatter: NSDateFormatter = {
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        return formatter
+    }()
+
     private let syncNowTitle = NSAttributedString(string: NSLocalizedString("Sync Now", comment: "Sync Firefox Account"), attributes: [NSForegroundColorAttributeName: UIColor.blackColor(), NSFontAttributeName: DynamicFontHelper.defaultHelper.DefaultStandardFont])
 
     private let syncingTitle = NSAttributedString(string: NSLocalizedString("Syncing…", comment: "Syncing Firefox Account"), attributes: [NSForegroundColorAttributeName: UIColor.grayColor(), NSFontAttributeName: UIFont.systemFontOfSize(DynamicFontHelper.defaultHelper.DefaultStandardFontSize, weight: UIFontWeightRegular)])
@@ -274,8 +280,7 @@ private class SyncNowSetting: WithAccountSetting {
             return nil
         }
 
-        let label = NSLocalizedString("Last synced: %@", comment: "Last synced time label beside Sync Now setting option. Argument is the relative date string.")
-        let formattedLabel = String(format: label, NSDate.fromTimestamp(timestamp).toRelativeTimeString())
+        let formattedLabel = timestampFormatter.stringFromDate(NSDate.fromTimestamp(timestamp))
         let attributedString = NSMutableAttributedString(string: formattedLabel)
         let attributes = [NSForegroundColorAttributeName: UIColor.grayColor(), NSFontAttributeName: UIFont.systemFontOfSize(12, weight: UIFontWeightRegular)]
         let range = NSMakeRange(0, attributedString.length)
@@ -810,9 +815,14 @@ class SettingsTableViewController: UITableViewController {
 //            ] + accountDebugSettings),
             SettingSection(title: NSAttributedString(string: NSLocalizedString("General", comment: "General settings section title")), children: generalSettings)
         ]
-
-        // var privacySettings: [Setting] = [LoginsSetting(settings: self, delegate: settingsDelegate), ClearPrivateDataSetting(settings: self)]
-
+#if !BRAVE
+        var privacySettings: [Setting]
+        if AppConstants.MOZ_LOGIN_MANAGER {
+            privacySettings = [LoginsSetting(settings: self, delegate: settingsDelegate), ClearPrivateDataSetting(settings: self)]
+        } else {
+            privacySettings = [ClearPrivateDataSetting(settings: self)]
+        }
+#endif
 //        if #available(iOS 9, *) {
 //            privacySettings += [
 //                BoolSetting(prefs: prefs,
@@ -960,21 +970,28 @@ class SettingsTableViewController: UITableViewController {
         }
         return nil
     }
+#if !BRAVE
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        //make account/sign-in and close private tabs rows taller, as per design specs
+        if indexPath.section == 0 && indexPath.row == 0 {
+            return 64
+        }
 
-//    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-//        //make account/sign-in and close private tabs rows taller, as per design specs
-//        if indexPath.section == 0 && indexPath.row == 0 {
-//            return 64
-//        }
-//
-//        if #available(iOS 9, *) {
-//            if indexPath.section == 2 && indexPath.row == 1 {
-//                return 64
-//            }
-//        }
-//
-//        return 44
-//    }
+        if #available(iOS 9, *) {
+            if AppConstants.MOZ_LOGIN_MANAGER {
+                if indexPath.section == 2 && indexPath.row == 2 {
+                    return 64
+                }
+            } else {
+                if indexPath.section == 2 && indexPath.row == 1 {
+                    return 64
+                }
+            }
+        }
+
+        return 44
+    }
+#endif
 }
 
 class SettingsTableFooterView: UIView {

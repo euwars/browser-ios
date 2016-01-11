@@ -21,11 +21,13 @@ protocol BrowserHelper {
 protocol BrowserDelegate {
     func browser(browser: Browser, didAddSnackbar bar: SnackBar)
     func browser(browser: Browser, didRemoveSnackbar bar: SnackBar)
+    func browser(browser: Browser, didSelectFindInPageForSelection selection: String)
+    func browser(browser: Browser, didSelectFindInPageForSelection selection: String)
     func browser(browser: Browser, didCreateWebView webView: BraveWebView)
     func browser(browser: Browser, willDeleteWebView webView: BraveWebView)
 }
 
-class Browser: NSObject {
+class Browser: NSObject, BrowserWebViewDelegate {
     private var _isPrivate: Bool = false
     internal private(set) var isPrivate: Bool {
         get {
@@ -399,6 +401,10 @@ class Browser: NSObject {
         desktopSite = !desktopSite
         reload()
     }
+
+    private func browserWebView(browserWebView: BrowserWebView, didSelectFindInPageForSelection selection: String) {
+        browserDelegate?.browser(self, didSelectFindInPageForSelection: selection)
+    }
 }
 
 private class HelperManager: NSObject, WKScriptMessageHandler {
@@ -439,26 +445,21 @@ private class HelperManager: NSObject, WKScriptMessageHandler {
     }
 }
 
-extension WKWebView {
-    func runScriptFunction(function: String, fromScript: String, callback: (AnyObject?) -> Void) {
-        if let path = NSBundle.mainBundle().pathForResource(fromScript, ofType: "js") {
-            if let source = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String {
-                evaluateJavaScript(source, completionHandler: { (obj, err) -> Void in
-                    if let err = err {
-                        print("Error injecting \(err)")
-                        return
-                    }
+private protocol BrowserWebViewDelegate: class {
+    func browserWebView(browserWebView: BrowserWebView, didSelectFindInPageForSelection selection: String)
+}
 
-                    self.evaluateJavaScript("__firefox__.\(fromScript).\(function)", completionHandler: { (obj, err) -> Void in
-                        self.evaluateJavaScript("delete window.__firefox__.\(fromScript)", completionHandler: { (obj, err) -> Void in })
-                        if let err = err {
-                            print("Error running \(err)")
-                            return
-                        }
-                        callback(obj)
-                    })
-                })
-            }
+private class BrowserWebView: WKWebView, MenuHelperInterface {
+    private weak var delegate: BrowserWebViewDelegate?
+
+    override func canPerformAction(action: Selector, withSender sender: AnyObject?) -> Bool {
+        return action == MenuHelper.SelectorFindInPage
+    }
+
+    @objc func menuHelperFindInPage(sender: NSNotification) {
+        evaluateJavaScript("getSelection().toString()") { result, _ in
+            let selection = result as? String ?? ""
+            self.delegate?.browserWebView(self, didSelectFindInPageForSelection: selection)
         }
     }
 }

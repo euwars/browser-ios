@@ -64,6 +64,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Start the keyboard helper to monitor and cache keyboard state.
         DynamicFontHelper.defaultHelper.startObserving()
 
+        log.debug("Setting custom menu items…")
+        MenuHelper.defaultHelper.setItems()
+
         log.debug("Creating Sync log file…")
         let logDate = NSDate()
         // Create a new sync log file on cold app launch. Note that this doesn't roll old logs.
@@ -362,8 +365,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 if #available(iOS 9, *) {
                     var userData = [QuickActions.TabURLKey: alertURL]
-                    if let title = notification.userInfo?[TabSendTitleKey] as? String {
+                    if let title = notification.userInfo?[TabSendTitleKey] as? String where title.characters.count > 0 {
                         userData[QuickActions.TabTitleKey] = title
+                    } else {
+                        userData[QuickActions.TabTitleKey] = alertURL
                     }
                     QuickActions.sharedInstance.addDynamicApplicationShortcutItemOfType(.OpenLastTab, withUserData: userData, toApplication: UIApplication.sharedApplication())
                 }

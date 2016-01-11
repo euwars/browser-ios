@@ -43,7 +43,7 @@ class TopSitesPanel: UIViewController {
                     homePanelDelegate?.homePanelWillEnterEditingMode?(self)
                 }
 
-                updateRemoveButtonStates()
+                updateAllRemoveButtonStates()
             }
         }
     }
@@ -83,6 +83,7 @@ class TopSitesPanel: UIViewController {
         collection.dataSource = dataSource
         collection.registerClass(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailIdentifier)
         collection.keyboardDismissMode = .OnDrag
+        collection.accessibilityIdentifier = "Top Sites View"
         view.addSubview(collection)
         collection.snp_makeConstraints { make in
             make.edges.equalTo(self.view)
@@ -119,36 +120,38 @@ class TopSitesPanel: UIViewController {
             self.dataSource.data = data
             self.dataSource.profile = self.profile
 
-            // redraw now we've udpated our sources
+            // redraw now we've updated our sources
             self.collection?.collectionViewLayout.invalidateLayout()
             self.collection?.setNeedsLayout()
         }
     }
 
-    private func updateRemoveButtonStates() {
-        for i in 0..<layout.thumbnailCount {
-            if let cell = collection?.cellForItemAtIndexPath(NSIndexPath(forItem: i, inSection: 0)) as? ThumbnailCell {
-                //TODO: Only toggle the remove button for non-suggested tiles for now
-                if i < dataSource.data.count {
-                    cell.toggleRemoveButton(editingThumbnails)
-                } else {
-                    cell.toggleRemoveButton(false)
-                }
-            }
-        }
+    private func updateAllRemoveButtonStates() {
+        collection?.indexPathsForVisibleItems().forEach(updateRemoveButtonStateForIndexPath)
     }
 
     private func deleteHistoryTileForSite(site: Site, atIndexPath indexPath: NSIndexPath) {
-        func reloadThumbnails() {
-            self.profile.history.getTopSitesWithLimit(self.layout.thumbnailCount)
-                .uponQueue(dispatch_get_main_queue()) { result in
-                    self.deleteOrUpdateSites(result, indexPath: indexPath)
-            }
+        collection?.userInteractionEnabled = false
+
+        let newSites = profile.history.removeSiteFromTopSites(site) >>> {
+            self.profile.history.getTopSitesWithLimit(self.maxFrecencyLimit)
         }
 
-        profile.history.removeSiteFromTopSites(site)
-        >>> self.profile.history.refreshTopSitesCache
-        >>> reloadThumbnails
+        newSites.uponQueue(dispatch_get_main_queue()) { result in
+            self.deleteOrUpdateSites(result, indexPath: indexPath)
+            self.collection?.userInteractionEnabled = true
+        }
+    }
+
+    private func updateRemoveButtonStateForIndexPath(indexPath: NSIndexPath) {
+        // If we have a cell passed in, use it. If not, then use the indexPath to get it.
+        guard let cell = collection?.cellForItemAtIndexPath(indexPath) as? ThumbnailCell else {
+            return
+        }
+
+        dataSource[indexPath.row] is SuggestedSite ?
+            cell.toggleRemoveButton(false) :
+            cell.toggleRemoveButton(editingThumbnails)
     }
 
     private func refreshTopSites(frecencyLimit: Int) {
@@ -203,7 +206,7 @@ class TopSitesPanel: UIViewController {
                 self.collection?.deleteItemsAtIndexPaths([indexPath])
             }
         }, completion: { _ in
-            self.updateRemoveButtonStates()
+            self.updateAllRemoveButtonStates()
         })
     }
 
@@ -267,7 +270,6 @@ extension TopSitesPanel: UICollectionViewDelegate {
     func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
         if let thumbnailCell = cell as? ThumbnailCell {
             thumbnailCell.delegate = self
-
             if editingThumbnails && indexPath.item < dataSource.data.count && thumbnailCell.removeButton.hidden {
                 thumbnailCell.removeButton.hidden = false
             }
@@ -277,12 +279,10 @@ extension TopSitesPanel: UICollectionViewDelegate {
 
 extension TopSitesPanel: ThumbnailCellDelegate {
     func didRemoveThumbnail(thumbnailCell: ThumbnailCell) {
-        if let indexPath = collection?.indexPathForCell(thumbnailCell) {
-            if let site = dataSource[indexPath.item] {
-                self.deleteHistoryTileForSite(site, atIndexPath: indexPath)
-            }
-        }
-        
+        guard let indexPath = collection?.indexPathForCell(thumbnailCell),
+              let site = dataSource[indexPath.item] else { return }
+
+        self.deleteHistoryTileForSite(site, atIndexPath: indexPath)
     }
 
     func didLongPressThumbnail(thumbnailCell: ThumbnailCell) {
@@ -298,13 +298,21 @@ private class TopSitesCollectionView: UICollectionView {
     }
 }
 
-private class TopSitesLayout: UICollectionViewLayout {
+class TopSitesLayout: UICollectionViewLayout {
+
+    var thumbnailCount: Int {
+        assertIsMainThread("layout.thumbnailCount interacts with UIKit components - cannot call from background thread.")
+        return thumbnailRows * thumbnailCols
+    }
 
     private var thumbnailRows: Int {
+        assert(NSThread.isMainThread(), "Interacts with UIKit components - not thread-safe.")
         return max(2, Int((self.collectionView?.frame.height ?? self.thumbnailHeight) / self.thumbnailHeight))
     }
 
     private var thumbnailCols: Int {
+        assert(NSThread.isMainThread(), "Interacts with UIKit components - not thread-safe.")
+
         let size = collectionView?.bounds.size ?? CGSizeZero
         let traitCollection = collectionView!.traitCollection
         if traitCollection.horizontalSizeClass == .Compact {
@@ -332,13 +340,15 @@ private class TopSitesLayout: UICollectionViewLayout {
         }
     }
 
-    private var thumbnailCount: Int {
-        return thumbnailRows * thumbnailCols
+    private var width: CGFloat {
+        assertIsMainThread("layout.width interacts with UIKit components - cannot call from background thread.")
+        return self.collectionView?.frame.width ?? 0
     }
-    private var width: CGFloat { return self.collectionView?.frame.width ?? 0 }
 
     // The width and height of the thumbnail here are the width and height of the tile itself, not the image inside the tile.
     private var thumbnailWidth: CGFloat {
+        assertIsMainThread("layout.thumbnailWidth interacts with UIKit components - cannot call from background thread.")
+
         let size = collectionView?.bounds.size ?? CGSizeZero
         let insets = ThumbnailCellUX.insetsForCollectionViewSize(size,
             traitCollection:  collectionView!.traitCollection)
@@ -348,6 +358,8 @@ private class TopSitesLayout: UICollectionViewLayout {
     // The tile's height is determined the aspect ratio of the thumbnails width. We also take into account
     // some padding between the title and the image.
     private var thumbnailHeight: CGFloat {
+        assertIsMainThread("layout.thumbnailHeight interacts with UIKit components - cannot call from background thread.")
+
         return floor(thumbnailWidth / CGFloat(ThumbnailCellUX.ImageAspectRatio))
     }
 
@@ -387,7 +399,7 @@ private class TopSitesLayout: UICollectionViewLayout {
 
     private var layoutAttributes:[UICollectionViewLayoutAttributes]?
 
-    private override func prepareLayout() {
+    override func prepareLayout() {
         var layoutAttributes = [UICollectionViewLayoutAttributes]()
         for section in 0..<(self.collectionView?.numberOfSections() ?? 0) {
             for item in 0..<(self.collectionView?.numberOfItemsInSection(section) ?? 0) {
