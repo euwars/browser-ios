@@ -22,7 +22,6 @@ protocol BrowserDelegate {
     func browser(browser: Browser, didAddSnackbar bar: SnackBar)
     func browser(browser: Browser, didRemoveSnackbar bar: SnackBar)
     func browser(browser: Browser, didSelectFindInPageForSelection selection: String)
-    func browser(browser: Browser, didSelectFindInPageForSelection selection: String)
     func browser(browser: Browser, didCreateWebView webView: BraveWebView)
     func browser(browser: Browser, willDeleteWebView webView: BraveWebView)
 }
