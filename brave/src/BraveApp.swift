@@ -169,4 +169,11 @@ class BraveApp {
     static func showErrorAlert(title title: String,  error: String) {
         UIAlertView(title: title, message: error, delegate: nil, cancelButtonTitle: "Close").show()
     }
+
+    static func statusBarHeight() -> CGFloat {
+        if UIScreen.mainScreen().traitCollection.verticalSizeClass == .Compact {
+            return 0
+        }
+        return 20
+    }
 }

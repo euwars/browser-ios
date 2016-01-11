@@ -94,24 +94,30 @@ class BraveScrollController: NSObject {
     }
 
     func pageUnload() {
-        #if CONTENT_INSET_SCROLLING
-            layoutWebViewPinnedToWindowExtents()
-            setInset(UIConstants.ToolbarHeight)
-        #endif
         delay(0.1) {
             self.showToolbars(animated: true)
         }
     }
 
+    func checkHeightOfPageAndAdjustWebViewInsents() {
+        if !isScrollHeightIsLargeEnoughForScrolling() {
+            if (scrollView?.contentInset.bottom == 0) {
+                scrollView?.contentInset = UIEdgeInsetsMake(0, 0, UIConstants.ToolbarHeight * 2, 0)
+            }
+        } else {
+            if (scrollView?.contentInset.bottom != 0) {
+                scrollView?.contentInset = UIEdgeInsetsZero
+            }
+        }
+    }
+
     func showToolbars(animated animated: Bool, completion: ((finished: Bool) -> Void)? = nil) {
-        if verticalTranslation == 0 && headerTopOffset == 0 && !self.isLayoutPinnedToWindowExtents() {
+        checkHeightOfPageAndAdjustWebViewInsents()
+
+        if verticalTranslation == 0 && headerTopOffset == 0 {
             completion?(finished: true)
             return
         }
-
-        #if !CONTENT_INSET_SCROLLING
-            layoutWebViewPinnedToHeaderFooter(triggerRedrawWithLayoutIfNeeded: false)
-        #endif
 
         let durationRatio = abs(headerTopOffset / headerFrame.height)
         let actualDuration = NSTimeInterval(ToolbarBaseAnimationDuration * durationRatio)
@@ -126,7 +132,8 @@ class BraveScrollController: NSObject {
 
     override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
         if keyPath == "contentSize" {
-            if !checkScrollHeightIsLargeEnoughForScrolling() && !toolbarsShowing {
+            checkHeightOfPageAndAdjustWebViewInsents()
+            if !isScrollHeightIsLargeEnoughForScrolling() && !toolbarsShowing {
                 showToolbars(animated: true, completion: nil)
             }
         }
@@ -159,7 +166,7 @@ private extension BraveScrollController {
         }
 
         lastContentOffset = translation.y
-        if checkScrollHeightIsLargeEnoughForScrolling() {
+        if isScrollHeightIsLargeEnoughForScrolling() {
             scrollWithDelta(delta)
         }
 
@@ -167,16 +174,6 @@ private extension BraveScrollController {
             lastContentOffset = 0
         }
     }
-
-    #if CONTENT_INSET_SCROLLING
-    func setInset(inset: CGFloat) {
-    scrollView?.contentInset = UIEdgeInsetsMake(inset, 0, inset, 0)
-    }
-
-    func getInset() -> CGFloat {
-    return scrollView?.contentInset.top ?? 0
-    }
-    #endif
 
     func scrollWithDelta(delta: CGFloat) {
         if scrollViewHeight >= contentSize.height {
@@ -191,30 +188,17 @@ private extension BraveScrollController {
             return
         }
 
-        #if !CONTENT_INSET_SCROLLING
-            if headerTopOffset != 0 && headerTopOffset != -UIConstants.ToolbarHeight {
-                assert(verticalTranslation == 0)
-                return
-            }
-        #endif
-
         let updatedOffset = toolbarsShowing ? clamp(verticalTranslation - delta, min: -UIConstants.ToolbarHeight, max: 0) :
             clamp(verticalTranslation - delta, min: 0, max: UIConstants.ToolbarHeight)
 
-        #if CONTENT_INSET_SCROLLING
-            if verticalTranslation == updatedOffset {
-                return
-            }
-        #endif
-
         verticalTranslation = updatedOffset
 
-        #if CONTENT_INSET_SCROLLING
-            setInset(UIConstants.ToolbarHeight + updatedOffset)
-        #endif
-
         header?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, verticalTranslation))
-        footer?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, -verticalTranslation));
+        footer?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, -verticalTranslation))
+
+        let webViewVertTranslation = toolbarsShowing ? verticalTranslation : verticalTranslation - UIConstants.ToolbarHeight
+        let webView = getApp().browserViewController.webViewContainer
+        webView.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, webViewVertTranslation))
 
         var alpha = 1 - abs(verticalTranslation / UIConstants.ToolbarHeight)
         if (!toolbarsShowing) {
@@ -249,7 +233,6 @@ private extension BraveScrollController {
 
             let requiredOffsetForHide = self.contentOffset.y - UIConstants.ToolbarHeight
             if !isShow{
-                self.layoutWebViewPinnedToWindowExtents()
                 scrollView?.contentOffset.y = requiredOffsetForHide
             }
 
@@ -268,59 +251,7 @@ private extension BraveScrollController {
             }
     }
 
-    // TODO track the constraint
-    func isLayoutPinnedToWindowExtents() -> Bool {
-        guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return false }
-        let view = app.browserViewController.webViewContainer
-        let constraints = view.constraintsAffectingLayoutForAxis(.Vertical)
-        for (_, value) in constraints.enumerate() {
-            if value.firstItem as? UIView == view {
-                if value.secondItem as? UIView == app.browserViewController.statusBarOverlay {
-                    return true // is already set
-                }
-            }
-        }
-        return false
-    }
-
-    #if !CONTENT_INSET_SCROLLING
-    func layoutWebViewPinnedToHeaderFooter(triggerRedrawWithLayoutIfNeeded triggerRedrawWithLayoutIfNeeded: Bool) {
-        if !isLayoutPinnedToWindowExtents() {
-            return
-        }
-
-        guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return }
-        app.browserViewController.webViewContainer.snp_remakeConstraints {
-            make in
-            make.left.right.equalTo(app.browserViewController.view)
-            make.top.equalTo(app.browserViewController.header.snp_bottom)
-            make.bottom.equalTo(app.browserViewController.footer.snp_top)
-        }
-
-        if triggerRedrawWithLayoutIfNeeded {
-            app.browserViewController.webViewContainer.layoutIfNeeded()
-        }
-        self.scrollView?.contentOffset.y += UIConstants.ToolbarHeight
-    }
-    #endif
-
-    func layoutWebViewPinnedToWindowExtents() {
-        if isLayoutPinnedToWindowExtents() {
-            return
-        }
-
-        guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return }
-        app.browserViewController.webViewContainer.snp_remakeConstraints {
-            make in
-            make.left.right.bottom.equalTo(app.browserViewController.view)
-            make.top.equalTo(app.browserViewController.statusBarOverlay.snp_bottom)
-        }
-        #if !CONTENT_INSET_SCROLLING
-            self.scrollView?.contentOffset.y -= UIConstants.ToolbarHeight
-        #endif
-    }
-
-    func checkScrollHeightIsLargeEnoughForScrolling() -> Bool {
+    func isScrollHeightIsLargeEnoughForScrolling() -> Bool {
         return (UIScreen.mainScreen().bounds.size.height + 2 * UIConstants.ToolbarHeight) < scrollView?.contentSize.height
     }
 }
@@ -352,7 +283,7 @@ extension BraveScrollController: UIScrollViewDelegate {
     func scrollViewDidScroll(scrollView: UIScrollView) {
         guard let webView = browser?.webView else { return }
         let position = -webView.convertPoint(webView.frame.origin, fromView: nil).y
-        if contentOffset.y < 0 && !isInRefreshQuietPeriod && !isRefreshBlockedDueToMomentumScroll && !isLayoutPinnedToWindowExtents() {
+        if contentOffset.y < 0 && !isInRefreshQuietPeriod && !isRefreshBlockedDueToMomentumScroll && verticalTranslation == 0 && toolbarsShowing {
             if refreshControl == nil {
                 refreshControl = ODRefreshControl(inScrollView: getApp().rootViewController.view)
                 refreshControl?.backgroundColor = UIColor.blackColor()
@@ -392,7 +323,6 @@ extension BraveScrollController: UIScrollViewDelegate {
         }
     }
 
-    #if !CONTENT_INSET_SCROLLING
     func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if browserIsLoading() {
             return
@@ -405,16 +335,6 @@ extension BraveScrollController: UIScrollViewDelegate {
         }
     }
 
-
-    func scrollViewWillEndDragging(scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        if contentOffset.y < 0 && verticalTranslation > UIConstants.ToolbarHeight / 2.0 && headerTopOffset != 0  {
-            // user has scrolled past top (rubberbanding area) and toolbar needs to show. Hack the scrollview to not bounce back
-            let offsetY = scrollView.contentOffset.y
-            scrollView.contentInset = UIEdgeInsetsMake(44, 0, 0, 0)
-            scrollView.setContentOffset(CGPoint(x: 0, y: offsetY), animated: false)
-        }
-    }
-    
     func removeTranslationAndSetLayout() {
         if verticalTranslation == 0 {
             return
@@ -423,12 +343,10 @@ extension BraveScrollController: UIScrollViewDelegate {
         if verticalTranslation < 0 && headerTopOffset == 0 {
             headerTopOffset = -UIConstants.ToolbarHeight
             footerBottomOffset = UIConstants.ToolbarHeight
-            layoutWebViewPinnedToWindowExtents()
             urlBar?.updateAlphaForSubviews(0)
         } else if verticalTranslation > UIConstants.ToolbarHeight / 2.0 && headerTopOffset != 0 {
             headerTopOffset = 0
             footerBottomOffset = 0
-            layoutWebViewPinnedToHeaderFooter(triggerRedrawWithLayoutIfNeeded: true)
             urlBar?.updateAlphaForSubviews(1.0)
         }
         
@@ -444,15 +362,9 @@ extension BraveScrollController: UIScrollViewDelegate {
     
     func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         self.removeTranslationAndSetLayout()
-        guard let app = UIApplication.sharedApplication().delegate as? AppDelegate else { return }
-        app.browserViewController.webViewContainer.layoutIfNeeded()
-        if scrollView.contentInset != UIEdgeInsetsZero {
-            scrollView.contentOffset.y = 0
-            scrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
-        }
         isRefreshBlockedDueToMomentumScroll = false
     }
-    #endif
+
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
         showToolbars(animated: true)
         return true
