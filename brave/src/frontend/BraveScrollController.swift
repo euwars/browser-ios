@@ -345,13 +345,14 @@ func blockOtherGestures(isBlocked: Bool, views: [UIView]) {
 var refreshControl:ODRefreshControl?
 // stop refresh interaction while animating
 var isInRefreshQuietPeriod:Bool = false
-
+// only allow refresh when scrolling with finger down, not from a momentum scrll
+var isRefreshBlockedDueToMomentumScroll = false
 
 extension BraveScrollController: UIScrollViewDelegate {
     func scrollViewDidScroll(scrollView: UIScrollView) {
         guard let webView = browser?.webView else { return }
         let position = -webView.convertPoint(webView.frame.origin, fromView: nil).y
-        if contentOffset.y < 0 && !isInRefreshQuietPeriod && !isLayoutPinnedToWindowExtents() {
+        if contentOffset.y < 0 && !isInRefreshQuietPeriod && !isRefreshBlockedDueToMomentumScroll && !isLayoutPinnedToWindowExtents() {
             if refreshControl == nil {
                 refreshControl = ODRefreshControl(inScrollView: getApp().rootViewController.view)
                 refreshControl?.backgroundColor = UIColor.blackColor()
@@ -399,6 +400,8 @@ extension BraveScrollController: UIScrollViewDelegate {
 
         if (!decelerate) {
             removeTranslationAndSetLayout()
+        } else {
+            isRefreshBlockedDueToMomentumScroll = true
         }
     }
 
@@ -447,6 +450,7 @@ extension BraveScrollController: UIScrollViewDelegate {
             scrollView.contentOffset.y = 0
             scrollView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0)
         }
+        isRefreshBlockedDueToMomentumScroll = false
     }
     #endif
     func scrollViewShouldScrollToTop(scrollView: UIScrollView) -> Bool {
