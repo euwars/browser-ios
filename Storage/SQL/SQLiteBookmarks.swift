@@ -182,13 +182,16 @@ public class SQLiteBookmarks: BookmarksModelFactory {
         return db.withReadableConnection(&err) { (conn, err) -> Cursor<BookmarkNode> in
             let inner = "SELECT id, type, guid, url, title, faviconID FROM \(TableBookmarks) WHERE \(whereClause)"
 
-            let sql: String
+            var sql: String
             if includeIcon {
                 sql =
                 "SELECT bookmarks.id AS id, bookmarks.type AS type, guid, bookmarks.url AS url, title, " +
                 "favicons.url AS iconURL, favicons.date AS iconDate, favicons.type AS iconType " +
                 "FROM (\(inner)) AS bookmarks " +
-                "LEFT OUTER JOIN favicons ON bookmarks.faviconID = favicons.id"
+                "LEFT OUTER JOIN favicons ON bookmarks.faviconID = favicons.id "
+#if BRAVE
+                sql += " ORDER BY id DESC"
+#endif
             } else {
                 sql = inner
             }
