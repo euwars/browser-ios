@@ -137,7 +137,7 @@ class BraveWebView: UIWebView {
         LegacyUserContentController.injectJsIntoAllFrames(self, script: "document.body.style.webkitTouchCallout='none'")
 
         #if !TEST
-            replaceImagesUsingTheVault(self)
+            replaceAdImages(self)
         #endif
     }
 
