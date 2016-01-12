@@ -53,3 +53,9 @@ None of these are comparable to Safari iOS's JS engine, which is highly up-to-da
 
 ```brave/build-system/build-archive.sh``` does everything. When that completes, the Fabric app detects a new archive and asks to distribute to testers.
 
+## Misc Tips
+
+Go to the Brave app folder for the most recently run simulator:
+```
+cd ~/Library/Developer/CoreSimulator/Devices && cd `ls -t | head -1` && cd data/Containers/Data/Application && cd `find . -iname "*brave*" | head -1 | xargs -I{} dirname {}`
+```
