@@ -94,12 +94,16 @@ class BrowserViewController: UIViewController {
         return toolbar ?? urlBar
     }
 
+    static var instanceAsserter = 0 // Brave: it is easy to get confused as to which fx classes are effectively singletons
+
     init(profile: Profile, tabManager: TabManager) {
         self.profile = profile
         self.tabManager = tabManager
         self.readerModeCache = DiskReaderModeCache.sharedInstance
         super.init(nibName: nil, bundle: nil)
         didInit()
+
+        assert(++BrowserViewController.instanceAsserter == 1)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -1707,10 +1711,9 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     func updateTabCountUsingTabManager(tabManager: TabManager, animated: Bool = true) {
-        if let selectedTab = tabManager.selectedTab {
-            let count = selectedTab.isPrivate ? tabManager.privateTabs.count : tabManager.normalTabs.count
-            urlBar.updateTabCount(max(count, 1), animated: animated)
-        }
+        let isPrivate = tabManager.selectedTab?.isPrivate ?? false
+        let count = isPrivate ? tabManager.privateTabs.count : tabManager.normalTabs.count
+        urlBar.updateTabCount(max(count, 1), animated: animated)
     }
 }
 
