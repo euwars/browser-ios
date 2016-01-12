@@ -220,7 +220,9 @@ public class SQLiteBookmarks: BookmarksModelFactory {
 
         // We add some suggested sites to the mobile bookmarks folder only.
         if guid == BookmarkRoots.MobileFolderGUID {
+            #if !BRAVE
             return BookmarkFolderWithDefaults(folder: folder, sites: SuggestedSites)
+            #endif
         }
 
         return folder
