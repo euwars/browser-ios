@@ -289,13 +289,22 @@ class TabManager : NSObject {
         }
 
         let prevCount = count
+        var removedIndex = -1
         for i in 0..<count {
             if tabs[i] === tab {
                 tabs.removeAtIndex(i)
+                removedIndex = i
                 break
             }
         }
         assert(count == prevCount - 1, "Tab removed")
+
+
+        #if BRAVE
+            if removedIndex < _selectedIndex {
+                _selectedIndex--
+            }
+        #endif
 
         if tab != selectedTab {
             _selectedIndex = selectedTab == nil ? -1 : tabs.indexOf(selectedTab!) ?? 0
