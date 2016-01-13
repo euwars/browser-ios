@@ -26,7 +26,7 @@ extension UIImage{
     }
 }
 
-class BraveBrowserToolbar : BrowserToolbar {
+class BraveBrowserBottomToolbar : BrowserToolbar {
     static var tabsCount = 0
 
     lazy var tabsButton: TabsButton = {
@@ -61,7 +61,7 @@ class BraveBrowserToolbar : BrowserToolbar {
     private weak var clonedTabsButton: TabsButton?
     var tabsContainer = UIView()
 
-    private static weak var currentInstance: BraveBrowserToolbar?
+    private static weak var currentInstance: BraveBrowserBottomToolbar?
 
     let backForwardUnderlay = UIImageView(image: UIImage(named: "backForwardUnderlay"))
 
@@ -69,7 +69,7 @@ class BraveBrowserToolbar : BrowserToolbar {
         //leftSidePanelButton = UIButton()
         super.init(frame: frame)
 
-        BraveBrowserToolbar.currentInstance = self
+        BraveBrowserBottomToolbar.currentInstance = self
 
         bookmarkButton.hidden = true
         stopReloadButton.hidden = true
@@ -98,7 +98,7 @@ class BraveBrowserToolbar : BrowserToolbar {
     }
 
     class func updateTabCountDuplicatedButton(count: Int, animated: Bool) {
-        guard let instance = BraveBrowserToolbar.currentInstance else { return }
+        guard let instance = BraveBrowserBottomToolbar.currentInstance else { return }
         tabsCount = count
         URLBarView.updateTabCount(instance.tabsButton,
             clonedTabsButton: &instance.clonedTabsButton, count: count, animated: animated)

@@ -56,7 +56,7 @@ class BraveURLBarView : URLBarView {
 
     override func updateTabCount(count: Int, animated: Bool = true) {
         super.updateTabCount(count, animated: false)
-        BraveBrowserToolbar.updateTabCountDuplicatedButton(count, animated: animated)
+        BraveBrowserBottomToolbar.updateTabCountDuplicatedButton(count, animated: animated)
     }
 
     class func tabButtonPressed() {

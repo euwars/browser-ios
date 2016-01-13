@@ -170,7 +170,7 @@ class BrowserViewController: UIViewController {
         toolbar = nil
 
         if showToolbar {
-            toolbar = BraveBrowserToolbar()
+            toolbar = BraveBrowserBottomToolbar()
             toolbar?.browserToolbarDelegate = self
             footerBackground = BlurWrapper(view: toolbar!)
             footerBackground?.translatesAutoresizingMaskIntoConstraints = false
