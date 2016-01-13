@@ -91,6 +91,11 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
         if let img = backButton.imageView?.image {
             backButton.setImage(img.alpha(BraveUX.BackForwardDisabledButtonAlpha), forState: .Disabled)
         }
+
+        var theme = Theme()
+        theme.buttonTintColor = BraveUX.ActionButtonTintColor
+        theme.backgroundColor = UIColor.clearColor()
+        BrowserToolbar.Themes[Theme.NormalMode] = theme
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -116,11 +121,7 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
 
     // TODO find a way to do this properly with themes.
     func styleHacks() {
-        backgroundColor = UIColor.clearColor()
         tabsButton.labelBackground.backgroundColor = BraveUX.ActionButtonTintColor
-        shareButton.tintColor = BraveUX.ActionButtonTintColor
-        backButton.tintColor = BraveUX.ActionButtonTintColor
-        forwardButton.tintColor = BraveUX.ActionButtonTintColor
     }
 
     override func updateConstraints() {

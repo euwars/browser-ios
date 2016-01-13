@@ -50,7 +50,7 @@ public class BrowserToolbarHelper: NSObject {
     let ImageStop = UIImage(named: "stop")
     let ImageStopPressed = UIImage(named: "stopPressed")
 
-    var buttonTintColor = UIColor.darkGrayColor() {
+    var buttonTintColor = BraveUX.ActionButtonTintColor { // TODO see if setting it here can be avoided
         didSet {
             setTintColor(buttonTintColor, forButtons: toolbar.actionButtons)
         }
@@ -183,7 +183,7 @@ class BrowserToolbar: Toolbar, BrowserToolbarProtocol {
 
     var helper: BrowserToolbarHelper?
 
-    static let Themes: [String: Theme] = {
+    static var Themes: [String: Theme] = {
         var themes = [String: Theme]()
         var theme = Theme()
         theme.buttonTintColor = UIConstants.PrivateModeActionButtonTintColor
