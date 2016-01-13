@@ -115,6 +115,10 @@ class BraveURLBarView : URLBarView {
     }
 
     override func leaveOverlayMode(didCancel cancel: Bool) {
+        if !inOverlayMode {
+            return
+        }
+
         super.leaveOverlayMode(didCancel: cancel)
         locationView.backgroundColor = BraveUX.LocationBarNormalModeBackgroundColor_NonPrivateMode
 
@@ -136,15 +140,28 @@ class BraveURLBarView : URLBarView {
         bookmarkButton.snp_removeConstraints()
         curveShape.snp_removeConstraints()
 
-        if !inOverlayMode {
+        if inOverlayMode {
+            // In overlay mode, we always show the location view full width
+            self.locationContainer.snp_remakeConstraints { make in
+                make.left.equalTo(self.leftSidePanelButton.snp_right)//.offset(URLBarViewUX.LocationLeftPadding)
+                make.right.equalTo(self.cancelButton.snp_left)
+                make.height.equalTo(URLBarViewUX.LocationHeight)
+                make.centerY.equalTo(self)
+            }
+            leftSidePanelButton.snp_remakeConstraints { make in
+                make.left.equalTo(self)
+                make.centerY.equalTo(self)
+                make.size.lessThanOrEqualTo(UIConstants.ToolbarHeight)
+            }
+        } else {
             self.locationContainer.snp_remakeConstraints { make in
                 if self.toolbarIsShowing {
                     // Firefox is not referring to the bottom toolbar, it is asking is this class showing more tool buttons
                     make.leading.equalTo(self.leftSidePanelButton.snp_trailing)
                     make.trailing.equalTo(self.shareButton.snp_leading)
                 } else {
-                    make.leading.equalTo(self.leftSidePanelButton.snp_trailing)
-                    make.trailing.equalTo(self).offset(-5)
+                    make.left.equalTo(self.leftSidePanelButton.snp_right)
+                    make.right.equalTo(self).offset(-5)
                 }
 
                 make.height.equalTo(URLBarViewUX.LocationHeight)

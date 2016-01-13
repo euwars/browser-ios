@@ -304,6 +304,7 @@ class URLBarView: UIView {
     override func updateConstraints() {
         super.updateConstraints()
         if inOverlayMode {
+            #if !BRAVE
             // In overlay mode, we always show the location view full width
             self.locationContainer.snp_remakeConstraints { make in
                 make.leading.equalTo(self).offset(URLBarViewUX.LocationLeftPadding)
@@ -311,6 +312,7 @@ class URLBarView: UIView {
                 make.height.equalTo(URLBarViewUX.LocationHeight)
                 make.centerY.equalTo(self)
             }
+            #endif
         } else {
             self.locationContainer.snp_remakeConstraints { make in
                 if self.toolbarIsShowing {
