@@ -66,7 +66,7 @@ class BraveBrowserBottomToolbar : BrowserToolbar {
     let backForwardUnderlay = UIImageView(image: UIImage(named: "backForwardUnderlay"))
 
     override init(frame: CGRect) {
-        //leftSidePanelButton = UIButton()
+
         super.init(frame: frame)
 
         BraveBrowserBottomToolbar.currentInstance = self

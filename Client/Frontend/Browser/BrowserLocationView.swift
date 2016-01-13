@@ -137,7 +137,8 @@ class BrowserLocationView: UIView {
         return readerModeButton
     }()
 
-    var progressView: UIView = UIView(frame: CGRectMake(0, 0, 0, CGFloat(URLBarViewUX.LocationHeight - 1)))
+    // Prefixing with brave to distinguish from progress view that firefox has (which we hide)
+    var braveProgressView: UIView = UIView(frame: CGRectMake(0, 0, 0, CGFloat(URLBarViewUX.LocationHeight - 1)))
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -159,12 +160,12 @@ class BrowserLocationView: UIView {
             make.width.equalTo(self.readerModeButton.intrinsicContentSize().width + CGFloat(BrowserLocationViewUX.LocationContentInset * 2))
         }
 
-        progressView.accessibilityLabel = "progressView"
-        progressView.backgroundColor = BraveUX.ProgressBarColor
-        progressView.layer.cornerRadius = CGFloat(BraveUX.TextFieldCornerRadius)
-        progressView.layer.masksToBounds = true
-        self.addSubview(progressView)
-        self.sendSubviewToBack(progressView)
+        braveProgressView.accessibilityLabel = "braveProgressView"
+        braveProgressView.backgroundColor = BraveUX.ProgressBarColor
+        braveProgressView.layer.cornerRadius = CGFloat(BraveUX.TextFieldCornerRadius)
+        braveProgressView.layer.masksToBounds = true
+        self.addSubview(braveProgressView)
+        self.sendSubviewToBack(braveProgressView)
     }
 
     override var accessibilityElements: [AnyObject]! {

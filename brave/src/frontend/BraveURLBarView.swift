@@ -68,7 +68,7 @@ class BraveURLBarView : URLBarView {
         get {
             if inOverlayMode {
                 guard let locationTextField = locationTextField else { return nil }
-                return [locationTextField, cancelButton]
+                return [leftSidePanelButton, locationTextField, cancelButton]
             } else {
                 if toolbarIsShowing {
                     return [backButton, forwardButton, leftSidePanelButton, locationView, shareButton, tabsButton]
@@ -84,7 +84,7 @@ class BraveURLBarView : URLBarView {
 
     override func updateViewsForOverlayModeAndToolbarChanges() {
         super.updateViewsForOverlayModeAndToolbarChanges()
-        self.leftSidePanelButton.hidden = inOverlayMode
+        //self. leftSidePanelButton .hidden = false
         if !self.toolbarIsShowing {
             self.tabsButton.hidden = true
         } else {
@@ -100,12 +100,12 @@ class BraveURLBarView : URLBarView {
     override func prepareOverlayAnimation() {
         super.prepareOverlayAnimation()
         progressBar.hidden = true
-        self.leftSidePanelButton.hidden = !self.toolbarIsShowing
+        //self.leftSidePanelButton.hidden = !self.toolbarIsShowing
         bookmarkButton.hidden = true
     }
 
     override func transitionToOverlay(didCancel: Bool = false) {
-        self.leftSidePanelButton.alpha = inOverlayMode ? 0 : 1
+        //self.leftSidePanelButton.alpha = inOverlayMode ? 0 : 1
         super.transitionToOverlay(didCancel)
         bookmarkButton.hidden = true
 
@@ -127,7 +127,7 @@ class BraveURLBarView : URLBarView {
         bookmarkButton.hidden = true
 
         // In edit mode you can see bits of the locationView underneath at the left edge
-        locationView.progressView.hidden = inOverlayMode
+        locationView.braveProgressView.hidden = inOverlayMode
 
         // TODO : remove this entirely
         progressBar.hidden = true
@@ -175,9 +175,6 @@ class BraveURLBarView : URLBarView {
                 }
             }
         }
-        //  leftSidePanelButton.contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10)
-        //stopReloadButton.contentEdgeInsets =  UIEdgeInsetsMake(0, 10, 0, 10)
-
     }
 
     override func setupConstraints() {
@@ -207,9 +204,9 @@ class BraveURLBarView : URLBarView {
         let minProgress = locationView.frame.width / 3.0
 
         func setWidth(width: CGFloat) {
-            var frame = locationView.progressView.frame
+            var frame = locationView.braveProgressView.frame
             frame.size.width = width
-            locationView.progressView.frame = frame
+            locationView.braveProgressView.frame = frame
         }
         
         if progress == 1.0 {
@@ -222,18 +219,18 @@ class BraveURLBarView : URLBarView {
                 setWidth(self.locationView.frame.width)
                 }, completion: { _ in
                     UIView.animateWithDuration(0.5, animations: {
-                        self.locationView.progressView.alpha = 0.0
+                        self.locationView.braveProgressView.alpha = 0.0
                         }, completion: { _ in
                             self.progressIsCompleting = false
                             setWidth(0)
                     })
             })
         } else {
-            self.locationView.progressView.alpha = 1.0
+            self.locationView.braveProgressView.alpha = 1.0
             progressIsCompleting = false
             let w = minProgress + CGFloat(progress) * (self.locationView.frame.width - minProgress)
             
-            if w > locationView.progressView.frame.size.width {
+            if w > locationView.braveProgressView.frame.size.width {
                 UIView.animateWithDuration(0.5, animations: {
                     setWidth(w)
                     }, completion: { _ in
