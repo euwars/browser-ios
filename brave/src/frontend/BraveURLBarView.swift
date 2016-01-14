@@ -100,7 +100,6 @@ class BraveURLBarView : URLBarView {
     override func prepareOverlayAnimation() {
         super.prepareOverlayAnimation()
         progressBar.hidden = true
-        //self.leftSidePanelButton.hidden = !self.toolbarIsShowing
         bookmarkButton.hidden = true
     }
 
@@ -175,18 +174,6 @@ class BraveURLBarView : URLBarView {
                     make.size.equalTo(UIConstants.ToolbarHeight)
                 } else {
                     make.left.equalTo(self)
-                    make.centerY.equalTo(self)
-                    make.size.lessThanOrEqualTo(UIConstants.ToolbarHeight)
-                }
-            }
-
-            stopReloadButton.snp_remakeConstraints { make in
-                if self.toolbarIsShowing {
-                    make.right.equalTo(self.shareButton.snp_left)
-                    make.centerY.equalTo(self)
-                    make.size.equalTo(UIConstants.ToolbarHeight)
-                } else {
-                    make.right.equalTo(self)
                     make.centerY.equalTo(self)
                     make.size.lessThanOrEqualTo(UIConstants.ToolbarHeight)
                 }
