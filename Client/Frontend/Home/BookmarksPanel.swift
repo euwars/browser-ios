@@ -228,15 +228,15 @@ class BookmarksPanel: SiteTableViewController, HomePanel {
         if source == nil {
             return .None
         }
-        #if !BRAVE
+#if BRAVE
+        return.Delete
+#else
         if source!.current.itemIsEditableAtIndex(indexPath.row) ?? false {
             return .Delete
         }
-        #else
-            return.Delete
-        #endif
 
         return .None
+#endif
     }
 
     func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {

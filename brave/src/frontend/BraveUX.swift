@@ -15,6 +15,8 @@ struct BraveUX {
 
     static let PrefKeyIsToolbarHidingEnabled = "PrefKeyIsToolbarHidingEnabled"
 
+    static let BackgroundColorForBookmarksHistoryAndTopSites = UIColor(white: 242/255.0, alpha: 1.0)
+
     // debug settings
     //  static var IsToolbarHidingOff = false
     //  static var IsOverrideScrollingSpeedAndMakeSlower = false // overrides IsHighLoadAnimationAllowed effect

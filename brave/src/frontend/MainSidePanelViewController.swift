@@ -196,7 +196,7 @@ class MainSidePanelViewController : UIViewController {
     private func show(showing: Bool) {
         if (showing) {
             view.hidden = false
-            bookmarks.tableView.backgroundColor = UIColor(white: 242/255.0, alpha: 1.0)
+            bookmarks.tableView.backgroundColor = BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
             history.tableView.backgroundColor = bookmarks.tableView.backgroundColor
             setupConstraints()
         }

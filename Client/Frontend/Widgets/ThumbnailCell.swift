@@ -13,8 +13,10 @@ struct ThumbnailCellUX {
     static let LabelColor = UIAccessibilityDarkerSystemColorsEnabled() ? UIColor.blackColor() : UIColor(rgb: 0x353535)
     static let LabelBackgroundColor = UIColor(white: 1.0, alpha: 0.5)
     static let LabelAlignment: NSTextAlignment = .Center
-    static let InsetSize: CGFloat = 20
-    static let InsetSizeCompact: CGFloat = 6
+#if BRAVE
+    static let InsetSize: CGFloat = 10
+    static let InsetSizeCompact: CGFloat = 3
+#endif
     static func insetsForCollectionViewSize(size: CGSize, traitCollection: UITraitCollection) -> UIEdgeInsets {
         let largeInsets = UIEdgeInsets(
                 top: ThumbnailCellUX.InsetSize,
@@ -35,9 +37,10 @@ struct ThumbnailCellUX {
             return largeInsets
         }
     }
-
-    static let ImagePaddingWide: CGFloat = 20
-    static let ImagePaddingCompact: CGFloat = 10
+#if BRAVE
+    static let ImagePaddingWide: CGFloat = 4
+    static let ImagePaddingCompact: CGFloat = 2
+#endif
     static func imageInsetsForCollectionViewSize(size: CGSize, traitCollection: UITraitCollection) -> UIEdgeInsets {
         let largeInsets = UIEdgeInsets(
                 top: ThumbnailCellUX.ImagePaddingWide,
@@ -55,7 +58,7 @@ struct ThumbnailCellUX {
         if traitCollection.horizontalSizeClass == .Compact {
             return smallInsets
         } else {
-            return largeInsets
+            return largeInsets // reminder: iphone landscape uses this
         }
     }
 
@@ -124,6 +127,9 @@ class ThumbnailCell: UICollectionViewCell {
     lazy var textWrapper: UIView = {
         let wrapper = UIView()
         wrapper.backgroundColor = ThumbnailCellUX.LabelBackgroundColor
+#if BRAVE
+        wrapper.backgroundColor = UIColor.clearColor()
+#endif
         return wrapper
     }()
 
@@ -148,10 +154,12 @@ class ThumbnailCell: UICollectionViewCell {
 
     lazy var imageWrapper: UIView = {
         let imageWrapper = UIView()
+    #if !BRAVE
         imageWrapper.layer.borderColor = ThumbnailCellUX.BorderColor.CGColor
         imageWrapper.layer.borderWidth = ThumbnailCellUX.BorderWidth
         imageWrapper.layer.cornerRadius = ThumbnailCellUX.CornerRadius
         imageWrapper.clipsToBounds = true
+    #endif
         return imageWrapper
     }()
 
@@ -182,10 +190,12 @@ class ThumbnailCell: UICollectionViewCell {
         addGestureRecognizer(longPressGesture)
 
         contentView.addSubview(imageWrapper)
+#if !BRAVE
         imageWrapper.addSubview(backgroundImage)
         backgroundImage.snp_remakeConstraints { make in
             make.top.bottom.left.right.equalTo(self.imageWrapper)
         }
+#endif
         imageWrapper.addSubview(imageView)
         imageWrapper.addSubview(textWrapper)
         textWrapper.addSubview(textLabel)

@@ -78,7 +78,7 @@ class TopSitesPanel: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let collection = TopSitesCollectionView(frame: self.view.frame, collectionViewLayout: layout)
-        collection.backgroundColor = UIConstants.PanelBackgroundColor
+        collection.backgroundColor = BraveUX.BackgroundColorForBookmarksHistoryAndTopSites
         collection.delegate = self
         collection.dataSource = dataSource
         collection.registerClass(ThumbnailCell.self, forCellWithReuseIdentifier: ThumbnailIdentifier)
