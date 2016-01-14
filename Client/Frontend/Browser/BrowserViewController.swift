@@ -984,6 +984,7 @@ class BrowserViewController: UIViewController {
         }
         activities.append(findInPageActivity)
 
+        #if !BRAVE
         if #available(iOS 9.0, *) {
             if let tab = tab where (tab.getHelper(name: ReaderMode.name()) as? ReaderMode)?.state != .Active {
                 let requestDesktopSiteActivity = RequestDesktopSiteActivity(requestMobileSite: tab.desktopSite) {
@@ -992,6 +993,7 @@ class BrowserViewController: UIViewController {
                 activities.append(requestDesktopSiteActivity)
             }
         }
+        #endif
 
         let helper = ShareExtensionHelper(url: url, tab: tab, activities: activities)
 
