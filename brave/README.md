@@ -27,8 +27,6 @@ Run Product>Test in Xcode to do so. Not all Firefox tests are passing yet.
 
 ## Contribution Notes
 
-The main branch is brave-master, the master is Mozilla's master. If this is too confusing I can remove that master, it isn't absolutely necessary for merging.
-
 Most of the code is in the brave/ directory. The primary design goal has been to preserve easy merging from Firefox iOS upstream, so hopefully code changes outside of that dir are minimal.
 
 To find changes outside of brave/, look for #if BRAVE / #if !BRAVE (#if/#else/#endif is supported by Swift).
