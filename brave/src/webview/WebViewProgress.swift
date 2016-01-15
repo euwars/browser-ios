@@ -6,9 +6,6 @@
 import Foundation
 
 let completedUrlPath: String = "__completedprogress__"
-let initialProgressValue: Double = 0.1;
-let interactiveProgressValue: Double = 0.5;
-let finalProgressValue: Double = 0.9;
 
 public class WebViewProgress
 {
@@ -16,12 +13,56 @@ public class WebViewProgress
     var maxLoadCount: Int = 0;
     var interactive: Bool = false;
 
+    let initialProgressValue: Double = 0.1;
+    let interactiveProgressValue: Double = 0.5;
+    let finalProgressValue: Double = 0.9;
+
     weak var webView: BraveWebView?;
     var currentURL: NSURL?;
 
+    /* After all efforts to catch page load completion in WebViewProgress, sometimes, load completion is *still* missed.
+    As a backup we can do KVO on 'loading'. Which can arrive too early (from subrequests) -and frequently- so delay checking by an arbitrary amount
+    using a timer. The only problem with this is that there is yet more code for load detection, sigh.
+    TODO figure this out. http://thestar.com exhibits this sometimes.
+    Possibly a bug in UIWebView with load completion, but hard to repro, a reload of a page always seems to complete. */
+    private class LoadingObserver : NSObject {
+        private let webView: BraveWebView
+        private var timer: NSTimer?
+
+        init(webView:BraveWebView) {
+            self.webView = webView
+            super.init()
+            webView.addObserver(self, forKeyPath: "loading", options: .New, context: nil)
+        }
+
+        @objc func delayedCompletionCheck() {
+            if webView.loading || webView.estimatedProgress > 0.99 {
+                return
+            }
+
+            let readyState = webView.stringByEvaluatingJavaScriptFromString("document.readyState")?.lowercaseString
+            if readyState == "loaded" || readyState == "complete" {
+                webView.progress.completeProgress()
+            }
+        }
+
+        @objc override func observeValueForKeyPath(keyPath: String?, ofObject object: AnyObject?, change: [String : AnyObject]?, context: UnsafeMutablePointer<Void>) {
+            if let path = keyPath where path == "loading" {
+                if !webView.loading && webView.estimatedProgress < 1.0 {
+                    timer?.invalidate()
+                    timer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "delayedCompletionCheck", userInfo: nil, repeats: false)
+                } else {
+                    timer?.invalidate()
+                }
+            }
+        }
+    }
+    private var loadingObserver: LoadingObserver?
+
     init(parent: BraveWebView) {
         webView = parent
-        currentURL = webView?.request?.URL
+        currentURL = parent.request?.URL
+        loadingObserver = LoadingObserver(webView: parent)
     }
 
     func setProgress(progress: Double) {
@@ -95,6 +136,28 @@ public class WebViewProgress
         loadingCount++
         maxLoadCount = max(maxLoadCount, loadingCount)
         startProgress()
+
+        func injectLoadDetection() {
+            if let scheme = webView?.request?.mainDocumentURL?.scheme,
+                host = webView?.request?.mainDocumentURL?.host
+            {
+                let waitForCompleteJS = String(format:
+                    "if (!__waitForCompleteJS__) {" +
+                        "var __waitForCompleteJS__ = 1;" +
+                        "window.addEventListener('load', function() {" +
+                        "var iframe = document.createElement('iframe');" +
+                        "iframe.style.display = 'none';" +
+                        "iframe.src = '%@://%@/#%@';" +
+                        "document.body.appendChild(iframe);" +
+                    "}, false);}",
+                    scheme,
+                    host,
+                    completedUrlPath);
+                webView?.stringByEvaluatingJavaScriptFromString(waitForCompleteJS)
+            }
+        }
+
+        injectLoadDetection()
     }
 
     public func webViewDidFinishLoad(documentReadyState documentReadyState:String?) {
@@ -111,24 +174,7 @@ public class WebViewProgress
             case "loaded":
                 completeProgress()
             case "interactive":
-                if let scheme = webView?.request?.mainDocumentURL?.scheme,
-                    host = webView?.request?.mainDocumentURL?.host
-                {
-                    interactive = true
-                    let waitForCompleteJS = String(format:
-                        "if (!__waitForCompleteJS__) {" +
-                        "var __waitForCompleteJS__ = 1;" +
-                        "window.addEventListener('load', function() {" +
-                            "var iframe = document.createElement('iframe');" +
-                            "iframe.style.display = 'none';" +
-                            "iframe.src = '%@://%@/#%@';" +
-                            "document.body.appendChild(iframe);" +
-                        "}, false);}",
-                        scheme,
-                        host,
-                        completedUrlPath);
-                    webView?.stringByEvaluatingJavaScriptFromString(waitForCompleteJS)
-                }
+                interactive = true
             case "complete":
                 // When loading consecutive pages, I often see a finishLoad for the previous page
                 // arriving. I have tried webview.stopLoading, and still this seems to arrive. Bizarre.
