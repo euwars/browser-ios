@@ -352,7 +352,7 @@ extension BraveWebView: UIWebViewDelegate {
         kvoBroadcast([KVOStrings.kvoLoading])
 
         #if !TEST
-            let _ = HideEmptyImages(webView: self)
+            HideEmptyImages.runJsInWebView(self)
         #endif
     }
 

@@ -9,17 +9,17 @@ import Storage
 import ReadingList
 
 struct TabTrayControllerUX {
-    static let CornerRadius = CGFloat(4.0)
+    static let CornerRadius = CGFloat(BraveUX.TabTrayCellCornerRadius)
     static let BackgroundColor = UIConstants.AppBackgroundColor
     static let CellBackgroundColor = UIColor(red:0.95, green:0.95, blue:0.95, alpha:1)
     static let TextBoxHeight = CGFloat(32.0)
-    static let FaviconSize = CGFloat(18.0)
+    static let FaviconSize = CGFloat(BraveUX.TabTrayCellFaviconSize)
     static let Margin = CGFloat(15)
     static let ToolbarBarTintColor = UIConstants.AppBackgroundColor
     static let ToolbarButtonOffset = CGFloat(10.0)
-    static let CloseButtonSize = CGFloat(18.0)
-    static let CloseButtonMargin = CGFloat(6.0)
-    static let CloseButtonEdgeInset = CGFloat(10)
+    static let CloseButtonSize = CGFloat(BraveUX.TabTrayCellCloseButtonSize)
+    static let CloseButtonMargin = CGFloat(2.0)
+    static let CloseButtonEdgeInset = CGFloat(6)
 
     static let NumberOfColumnsThin = 1
     static let NumberOfColumnsWide = 3
@@ -87,7 +87,6 @@ class TabCell: UICollectionViewCell {
         self.background.alignLeft = true
         self.background.alignTop = true
 
-        self.favicon.backgroundColor = UIColor.clearColor()
         self.favicon.layer.cornerRadius = 2.0
         self.favicon.layer.masksToBounds = true
 
@@ -100,7 +99,7 @@ class TabCell: UICollectionViewCell {
         self.closeButton = UIButton()
         self.closeButton.setImage(UIImage(named: "stop"), forState: UIControlState.Normal)
         self.closeButton.tintColor = UIColor.lightGrayColor()
-        self.closeButton.imageEdgeInsets = UIEdgeInsetsMake(TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset)
+       // self.closeButton.imageEdgeInsets = UIEdgeInsetsMake(TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset, TabTrayControllerUX.CloseButtonEdgeInset)
 
         self.innerStroke = InnerStrokedView(frame: self.backgroundHolder.frame)
         self.innerStroke.layer.backgroundColor = UIColor.clearColor().CGColor
@@ -146,7 +145,7 @@ class TabCell: UICollectionViewCell {
 
         title.addSubview(self.closeButton)
         title.addSubview(self.titleText)
-        title.addSubview(self.favicon)
+        backgroundHolder.addSubview(self.favicon)
 
         backgroundHolder.addSubview(title)
         self.title = title
@@ -159,35 +158,41 @@ class TabCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        let w = frame.width
-        let h = frame.height
-        backgroundHolder.frame = CGRect(x: margin,
-            y: margin,
-            width: w,
-            height: h)
-        background.frame = CGRect(origin: CGPointMake(0, 0), size: backgroundHolder.frame.size)
+        closeButton.tintColor = BraveUX.ProgressBarColor
 
-        title.frame = CGRect(x: 0,
-            y: 0,
-            width: backgroundHolder.frame.width,
-            height: TabTrayControllerUX.TextBoxHeight)
+        backgroundHolder.snp_makeConstraints { make in
+            make.edges.equalTo(backgroundHolder.superview!)
+        }
 
-        favicon.frame = CGRect(x: 6,
-            y: (TabTrayControllerUX.TextBoxHeight - TabTrayControllerUX.FaviconSize)/2,
-            width: TabTrayControllerUX.FaviconSize,
-            height: TabTrayControllerUX.FaviconSize)
+        background.snp_makeConstraints { make in
+            make.bottom.left.right.equalTo(background.superview!)
+            make.top.equalTo(background.superview!).offset(TabTrayControllerUX.TextBoxHeight)
+        }
 
-        let titleTextLeft = favicon.frame.origin.x + favicon.frame.width + 6
-        titleText.frame = CGRect(x: titleTextLeft,
-            y: 0,
-            width: title.frame.width - titleTextLeft - margin  - TabTrayControllerUX.CloseButtonSize - TabTrayControllerUX.CloseButtonMargin * 2,
-            height: title.frame.height)
+        favicon.snp_makeConstraints { make in
+            make.bottom.left.equalTo(favicon.superview!)
+            make.width.height.equalTo(TabTrayControllerUX.FaviconSize)
+        }
 
-        innerStroke.frame = background.frame
+        title.snp_makeConstraints { make in
+            make.left.top.equalTo(title.superview!)
+            make.width.equalTo(title.superview!.snp_width)
+            make.height.equalTo(TabTrayControllerUX.TextBoxHeight)
+        }
+
+        innerStroke.snp_makeConstraints { make in
+            make.edges.equalTo(background)
+        }
+
+        titleText.snp_makeConstraints { make in
+            make.left.equalTo(closeButton.snp_right)
+            make.top.right.bottom.equalTo(titleText.superview!)
+        }
 
         closeButton.snp_makeConstraints { make in
             make.size.equalTo(title.snp_height)
-            make.trailing.centerY.equalTo(title)
+            make.centerY.equalTo(title)
+            make.left.equalTo(closeButton.superview!)
         }
 
         let top = (TabTrayControllerUX.TextBoxHeight - titleText.bounds.height) / 2.0
@@ -806,17 +811,9 @@ private class TabManagerDataSource: NSObject, UICollectionViewDataSource {
 
         if let favIcon = tab.displayFavicon {
             tabCell.favicon.sd_setImageWithURL(NSURL(string: favIcon.url)!)
-        } else {
-            var defaultFavicon = UIImage(named: "defaultFavicon")
-            if tab.isPrivate {
-                defaultFavicon = defaultFavicon?.imageWithRenderingMode(.AlwaysTemplate)
-                tabCell.favicon.image = defaultFavicon
-                tabCell.favicon.tintColor = UIColor.whiteColor()
-            } else {
-                tabCell.favicon.image = defaultFavicon
-            }
+            tabCell.favicon.backgroundColor = BraveUX.TabTrayCellBackgroundColor
         }
-
+        
         tabCell.background.image = tab.screenshot
         return tabCell
     }

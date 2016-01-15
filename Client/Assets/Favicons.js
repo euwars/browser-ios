@@ -45,4 +45,9 @@ window.addEventListener("load", function() {
   webkit.messageHandlers.faviconsMessageHandler.postMessage(favicons);
 });
 
+var favicons = Favicons.getAll();
+if (favicons) {
+  webkit.messageHandlers.faviconsMessageHandler.postMessage(favicons);
+}
+
 })()

@@ -55,5 +55,9 @@ struct BraveUX {
     
     // Internal use
     static let HeaderBackdropBackgroundColor = UIColor.blackColor()
-    
+
+    static let TabTrayCellCornerRadius = 14.0
+    static let TabTrayCellFaviconSize = 54.0
+    static let TabTrayCellCloseButtonSize = 24.0
+    static let TabTrayCellBackgroundColor = UIColor.whiteColor()
 }
