@@ -56,6 +56,17 @@ static ABPFilterParser parser;
             option  = FOScript;
         }
     }
+    if (option == FONoFilterOption) {
+        if ([url hasSuffix:@".js"]) {
+            option = FOScript;
+        }
+        else if ([url hasSuffix:@".png"] || [url hasSuffix:@".jpg"] || [url hasSuffix:@".jpeg"] || [url hasSuffix:@".gif"]) {
+            option = FOImage;
+        }
+        else if ([url hasSuffix:@".css"]) {
+            option = FOStylesheet;
+        }
+    }
 
     return parser.matches(url.UTF8String, option, mainDoc.UTF8String);
 }
