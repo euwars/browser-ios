@@ -45,7 +45,7 @@
 	<key>Fabric</key>
 	<dict>
 		<key>APIKey</key>
-		<string>***REMOVED***</string>
+		<string>FABRIC_KEY_REMOVED</string>
 		<key>Kits</key>
 		<array>
 			<dict>
@@ -56,7 +56,6 @@
 			</dict>
 		</array>
 	</dict>
-	
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

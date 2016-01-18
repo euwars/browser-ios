@@ -77,3 +77,4 @@ build-id.xcconfig
 ABPFilterParserData.dat
 Client.xcodeproj
 Client/Configuration
+Client/Info.plist
