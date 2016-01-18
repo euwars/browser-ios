@@ -78,12 +78,51 @@ class AdBlocker {
     }
 
     // We can add whitelisting logic here for puzzling adblock problems
-    private func isWhitelistedUrl(url: String, forMainDocDomain domain: String) -> Bool {
+    private func cleanUrlWithArgs(url: String, forMainDocDomain domain: String) -> String? {
         // https://github.com/brave/browser-ios/issues/89
-        if domain.contains("yahoo") && url.contains("s.yimg.com/zz/combo") {
-            return true
+        if !domain.contains("yahoo") || !url.contains("s.yimg.com/zz/combo") {
+            return nil
         }
-        return false
+        guard let pos = url.rangeOfString("?") else { return url }
+        let basePart = url.substringToIndex(pos.startIndex)
+        let urlargs = url.substringFromIndex(pos.startIndex.advancedBy(1))
+        let sanitized = urlargs.characters.split("&").filter {
+            item in
+            let s = String(item)
+            let isBad = s.contains("-ads-")
+            if isBad { print("\(s)") }
+            return !isBad
+        }
+        return "\(basePart)?\(String(sanitized.joinWithSeparator("&".characters)))"
+    }
+
+
+    func sanitizeURL(request: NSURLRequest) -> NSURLRequest? {
+        if !isEnabled {
+            return nil
+        }
+
+        guard var url = request.URL?.absoluteString,
+            var domain = request.mainDocumentURL?.host else {
+                return nil
+        }
+
+        url = stripLocalhostWebServer(url)
+        domain = stripLocalhostWebServer(domain)
+        if let host = request.URL?.host where host.contains(domain) {
+            return nil
+        }
+
+        if !url.contains("&") {
+            return nil
+        }
+
+        if let url = cleanUrlWithArgs(url, forMainDocDomain: domain) {
+            let newRequest = URLProtocol.safeURLRequestClone(request)
+            newRequest.URL = NSURL(string: url)
+            return newRequest
+        }
+        return nil
     }
 
     func shouldBlock(request: NSURLRequest) -> Bool {
@@ -95,29 +134,26 @@ class AdBlocker {
             return false
         }
 
-        guard let url = request.URL,
+        guard var url = request.URL?.absoluteString,
             var domain = request.mainDocumentURL?.host else {
                 return false
         }
 
+        url = stripLocalhostWebServer(url)
         domain = stripLocalhostWebServer(domain)
 
-        if let host = url.host where host.contains(domain) {
-            return false
-        }
-
-        if isWhitelistedUrl(url.absoluteString, forMainDocDomain: domain) {
+        if let host = request.URL?.host where host.contains(domain) {
             return false
         }
 
         // A cache entry is like: fifoOfCachedUrlChunks[0]["www.microsoft.com_http://some.url"] = true/false for blocking
-        let key = "\(domain)_" + stripLocalhostWebServer(url.absoluteString)
+        let key = "\(domain)_" + url
 
         if let urlIsBlocked = fifoOfCachedUrlChunks.containsAndIsBlocked(key) {
             return urlIsBlocked
         }
 
-        let isBlocked = AdBlockCppFilter.singleton().checkWithCppABPFilter(url.absoluteString,
+        let isBlocked = AdBlockCppFilter.singleton().checkWithCppABPFilter(url,
             mainDocumentUrl: domain,
             acceptHTTPHeader:request.valueForHTTPHeaderField("Accept"))
 

@@ -26,23 +26,31 @@ class URLProtocol: NSURLProtocol {
     }
 
     override class func canonicalRequestForRequest(request: NSURLRequest) -> NSURLRequest {
+        if let newRequest = AdBlocker.singleton.sanitizeURL(request) {
+            return newRequest
+        }
         return request
+    }
+
+    static func safeURLRequestClone(urlRequest: NSURLRequest) -> NSMutableURLRequest {
+        // Reportedly not safe to use built-in cloning methods: http://openradar.appspot.com/11596316
+        let newRequest = NSMutableURLRequest(URL: urlRequest.URL ?? NSURL(), cachePolicy: urlRequest.cachePolicy, timeoutInterval: urlRequest.timeoutInterval)
+        newRequest.allHTTPHeaderFields = urlRequest.allHTTPHeaderFields
+        if let m = urlRequest.HTTPMethod {
+            newRequest.HTTPMethod = m
+        }
+        if let b = urlRequest.HTTPBodyStream {
+            newRequest.HTTPBodyStream = b
+        }
+        if let b = urlRequest.HTTPBody {
+            newRequest.HTTPBody = b
+        }
+        return newRequest
     }
 
     override func startLoading() {
         // Reportedly not safe to use built-in cloning methods: http://openradar.appspot.com/11596316
-        let newRequest = NSMutableURLRequest(URL: request.URL!, cachePolicy: request.cachePolicy, timeoutInterval: request.timeoutInterval)
-        newRequest.allHTTPHeaderFields = request.allHTTPHeaderFields
-        if let m = request.HTTPMethod {
-            newRequest.HTTPMethod = m
-        }
-        if let b = request.HTTPBodyStream {
-            newRequest.HTTPBodyStream = b
-        }
-        if let b = request.HTTPBody {
-            newRequest.HTTPBody = b
-        }
-
+        let newRequest = URLProtocol.safeURLRequestClone(request)
         NSURLProtocol.setProperty(true, forKey: markerRequestHandled, inRequest: newRequest)
         self.connection = NSURLConnection(request: newRequest, delegate: self)
 
