@@ -91,6 +91,9 @@ class BraveContextMenu {
             let info = ["point": NSValue(CGPoint: tapLocation)]
             NSNotificationCenter.defaultCenter().postNotificationName(kNotificationMainWindowTapAndHold, object: self, userInfo: info)
             guard let bvc = getApp().browserViewController else { return }
+            if bvc.urlBar.inOverlayMode {
+                return
+            }
             bvc.showContextMenu(elements: tappedElement, touchPoint: tapLocation)
             resetTimer()
             return

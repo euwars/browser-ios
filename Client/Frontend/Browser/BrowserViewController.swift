@@ -2430,6 +2430,9 @@ extension BrowserViewController: ContextMenuHelperDelegate {
       // different page loads).
       let touchPoint = gestureRecognizer.locationInView(view)
       #if BRAVE
+        if urlBar.inOverlayMode {
+            return
+        }
         if touchPoint == CGPointZero && UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad {
           print("zero touchpoint for context menu: \(elements)")
           return
