@@ -77,6 +77,15 @@ class AdBlocker {
         updateEnabledState()
     }
 
+    // We can add whitelisting logic here for puzzling adblock problems
+    private func isWhitelistedUrl(url: String, forMainDocDomain domain: String) -> Bool {
+        // https://github.com/brave/browser-ios/issues/89
+        if domain.contains("yahoo") && url.contains("s.yimg.com/zz/combo") {
+            return true
+        }
+        return false
+    }
+
     func shouldBlock(request: NSURLRequest) -> Bool {
         // synchronize code from this point on.
         objc_sync_enter(self)
@@ -94,6 +103,10 @@ class AdBlocker {
         domain = stripLocalhostWebServer(domain)
 
         if let host = url.host where host.contains(domain) {
+            return false
+        }
+
+        if isWhitelistedUrl(url.absoluteString, forMainDocDomain: domain) {
             return false
         }
 
