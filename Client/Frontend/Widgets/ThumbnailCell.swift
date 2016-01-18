@@ -225,10 +225,11 @@ class ThumbnailCell: UICollectionViewCell {
 
         // TODO: We can avoid creating this button at all if we're not in editing mode.
         var frame = removeButton.frame
-        let insets = cellInsets
         frame.size = CGSize(width: ThumbnailCellUX.RemoveButtonSize, height: ThumbnailCellUX.RemoveButtonSize)
-        frame.center = CGPoint(x: insets.left, y: insets.top)
-        removeButton.frame = frame
+ #if BRAVE
+        frame.center = CGPoint(x: 26, y: 10)
+ #endif
+       removeButton.frame = frame
     }
 
     override func prepareForReuse() {

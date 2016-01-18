@@ -249,8 +249,9 @@ class TopSitesPanel: UIViewController {
 extension TopSitesPanel: HomePanel {
     func endEditing() {
         editingThumbnails = false
-
         collection?.reloadData()
+
+        (view.window as! BraveMainWindow).windowTouchFilter = nil
     }
 }
 
@@ -287,6 +288,7 @@ extension TopSitesPanel: ThumbnailCellDelegate {
 
     func didLongPressThumbnail(thumbnailCell: ThumbnailCell) {
         editingThumbnails = true
+        (view.window as! BraveMainWindow).windowTouchFilter = self
     }
 }
 
@@ -605,3 +607,15 @@ private class TopSitesDataSource: NSObject, UICollectionViewDataSource {
         return cell
     }
 }
+
+#if BRAVE
+extension TopSitesPanel : WindowTouchFilter {
+    func filterTouch(touch: UITouch) -> Bool {
+        if (touch.view as? UIButton) == nil && touch.phase == .Began {
+            self.endEditing()
+            return true
+        }
+        return false
+    }
+}
+#endif
