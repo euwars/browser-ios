@@ -21,6 +21,10 @@ After a git pull (i.e. updating from the remote) run
 
 The Xcode project is generated, so local changes won't persist. And if files are added/removed after updating, your project won't be in sync unless the above command is run. 
 
+## Crash reporting using Fabric
+
+To enable, add ~/.brave-fabric-keys with 2 lines, the API key and build secret. Re-run ./brave-proj.py and the project will be generated to use Fabric and Crashlytics frameworks.
+
 ## Tests
 
 Run Product>Test in Xcode to do so. Not all Firefox tests are passing yet.
