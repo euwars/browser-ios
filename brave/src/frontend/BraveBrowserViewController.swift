@@ -35,6 +35,10 @@ class BraveBrowserViewController : BrowserViewController {
         footerBackdrop.accessibilityLabel = "footerBackdrop"
     }
 
+    override func SELtappedTopArea() {
+     //   scrollController.showToolbars(animated: true)
+    }
+
     func braveWebContainerConstraintSetup() {
         webViewContainer.snp_remakeConstraints { make in
             make.left.right.equalTo(self.view)
