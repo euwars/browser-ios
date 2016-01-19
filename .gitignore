@@ -78,3 +78,4 @@ ABPFilterParserData.dat
 Client.xcodeproj
 Client/Configuration
 Client/Info.plist
+/brave/xcconfig/.fabric-override.xcconfig

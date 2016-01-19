@@ -18,14 +18,17 @@ except:
 os.system('\\cp -f ../Client.xcodeproj.tgz /tmp; cd /tmp; tar xzf Client*tgz; cd -; ' +
           'rsync -ar /tmp/Client.xcodeproj/* ../Client.xcodeproj')
 
-fabric_keys = ''
+fabric_keys = None
 try:
     key_path = os.path.expanduser('~/.brave-fabric-keys')
     with open(key_path) as f:
       fabric_keys = [x.strip() for x in f.readlines()]
     os.system("sed -e 's/FABRIC_KEY_REMOVED/fabric_keys[0]/' ../Client/Info.plist.template > ../Client/Info.plist")
+    os.system("> xcconfig/.fabric-override.xcconfig")
 except:
     print 'no fabric keys'
+    os.system("\\cp -f ../Client/Info.plist.template ../Client/Info.plist")
+    os.system("echo 'OTHER_SWIFT_FLAGS = -DBRAVE -DDEBUG -DNO_FABRIC' > xcconfig/.fabric-override.xcconfig")
 
 def modpbxproj():
     from mod_pbxproj import XcodeProject, PBXBuildFile
@@ -78,6 +81,8 @@ def modpbxproj():
         config = project.objects.data[config_id]
         settings = config.data['buildSettings'].data
         settings['OTHER_SWIFT_FLAGS'] = '-D TEST -D BRAVE -D DEBUG'
+        if not fabric_keys:
+            settings['OTHER_SWIFT_FLAGS'] += " -D NO_FABRIC"
 
     group = project.get_or_create_group('abp-filter-parser-cpp', path='brave/node_modules/abp-filter-parser-cpp', parent=topgroup)
     for f in ['ABPFilterParser.h', 'ABPFilterParser.cpp', 'filter.cpp',
@@ -95,8 +100,9 @@ def modpbxproj():
     arr = project.root_group.data['children'].data
     arr.insert(0, arr.pop())
 
-    project.add_file('Fabric.framework', target='Client')
-    project.add_file('Crashlytics.framework', target='Client')
+    if fabric_keys:
+        project.add_file('Fabric.framework', target='Client')
+        project.add_file('Crashlytics.framework', target='Client')
 
     configs = [p for p in project.objects.values() if p.get('isa') == 'XCBuildConfiguration']
     for i in configs:

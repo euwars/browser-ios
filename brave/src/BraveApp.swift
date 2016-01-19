@@ -1,9 +1,11 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
+import Shared
+#if !NO_FABRIC
 import Fabric
 import Crashlytics
-import Shared
+#endif
 
 private let _singleton = BraveApp()
 
@@ -52,7 +54,9 @@ class BraveApp {
 
     // Be aware: the Prefs object has not been created yet
     class func willFinishLaunching_begin() {
+#if !NO_FABRIC
         Fabric.with([Crashlytics.self])
+#endif
         BraveApp.setupCacheDefaults()
         NSURLProtocol.registerClass(URLProtocol);
 
