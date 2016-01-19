@@ -167,7 +167,7 @@ private extension BraveScrollController {
 
         lastContentOffset = translation.y
         if isScrollHeightIsLargeEnoughForScrolling() {
-            scrollWithDelta(delta)
+            scrollToolbarsWithDelta(delta)
         }
 
         if gesture.state == .Ended || gesture.state == .Cancelled {
@@ -175,7 +175,7 @@ private extension BraveScrollController {
         }
     }
 
-    func scrollWithDelta(delta: CGFloat) {
+    func scrollToolbarsWithDelta(delta: CGFloat) {
         if scrollViewHeight >= contentSize.height {
             return
         }
@@ -193,12 +193,17 @@ private extension BraveScrollController {
 
         verticalTranslation = updatedOffset
 
-        header?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, verticalTranslation))
-        footer?.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, -verticalTranslation))
+        if (fabs(updatedOffset) > 0 && fabs(updatedOffset) < UIConstants.ToolbarHeight) {
+            // this stops parallax effect where the scrolling rate is doubled while hiding/showing toolbars
+            scrollView?.contentOffset = CGPoint(x: contentOffset.x, y: contentOffset.y - delta)
+        }
+
+        header?.layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, verticalTranslation))
+        footer?.layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, -verticalTranslation))
 
         let webViewVertTranslation = toolbarsShowing ? verticalTranslation : verticalTranslation - UIConstants.ToolbarHeight
         let webView = getApp().browserViewController.webViewContainer
-        webView.layer.sublayerTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, webViewVertTranslation))
+        webView.layer.transform = CATransform3DMakeAffineTransform(CGAffineTransformMakeTranslation(0, webViewVertTranslation))
 
         var alpha = 1 - abs(verticalTranslation / UIConstants.ToolbarHeight)
         if (!toolbarsShowing) {
@@ -351,8 +356,9 @@ extension BraveScrollController: UIScrollViewDelegate {
         }
         
         verticalTranslation = 0
-        header?.layer.sublayerTransform = CATransform3DIdentity
-        footer?.layer.sublayerTransform = CATransform3DIdentity
+        header?.layer.transform = CATransform3DIdentity
+        footer?.layer.transform = CATransform3DIdentity
+
         
     }
     
