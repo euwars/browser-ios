@@ -1,4 +1,4 @@
-# Brave iOS Browser: see readme in brave/
+# Brave iOS Browser: see readme in [brave dir](brave/README.md)
 
 Firefox for iOS
 ===============
